@@ -418,3 +418,11 @@
     .price-table .time{display:inline-block;margin-left:9px}
     .price-table .time::before{content:"· "}
   }
+
+  /* ---- CRO: соцдоказательство и заметка у CTA (лендинги) ---- */
+  .trustbar{display:flex;flex-wrap:wrap;align-items:center;gap:5px 12px;margin-top:16px;font-size:.85rem;color:var(--muted)}
+  .trustbar b{color:var(--ink);font-weight:700}
+  .trustbar .tb-star{color:#E0A100;font-weight:700;white-space:nowrap}
+  .trustbar .sep{opacity:.4}
+  .cta-note{margin-top:12px;font-size:.86rem;color:var(--muted);display:inline-flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .cta-note b{color:var(--ink);font-weight:600}
