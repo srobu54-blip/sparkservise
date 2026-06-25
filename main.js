@@ -1,3 +1,4 @@
+  /* ====== Lightweight, runs immediately (header/nav/reveal/callbar/modal) ====== */
   var hdr=document.getElementById('hdr');
   addEventListener('scroll',function(){hdr.style.boxShadow=scrollY>6?'0 6px 20px -14px rgba(0,0,0,.25)':'none'},{passive:true});
   var b=document.getElementById('burger'),m=document.getElementById('mnav');
@@ -9,58 +10,95 @@
     document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
   } else { document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('in')}); }
 
-  /* ---- Price calculator (demo data, no backend) ---- */
-  var DATA={
-    iphone:{label:"iPhone",
-      models:["iPhone 16 Pro Max","iPhone 16 Pro","iPhone 16","iPhone 15 Pro Max","iPhone 15 Pro","iPhone 15","iPhone 14 Pro","iPhone 14","iPhone 13","iPhone 12","iPhone 11","iPhone SE"],
-      problems:{"Замена экрана (дисплея)":[1200,7500],"Замена аккумулятора":[850,2400],"Замена стекла":[900,3800],"Не заряжается (разъём)":[750,1900],"После воды":[700,4500],"Замена камеры":[800,3200],"Динамик / микрофон":[700,2200],"Face ID":[1500,4500]}},
-    macbook:{label:"MacBook",
-      models:["MacBook Pro 14/16 (M-series)","MacBook Pro 13","MacBook Air (M-series)","MacBook Air 13","MacBook Pro Retina","MacBook Air (старый)"],
-      problems:{"Замена матрицы":[3500,16000],"Замена клавиатуры":[1800,6500],"Замена аккумулятора":[1500,4500],"Чистка после воды":[1200,6000],"Не включается (плата)":[2000,9000],"Апгрейд SSD / RAM":[900,3500]}},
-    ipad:{label:"iPad",
-      models:["iPad Pro 12.9","iPad Pro 11","iPad Air","iPad","iPad mini"],
-      problems:{"Замена стекла (тачскрина)":[1200,5500],"Замена дисплея":[1800,9000],"Замена аккумулятора":[1200,3000],"Не заряжается (разъём)":[900,2200],"После воды":[1000,4500]}},
-    watch:{label:"Apple Watch",
-      models:["Apple Watch Ultra","Series 9 / 8 / 7","Series 6 / SE","Series 5 / 4","Series 3 и старше"],
-      problems:{"Замена стекла":[900,3500],"Замена дисплея":[1500,6000],"Замена аккумулятора":[800,2200],"После воды":[700,3000]}},
-    airpods:{label:"AirPods",
-      models:["AirPods Pro 2","AirPods Pro","AirPods 3","AirPods 2","AirPods Max"],
-      problems:{"Чистка":[400,900],"Не заряжаются":[500,1500],"Замена амбушюр / сетки":[400,1200],"Диагностика звука":[300,800]}}
-  };
-  function tierMult(model){
-    if(/Ultra|16 Pro Max|16 Pro|Pro 14\/16|Pro Max/.test(model)) return 1.5;
-    if(/16|15 Pro|15|Series 9|Pro 11|Pro 12\.9|Air \(M|AirPods Pro 2|Max/.test(model)) return 1.2;
-    if(/14|13|Series 8|Series 7|Air|iPad\b|AirPods 3|AirPods Pro\b/.test(model)) return 0.95;
-    return 0.7;
-  }
-  function r50(n){return Math.round(n/50)*50;}
-  var elDev=document.getElementById('cDevice'),elModel=document.getElementById('cModel'),elProb=document.getElementById('cProblem'),
-      elPrice=document.getElementById('cPrice'),elMeta=document.getElementById('cMeta');
-  var curDev='iphone';
-  function fill(sel,arr){sel.innerHTML='';arr.forEach(function(v){var o=document.createElement('option');o.textContent=v;sel.appendChild(o);});}
-  function buildDevices(){
-    Object.keys(DATA).forEach(function(k,i){
-      var btn=document.createElement('button');btn.type='button';btn.className='seg-btn'+(i===0?' on':'');btn.textContent=DATA[k].label;btn.dataset.k=k;
-      btn.addEventListener('click',function(){curDev=k;elDev.querySelectorAll('.seg-btn').forEach(function(x){x.classList.remove('on')});btn.classList.add('on');loadDevice();});
-      elDev.appendChild(btn);
-    });
-  }
-  function loadDevice(){fill(elModel,DATA[curDev].models);fill(elProb,Object.keys(DATA[curDev].problems));calc();}
-  function calc(){
-    var d=DATA[curDev],prob=elProb.value,model=elModel.value;
-    if(!d.problems[prob]){elPrice.textContent='-';elMeta.innerHTML='';return;}
-    var base=d.problems[prob],m=tierMult(model);
-    var lo=r50(base[0]*m),hi=r50(base[1]*Math.min(m,1.3));
-    if(hi<=lo) hi=lo+ r50(base[0]*0.3);
-    elPrice.innerHTML='от '+lo.toLocaleString('ru-RU')+' <small>до '+hi.toLocaleString('ru-RU')+' ₴</small>';
-    var t=(curDev==='iphone')?'30-60 минут':'от 1 часа';
-    elMeta.innerHTML='<span class="free">Диагностика 0 ₴</span><span>Гарантия 12 мес</span><span>Срок: '+t+'</span>';
-  }
-  elModel.addEventListener('change',calc);elProb.addEventListener('change',calc);
-  buildDevices();loadDevice();
-
-  /* ---- Smart booking forms (modal + inline): same approach, reusable ---- */
+  /* ---- Sticky call bar: threshold cached, recomputed only on resize (no per-frame layout read) ---- */
   (function(){
+    var bar=document.querySelector('.callbar');
+    if(!bar) return;
+    var hero=document.querySelector('.hero');
+    var threshold=200, ticking=false;
+    function measure(){ threshold = hero ? Math.max(hero.offsetHeight-100, 200) : window.innerHeight*0.8; }
+    function check(){ bar.classList.toggle('show', window.scrollY > threshold); ticking=false; }
+    function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(check); } }
+    window.addEventListener('scroll', onScroll, {passive:true});
+    window.addEventListener('resize', function(){ measure(); check(); }, {passive:true});
+    measure(); check();
+  })();
+
+  /* ---- Booking modal: open/close is lightweight and wired now;
+          the heavy form validation + price calculator are deferred (initHeavy) ---- */
+  var modal=document.getElementById('bookModal'), modalCard=null, modalName=null, lastFocus=null;
+  if(modal){
+    modalCard=modal.querySelector('.modal-card'); modalName=document.getElementById('mName');
+    var openM=function(){lastFocus=document.activeElement;initHeavy();modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');requestAnimationFrame(function(){modal.classList.add('show');});setTimeout(function(){if(modalName)modalName.focus();},360);};
+    var closeM=function(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');setTimeout(function(){modal.classList.remove('open');modalCard.classList.remove('done');},300);if(lastFocus&&lastFocus.focus)lastFocus.focus();};
+    document.addEventListener('click',function(e){
+      var op=e.target.closest('a[href="#book"],[data-book]');
+      if(op){e.preventDefault();openM();return;}
+      if(e.target.closest('[data-close]'))closeM();
+    });
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal.classList.contains('open'))closeM();});
+  }
+
+  /* ====== Deferred heavy work: price calculator + smart form validation ======
+     Runs on first idle, first scroll, first pointer, or when the modal opens —
+     whichever comes first. Keeps it off the critical render path. ====== */
+  var heavyDone=false;
+  function initHeavy(){
+    if(heavyDone) return; heavyDone=true;
+
+    /* ---- Price calculator (demo data, no backend) ---- */
+    var DATA={
+      iphone:{label:"iPhone",
+        models:["iPhone 16 Pro Max","iPhone 16 Pro","iPhone 16","iPhone 15 Pro Max","iPhone 15 Pro","iPhone 15","iPhone 14 Pro","iPhone 14","iPhone 13","iPhone 12","iPhone 11","iPhone SE"],
+        problems:{"Замена экрана (дисплея)":[1200,7500],"Замена аккумулятора":[850,2400],"Замена стекла":[900,3800],"Не заряжается (разъём)":[750,1900],"После воды":[700,4500],"Замена камеры":[800,3200],"Динамик / микрофон":[700,2200],"Face ID":[1500,4500]}},
+      macbook:{label:"MacBook",
+        models:["MacBook Pro 14/16 (M-series)","MacBook Pro 13","MacBook Air (M-series)","MacBook Air 13","MacBook Pro Retina","MacBook Air (старый)"],
+        problems:{"Замена матрицы":[3500,16000],"Замена клавиатуры":[1800,6500],"Замена аккумулятора":[1500,4500],"Чистка после воды":[1200,6000],"Не включается (плата)":[2000,9000],"Апгрейд SSD / RAM":[900,3500]}},
+      ipad:{label:"iPad",
+        models:["iPad Pro 12.9","iPad Pro 11","iPad Air","iPad","iPad mini"],
+        problems:{"Замена стекла (тачскрина)":[1200,5500],"Замена дисплея":[1800,9000],"Замена аккумулятора":[1200,3000],"Не заряжается (разъём)":[900,2200],"После воды":[1000,4500]}},
+      watch:{label:"Apple Watch",
+        models:["Apple Watch Ultra","Series 9 / 8 / 7","Series 6 / SE","Series 5 / 4","Series 3 и старше"],
+        problems:{"Замена стекла":[900,3500],"Замена дисплея":[1500,6000],"Замена аккумулятора":[800,2200],"После воды":[700,3000]}},
+      airpods:{label:"AirPods",
+        models:["AirPods Pro 2","AirPods Pro","AirPods 3","AirPods 2","AirPods Max"],
+        problems:{"Чистка":[400,900],"Не заряжаются":[500,1500],"Замена амбушюр / сетки":[400,1200],"Диагностика звука":[300,800]}}
+    };
+    function tierMult(model){
+      if(/Ultra|16 Pro Max|16 Pro|Pro 14\/16|Pro Max/.test(model)) return 1.5;
+      if(/16|15 Pro|15|Series 9|Pro 11|Pro 12\.9|Air \(M|AirPods Pro 2|Max/.test(model)) return 1.2;
+      if(/14|13|Series 8|Series 7|Air|iPad\b|AirPods 3|AirPods Pro\b/.test(model)) return 0.95;
+      return 0.7;
+    }
+    function r50(n){return Math.round(n/50)*50;}
+    var elDev=document.getElementById('cDevice'),elModel=document.getElementById('cModel'),elProb=document.getElementById('cProblem'),
+        elPrice=document.getElementById('cPrice'),elMeta=document.getElementById('cMeta');
+    if(elDev&&elModel&&elProb){
+      var curDev='iphone';
+      var fill=function(sel,arr){sel.innerHTML='';arr.forEach(function(v){var o=document.createElement('option');o.textContent=v;sel.appendChild(o);});};
+      var loadDevice=function(){fill(elModel,DATA[curDev].models);fill(elProb,Object.keys(DATA[curDev].problems));calc();};
+      var buildDevices=function(){
+        Object.keys(DATA).forEach(function(k,i){
+          var btn=document.createElement('button');btn.type='button';btn.className='seg-btn'+(i===0?' on':'');btn.textContent=DATA[k].label;btn.dataset.k=k;
+          btn.addEventListener('click',function(){curDev=k;elDev.querySelectorAll('.seg-btn').forEach(function(x){x.classList.remove('on')});btn.classList.add('on');loadDevice();});
+          elDev.appendChild(btn);
+        });
+      };
+      var calc=function(){
+        var dd=DATA[curDev],prob=elProb.value,model=elModel.value;
+        if(!dd.problems[prob]){elPrice.textContent='-';elMeta.innerHTML='';return;}
+        var base=dd.problems[prob],mm=tierMult(model);
+        var lo=r50(base[0]*mm),hi=r50(base[1]*Math.min(mm,1.3));
+        if(hi<=lo) hi=lo+ r50(base[0]*0.3);
+        elPrice.innerHTML='от '+lo.toLocaleString('ru-RU')+' <small>до '+hi.toLocaleString('ru-RU')+' ₴</small>';
+        var t=(curDev==='iphone')?'30-60 минут':'от 1 часа';
+        elMeta.innerHTML='<span class="free">Диагностика 0 ₴</span><span>Гарантия 12 мес</span><span>Срок: '+t+'</span>';
+      };
+      elModel.addEventListener('change',calc);elProb.addEventListener('change',calc);
+      buildDevices();loadDevice();
+    }
+
+    /* ---- Smart booking forms (modal + inline): same approach, reusable ---- */
     var OPS=[
       {n:'Kyivstar',c:['67','68','96','97','98','77']},
       {n:'Vodafone',c:['50','66','95','99']},
@@ -110,36 +148,17 @@
       update();
     }
 
-    var modal=document.getElementById('bookModal');
     if(modal){
-      var card=modal.querySelector('.modal-card'), nameEl=document.getElementById('mName');
-      wireForm({root:card,name:nameEl,phone:document.getElementById('mPhone'),dev:document.getElementById('mDevice'),hint:document.getElementById('mPhoneHint'),bar:document.getElementById('mpBar'),pct:document.getElementById('mPct'),submit:document.getElementById('mSubmit'),dotsWrap:document.getElementById('mPhoneDots'),summary:document.getElementById('msSummary')});
-      var lastFocus=null;
-      function openM(){lastFocus=document.activeElement;modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');requestAnimationFrame(function(){modal.classList.add('show');});setTimeout(function(){if(nameEl)nameEl.focus();},360);}
-      function closeM(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');setTimeout(function(){modal.classList.remove('open');card.classList.remove('done');},300);if(lastFocus&&lastFocus.focus)lastFocus.focus();}
-      document.addEventListener('click',function(e){
-        var op=e.target.closest('a[href="#book"],[data-book]');
-        if(op){e.preventDefault();openM();return;}
-        if(e.target.closest('[data-close]'))closeM();
-      });
-      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal.classList.contains('open'))closeM();});
+      wireForm({root:modalCard,name:modalName,phone:document.getElementById('mPhone'),dev:document.getElementById('mDevice'),hint:document.getElementById('mPhoneHint'),bar:document.getElementById('mpBar'),pct:document.getElementById('mPct'),submit:document.getElementById('mSubmit'),dotsWrap:document.getElementById('mPhoneDots'),summary:document.getElementById('msSummary')});
     }
 
     var inlineRoot=document.getElementById('bookFormInline');
     if(inlineRoot){
       wireForm({root:inlineRoot,name:inlineRoot.querySelector('.js-name'),phone:inlineRoot.querySelector('.js-phone'),dev:inlineRoot.querySelector('.js-device'),hint:inlineRoot.querySelector('.js-hint'),bar:inlineRoot.querySelector('.js-bar'),pct:inlineRoot.querySelector('.js-pct'),submit:inlineRoot.querySelector('.js-submit'),dotsWrap:inlineRoot.querySelector('.js-dots'),summary:inlineRoot.querySelector('.js-summary')});
     }
-  })();
+  }
 
-  (function(){
-    var bar=document.querySelector('.callbar');
-    if(!bar) return;
-    var hero=document.querySelector('.hero');
-    var ticking=false;
-    function point(){ return hero ? Math.max(hero.offsetHeight-100, 200) : window.innerHeight*0.8; }
-    function check(){ bar.classList.toggle('show', window.scrollY > point()); ticking=false; }
-    function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(check); } }
-    window.addEventListener('scroll', onScroll, {passive:true});
-    window.addEventListener('resize', onScroll, {passive:true});
-    check();
-  })();
+  if('requestIdleCallback' in window){ requestIdleCallback(initHeavy,{timeout:1500}); }
+  else { setTimeout(initHeavy,800); }
+  addEventListener('scroll', initHeavy, {passive:true, once:true});
+  addEventListener('pointerdown', initHeavy, {once:true});

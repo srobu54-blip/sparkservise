@@ -313,11 +313,11 @@
       document.addEventListener('click',function(e){var op=e.target.closest('a[href="#book"],[data-book]');if(op){e.preventDefault();openM();return;}if(e.target.closest('[data-close]'))closeM();});
       document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal.classList.contains('open'))closeM();});}
   })();
-  (function(){var bar=document.querySelector('.callbar');if(!bar) return;var hero=document.querySelector('.page-hero,.art');var ticking=false;
-    function point(){ return hero ? Math.max(hero.offsetHeight-100, 200) : window.innerHeight*0.8; }
-    function check(){ bar.classList.toggle('show', window.scrollY > point()); ticking=false; }
+  (function(){var bar=document.querySelector('.callbar');if(!bar) return;var hero=document.querySelector('.page-hero,.art');var threshold=200, ticking=false;
+    function measure(){ threshold = hero ? Math.max(hero.offsetHeight-100, 200) : window.innerHeight*0.8; }
+    function check(){ bar.classList.toggle('show', window.scrollY > threshold); ticking=false; }
     function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(check); } }
-    window.addEventListener('scroll', onScroll, {passive:true});window.addEventListener('resize', onScroll, {passive:true});check();})();
+    window.addEventListener('scroll', onScroll, {passive:true});window.addEventListener('resize', function(){ measure(); check(); }, {passive:true});measure(); check();})();
 </script>
 </body>
 </html>
