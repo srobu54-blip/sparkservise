@@ -172,8 +172,8 @@
   .svc .tag{position:absolute;top:24px;left:26px;background:var(--spark);color:#fff;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:5px 10px;border-radius:999px}
   .svc h3{font-size:1.3rem;font-weight:700;color:#fff;margin-bottom:9px}
   .svc p{color:#A9AEBC;font-size:.98rem;margin-bottom:18px}
-  .svc a.lk{color:#fff;font-weight:600;display:inline-flex;align-items:center;gap:7px;margin-top:auto}
-  .svc a.lk .ar{color:var(--spark);display:inline-block;transition:transform .3s cubic-bezier(.22,.61,.36,1)}
+  .svc a.lk{color:#fff;font-weight:600;display:inline-block;margin-top:auto;line-height:1.45}
+  .svc a.lk .ar{color:var(--spark);display:inline-block;margin-left:6px;transition:transform .3s cubic-bezier(.22,.61,.36,1)}
   .svc:hover a.lk .ar{transform:translateX(5px)}
   .svc a.lk::after{content:"";position:absolute;inset:0;border-radius:inherit}
 
