@@ -1,0 +1,44 @@
+# SPARK — сервисный центр Apple в Одессе
+
+> Независимый сервисный центр по ремонту техники Apple в Одессе. Работаем с 2017 года (9+ лет), выполнено более 32 000 ремонтов, рейтинг 4.9★ на Google (127 отзывов). Ремонтируем iPhone, MacBook, iMac, iPad, Apple Watch и AirPods. Бесплатная диагностика, гарантия до 12 месяцев, оплата по факту без предоплаты.
+
+SPARK — это независимая мастерская (не авторизованный и не официальный сервис Apple). Специализируемся только на технике Apple: от замены экранов и аккумуляторов до сложного ремонта на уровне платы (микропайка) и восстановления после залития водой.
+
+Ключевые факты:
+- Адрес: ул. Академика Королёва, 23, Одесса (рядом с Киевским рынком)
+- Телефон: +38 (096) 075-54-52
+- Часы работы: Пн–Сб 10:00–19:00, Вс — выходной
+- Канонический домен: https://sparkservice.od.ua/
+- Гарантия: до 12 месяцев; диагностика бесплатная; без предоплаты
+
+## Ремонт устройств Apple
+
+- [Ремонт iPhone](https://sparkservice.od.ua/remont-iphone/): хаб ремонта iPhone со всеми моделями и ценами; отсюда ведут отдельные страницы по каждой модели.
+- [Ремонт MacBook](https://sparkservice.od.ua/remont-macbook/): замена клавиатур, матриц, чистка системы охлаждения, ремонт платы MacBook Air и Pro.
+- [Ремонт iMac](https://sparkservice.od.ua/remont-imac/): ремонт и апгрейд моноблоков iMac.
+- [Ремонт iPad](https://sparkservice.od.ua/remont-ipad/): замена экранов, аккумуляторов и разъёмов iPad.
+- [Ремонт Apple Watch](https://sparkservice.od.ua/remont-apple-watch/): замена стекла/дисплея и аккумулятора часов.
+- [Ремонт AirPods](https://sparkservice.od.ua/remont-airpods/): диагностика и восстановление наушников AirPods.
+
+## Услуги
+
+- [Разблокировка iCloud](https://sparkservice.od.ua/razblokirovka-icloud/): легальная отвязка Apple ID / iCloud.
+- [Разблокировка iPhone](https://sparkservice.od.ua/razblokirovka-iphone/): разблокировка iPhone.
+- [Диагностика](https://sparkservice.od.ua/diagnostika/): бесплатная диагностика техники Apple с точной ценой и сроком до начала работ.
+- [Восстановление данных](https://sparkservice.od.ua/vosstanovlenie-dannyh/): восстановление данных с устройств Apple.
+
+## О компании и контакты
+
+- [О компании](https://sparkservice.od.ua/o-kompanii/): история сервиса с 2017 года, цифры, команда, гарантии и принципы работы.
+- [Контакты](https://sparkservice.od.ua/kontakty/): адрес, карта, телефон, часы работы и схема проезда.
+
+## Блог
+
+- [Блог SPARK](https://sparkservice.od.ua/blog/): статьи о ремонте и обслуживании техники Apple.
+- [Оригинал или копия дисплея iPhone](https://sparkservice.od.ua/blog/original-ili-kopiya-displeya-iphone/): чем отличаются дисплеи и что выбрать.
+- [iPhone упал в воду — что делать](https://sparkservice.od.ua/blog/iphone-upal-v-vodu-chto-delat/): пошаговая инструкция после залития.
+- [Почему быстро садится батарея iPhone](https://sparkservice.od.ua/blog/pochemu-bystro-saditsya-batareya/): причины и решения.
+
+## Optional
+
+- [Карта сайта (sitemap.xml)](https://sparkservice.od.ua/sitemap.xml): полный список всех страниц, включая отдельные страницы по каждой модели iPhone.
