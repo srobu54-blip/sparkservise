@@ -315,6 +315,7 @@ def render(tid):
         "@@OFFER_PRICE@@": str(batt_low), "@@OFFER_BATT@@": money(batt_low), "@@FROM_PRICE@@": money(batt_low),
         "@@PORT@@": port, "@@BIO_HUMAN@@": bio_human, "@@BIO_SEO@@": bio_seo, "@@BACK_SEO@@": back_seo,
         "@@SCREEN_FEAT@@": screen_feat, "@@SAVE_LINE@@": save_line, "@@DISP_HUMAN@@": disp_human,
+        "@@BACK_HERO@@": ("задней крышки и " if has_back else ""),
         "@@FAQ_JSON@@": faq_json, "@@FAQ_HTML@@": faq_html, "@@PRICE_ROWS@@": price_rows,
         "@@REPAIR_CARDS@@": repair_cards, "@@OTHER_MODELS@@": other_links, "@@BOOK_OPTIONS@@": opts,
         "@@HERO_ART@@": hero_art, "@@MODEL_NOTES@@": NOTES.get(slug, f"Сервисный центр SPARK ремонтирует {name} в Одессе — экран, аккумулятор, разъём, камеры, плата."),
@@ -484,7 +485,7 @@ TEMPLATE = r'''<!DOCTYPE html>
       <div class="page-hero-copy">
         <span class="eyebrow">Ремонт @@NAME@@ в Одессе</span>
         <h1>Ремонт @@NAME@@</h1>
-        <p class="sub">Замена экрана и аккумулятора, ремонт @@BIO_HUMAN@@, @@PORT@@ разъёма, задней крышки и платы. Сохраняем @@SCREEN_FEAT@@. Бесплатная диагностика, оригинальные запчасти и гарантия до 12 месяцев. Чаще всего — за 30-60 минут при вас.</p>
+        <p class="sub">Замена экрана и аккумулятора, ремонт @@BIO_HUMAN@@, @@PORT@@ разъёма, @@BACK_HERO@@платы. Сохраняем @@SCREEN_FEAT@@. Бесплатная диагностика, оригинальные запчасти и гарантия до 12 месяцев. Чаще всего — за 30-60 минут при вас.</p>
         <div class="hero-cta">
           <a class="btn btn-spark" href="#book">Записаться</a>
           <a class="btn btn-line" href="tel:+380960755452">☎ Позвонить</a>
