@@ -276,7 +276,7 @@
           foot.innerHTML='Всего голосов: <b>'+t.toLocaleString("ru-RU")+'</b>';
           var win=OPTS.reduce(function(a,b){return counts[a.k]>=counts[b.k]?a:b;});
           var mineO=null; OPTS.forEach(function(o){if(o.k===mine)mineO=o;}); if(!mineO)mineO=win;
-          ctatext.innerHTML='Чаще всего к нам несут <b>'+win.label+'</b>. Нужен ремонт?';
+          ctatext.innerHTML='Нужен ремонт вашего iPhone?';
           ctabtn.textContent=mineO.svc+' →';
         }
         function vote(k){
