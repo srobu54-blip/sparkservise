@@ -227,13 +227,28 @@ def render(dev, m):
     else:
         hero_art = '<div class="model-photo-wrap">\n          <div class="photo-fallback">\n            %s\n          </div>\n        </div>' % svg
 
+    # Лид-формулировки device-aware: у AirPods нет экрана/дисплея
+    if dev == "airpods":
+        lead_title = "чистка, аккумулятор, замена амбушюр"
+        lead_desc = "чистку, замену аккумулятора, амбушюр и защитных сеток, ремонт зарядного кейса и диагностику звука"
+        og_desc = "Чистка, замена аккумулятора и амбушюр, ремонт зарядного кейса. Бесплатная диагностика, гарантия 12 мес. ул. Академика Королёва, 23, Одесса."
+        lead_kw = f"чистка {name}, замена амбушюр {name}, не заряжаются {name}, замена аккумулятора {name}"
+        hero_sub = f"Чистка наушников и зарядного кейса, замена аккумулятора, амбушюр и защитных сеток, восстановление зарядки и звука {name}. Бесплатная диагностика, оригинальные запчасти и гарантия до 12 месяцев."
+    else:
+        lead_title = "замена экрана, батареи, после воды"
+        lead_desc = "замену экрана/дисплея, аккумулятора, разъёма зарядки, ремонт после воды и микропайку платы"
+        og_desc = "Замена экрана, батареи, ремонт после воды и платы. Бесплатная диагностика, гарантия 12 мес. ул. Академика Королёва, 23, Одесса."
+        lead_kw = f"замена экрана {name}, замена дисплея {name}, замена аккумулятора {name}"
+        hero_sub = f"Замена экрана и аккумулятора, ремонт разъёма зарядки, восстановление после воды и микропайка платы {name}. Бесплатная диагностика, оригинальные запчасти и гарантия до 12 месяцев."
+
     repl = {
         "@@NAME@@": name, "@@DEVLABEL@@": dev_label, "@@HUB@@": hub, "@@INTRO@@": d["intro"],
         "@@CANON@@": canon, "@@OG_IMAGE@@": OG_IMAGE, "@@FROM_PRICE@@": money(from_price),
         "@@OFFER_PRICE@@": str(pr[cheap_key][0]), "@@OFFER_DESC@@": cat[cheap_key][1] + " " + name + " от " + money(pr[cheap_key][0]) + " ₴",
         "@@PRICE_ROWS@@": price_rows, "@@REPAIR_CARDS@@": repair_cards, "@@FAQ_JSON@@": faq_json,
         "@@FAQ_HTML@@": faq_html, "@@OTHER@@": other, "@@BOOK_OPTIONS@@": opts, "@@HERO_ART@@": hero_art,
-        "@@NOTE@@": m["note"],
+        "@@NOTE@@": m["note"], "@@LEAD_TITLE@@": lead_title, "@@LEAD_DESC@@": lead_desc,
+        "@@OG_DESC@@": og_desc, "@@LEAD_KW@@": lead_kw, "@@HERO_SUB@@": hero_sub,
     }
     html = TEMPLATE
     for k, v in repl.items():
@@ -246,15 +261,15 @@ TEMPLATE = r'''<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ремонт @@NAME@@ в Одессе — замена экрана, батареи, после воды | SPARK</title>
-<meta name="description" content="Ремонт @@NAME@@ в Одессе: замена экрана/дисплея, аккумулятора, разъёма, ремонт после воды и платы. Бесплатная диагностика, оригинальные запчасти, гарантия 12 мес. ☎ +38 (096) 075-54-52">
-<meta name="keywords" content="ремонт @@NAME@@, ремонт @@NAME@@ Одесса, замена экрана @@NAME@@, замена дисплея @@NAME@@, замена аккумулятора @@NAME@@, @@NAME@@ после воды, сервисный центр Apple Одесса">
+<title>Ремонт @@NAME@@ в Одессе — @@LEAD_TITLE@@ | SPARK</title>
+<meta name="description" content="Ремонт @@NAME@@ в Одессе: @@LEAD_DESC@@. Бесплатная диагностика, оригинальные запчасти, гарантия 12 мес. ☎ +38 (096) 075-54-52">
+<meta name="keywords" content="ремонт @@NAME@@, ремонт @@NAME@@ Одесса, @@LEAD_KW@@, @@NAME@@ после воды, сервисный центр Apple Одесса">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="@@CANON@@">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Ремонт @@NAME@@ в Одессе | SPARK">
-<meta property="og:description" content="Замена экрана, батареи, ремонт после воды и платы. Бесплатная диагностика, гарантия 12 мес. ул. Академика Королёва, 23, Одесса.">
+<meta property="og:description" content="@@OG_DESC@@">
 <meta property="og:url" content="@@CANON@@">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:image" content="@@OG_IMAGE@@">
@@ -262,7 +277,7 @@ TEMPLATE = r'''<!DOCTYPE html>
 <script type="application/ld+json">
 {
   "@context":"https://schema.org","@type":"Service","@id":"@@CANON@@#service",
-  "name":"Ремонт @@NAME@@ в Одессе","description":"Профессиональный ремонт @@NAME@@: замена экрана/дисплея, аккумулятора, разъёма зарядки, ремонт после воды и микропайка платы. Гарантия до 12 месяцев.",
+  "name":"Ремонт @@NAME@@ в Одессе","description":"Профессиональный ремонт @@NAME@@: @@LEAD_DESC@@. Гарантия до 12 месяцев.",
   "provider":{"@type":"Organization","name":"SPARK","url":"https://sparkservice.od.ua/","telephone":"+380960755452","address":{"@type":"PostalAddress","streetAddress":"ул. Академика Королёва, 23","addressLocality":"Одесса","addressCountry":"UA"}},
   "areaServed":{"@type":"City","name":"Одесса"},
   "serviceType":"Ремонт @@NAME@@",
@@ -400,7 +415,7 @@ TEMPLATE = r'''<!DOCTYPE html>
       <div class="page-hero-copy">
         <span class="eyebrow">Ремонт @@NAME@@ в Одессе</span>
         <h1>Ремонт @@NAME@@</h1>
-        <p class="sub">Замена экрана и аккумулятора, ремонт разъёма зарядки, восстановление после воды и микропайка платы @@NAME@@. Бесплатная диагностика, оригинальные запчасти и гарантия до 12 месяцев.</p>
+        <p class="sub">@@HERO_SUB@@</p>
         <div class="hero-cta">
           <a class="btn btn-spark" href="#book">Записаться</a>
           <a class="btn btn-line" href="tel:+380960755452">☎ Позвонить</a>
@@ -445,7 +460,7 @@ TEMPLATE = r'''<!DOCTYPE html>
       <div class="sec-head reveal">
         <span class="sec-tag">Виды ремонта</span>
         <h2>Что ремонтируем в @@NAME@@</h2>
-        <p class="lead-p">Беремся за любые неисправности @@NAME@@ — от замены экрана до микропайки платы. Точную цену и срок назовём после бесплатной диагностики.</p>
+        <p class="lead-p">Беремся за любые неисправности @@NAME@@ — от мелкого ремонта до микропайки платы. Точную цену и срок назовём после бесплатной диагностики.</p>
       </div>
       <div class="repair-types">
         @@REPAIR_CARDS@@
