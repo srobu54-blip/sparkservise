@@ -1,29 +1,237 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+assemble_model.py — генератор spoke-страниц моделей iPhone (remont-iphone/<slug>/).
+Шаблон повторяет руками сделанную remont-iphone/iphone-17-pro-max/index.html,
+но параметризован: порт (Lightning/USB-C), ProMotion (только Pro), тип матрицы
+(LCD у iPhone 11), цены берутся из PRICES (синхронны с TIERS в хабе).
+
+Как добавить модель: допиши запись в MODELS (+ цены в PRICES) → python3 _build/assemble_model.py.
+Если в папке модели лежит <slug>.webp — он покажется как реальное фото; иначе SVG-макет.
+Пути относительные: глубина 2 → ../../ (главная/нав), ../<slug>/ (соседняя модель).
+"""
+import os
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE = "https://sparkservice.od.ua"
+OG_IMAGE = BASE + "/og/spark.jpg"
+
+# Порядок сервисов в прайсе/JSON (ключи совпадают с TIERS в хабе)
+SVC_ORDER = [
+    ("Замена экрана (дисплея)", "30-60 мин"),
+    ("Замена аккумулятора", "30-40 мин"),
+    ("Замена заднего стекла", "1-2 часа"),
+    ("__CHARGE__", "30-50 мин"),  # подменяется на "Не заряжается (<порт> разъём)"
+    ("После воды", "от 2 часов"),
+    ("Замена камеры", "40-60 мин"),
+    ("Динамик / микрофон", "30-50 мин"),
+    ("Face ID", "1-3 часа"),
+    ("Ремонт платы", "1-3 дня"),
+]
+
+# Цены [низ, верх] по сервисам — синхронно с TIERS (var TIERS в remont-iphone/index.html)
+PRICES = {
+    "11":   {"Замена экрана (дисплея)":[1500,2200],"Замена аккумулятора":[850,1200],"Замена заднего стекла":[1000,1600],"Не заряжается (разъём)":[750,1100],"После воды":[700,2500],"Замена камеры":[900,1400],"Динамик / микрофон":[700,1200],"Face ID":[1500,2500],"Ремонт платы":[1200,3800]},
+    "12":   {"Замена экрана (дисплея)":[1800,2600],"Замена аккумулятора":[850,1300],"Замена заднего стекла":[1200,1800],"Не заряжается (разъём)":[800,1200],"После воды":[750,2800],"Замена камеры":[1000,1500],"Динамик / микрофон":[750,1300],"Face ID":[1600,2800],"Ремонт платы":[1400,4200]},
+    "13":   {"Замена экрана (дисплея)":[2200,3000],"Замена аккумулятора":[900,1400],"Замена заднего стекла":[1300,2000],"Не заряжается (разъём)":[850,1300],"После воды":[800,3000],"Замена камеры":[1100,1600],"Динамик / микрофон":[800,1400],"Face ID":[1800,3000],"Ремонт платы":[1500,4500]},
+    "13pm": {"Замена экрана (дисплея)":[3200,4200],"Замена аккумулятора":[1000,1500],"Замена заднего стекла":[1500,2200],"Не заряжается (разъём)":[900,1350],"После воды":[900,3200],"Замена камеры":[1200,1800],"Динамик / микрофон":[850,1500],"Face ID":[2000,3200],"Ремонт платы":[1600,4800]},
+    "14":   {"Замена экрана (дисплея)":[2600,3400],"Замена аккумулятора":[1000,1500],"Замена заднего стекла":[1500,2200],"Не заряжается (разъём)":[900,1400],"После воды":[900,3200],"Замена камеры":[1200,1800],"Динамик / микрофон":[900,1500],"Face ID":[2000,3200],"Ремонт платы":[1600,4800]},
+    "14p":  {"Замена экрана (дисплея)":[3800,5000],"Замена аккумулятора":[1200,1800],"Замена заднего стекла":[1800,2600],"Не заряжается (разъём)":[1000,1500],"После воды":[1100,3600],"Замена камеры":[1500,2200],"Динамик / микрофон":[1000,1700],"Face ID":[2200,3600],"Ремонт платы":[1800,5500]},
+    "14pm": {"Замена экрана (дисплея)":[4200,5400],"Замена аккумулятора":[1300,1900],"Замена заднего стекла":[2000,2800],"Не заряжается (разъём)":[1050,1550],"После воды":[1200,3800],"Замена камеры":[1600,2400],"Динамик / микрофон":[1050,1800],"Face ID":[2400,3800],"Ремонт платы":[2000,5800]},
+    "15":   {"Замена экрана (дисплея)":[3200,4200],"Замена аккумулятора":[1200,1700],"Замена заднего стекла":[1800,2400],"Не заряжается (разъём)":[1000,1500],"После воды":[1000,3500],"Замена камеры":[1400,2000],"Динамик / микрофон":[1000,1600],"Face ID":[2200,3400],"Ремонт платы":[1800,5200]},
+    "15p":  {"Замена экрана (дисплея)":[4200,5400],"Замена аккумулятора":[1400,1900],"Замена заднего стекла":[2000,2800],"Не заряжается (разъём)":[1100,1600],"После воды":[1200,3800],"Замена камеры":[1600,2400],"Динамик / микрофон":[1100,1800],"Face ID":[2400,3800],"Ремонт платы":[2000,5800]},
+    "15pm": {"Замена экрана (дисплея)":[5000,6200],"Замена аккумулятора":[1500,2100],"Замена заднего стекла":[2200,3200],"Не заряжается (разъём)":[1200,1700],"После воды":[1300,4000],"Замена камеры":[1800,2600],"Динамик / микрофон":[1200,1900],"Face ID":[2600,4000],"Ремонт платы":[2200,6200]},
+    "16":   {"Замена экрана (дисплея)":[4000,5200],"Замена аккумулятора":[1400,2000],"Замена заднего стекла":[2000,2800],"Не заряжается (разъём)":[1100,1600],"После воды":[1200,3800],"Замена камеры":[1600,2400],"Динамик / микрофон":[1100,1800],"Face ID":[2400,3800],"Ремонт платы":[2000,6000]},
+    "16pm": {"Замена экрана (дисплея)":[6500,7500],"Замена аккумулятора":[1800,2400],"Замена заднего стекла":[2800,3800],"Не заряжается (разъём)":[1400,1900],"После воды":[1500,4500],"Замена камеры":[2200,3200],"Динамик / микрофон":[1500,2200],"Face ID":[3000,4500],"Ремонт платы":[2500,7000]},
+}
+
+# Спецификации моделей (порядок = приоритет по спросу Ahrefs UA)
+MODELS = [
+    {"name":"iPhone 11",          "slug":"iphone-11",          "tier":"11",   "port":"Lightning", "promotion":False, "display":"LCD"},
+    {"name":"iPhone 13",          "slug":"iphone-13",          "tier":"13",   "port":"Lightning", "promotion":False, "display":"OLED"},
+    {"name":"iPhone 14",          "slug":"iphone-14",          "tier":"14",   "port":"Lightning", "promotion":False, "display":"OLED"},
+    {"name":"iPhone 16",          "slug":"iphone-16",          "tier":"16",   "port":"USB-C",     "promotion":False, "display":"OLED"},
+    {"name":"iPhone 15",          "slug":"iphone-15",          "tier":"15",   "port":"USB-C",     "promotion":False, "display":"OLED"},
+    {"name":"iPhone 15 Pro",      "slug":"iphone-15-pro",      "tier":"15p",  "port":"USB-C",     "promotion":True,  "display":"OLED"},
+    {"name":"iPhone 16 Pro Max",  "slug":"iphone-16-pro-max",  "tier":"16pm", "port":"USB-C",     "promotion":True,  "display":"OLED"},
+    {"name":"iPhone 14 Pro",      "slug":"iphone-14-pro",      "tier":"14p",  "port":"Lightning", "promotion":True,  "display":"OLED"},
+    {"name":"iPhone 15 Pro Max",  "slug":"iphone-15-pro-max",  "tier":"15pm", "port":"USB-C",     "promotion":True,  "display":"OLED"},
+    {"name":"iPhone 13 Pro Max",  "slug":"iphone-13-pro-max",  "tier":"13pm", "port":"Lightning", "promotion":True,  "display":"OLED"},
+    {"name":"iPhone 14 Pro Max",  "slug":"iphone-14-pro-max",  "tier":"14pm", "port":"Lightning", "promotion":True,  "display":"OLED"},
+    {"name":"iPhone 12",          "slug":"iphone-12",          "tier":"12",   "port":"Lightning", "promotion":False, "display":"OLED"},
+]
+
+def money(n):
+    return f"{n:,}".replace(",", " ")
+
+def rng(p):
+    return f"{money(p[0])} — {money(p[1])} ₴"
+
+def translit(name):
+    return (name.replace("iPhone", "айфон").replace("Pro Max", "про макс")
+                .replace("Pro", "про").replace("Plus", "плюс").replace("mini", "мини").replace("Air", "эйр"))
+
+def esc_attr(s):
+    return s.replace('"', "&quot;")
+
+def render(m):
+    name, slug, port, promo, disp = m["name"], m["slug"], m["port"], m["promotion"], m["display"]
+    pr = PRICES[m["tier"]]
+    canon = f"{BASE}/remont-iphone/{slug}/"
+    charge_label = f"Не заряжается ({port} разъём)"
+    batt_low = pr["Замена аккумулятора"][0]
+    screen_rng = rng(pr["Замена экрана (дисплея)"])
+
+    # Экран: фичи зависят от Pro (ProMotion) и матрицы (LCD/OLED)
+    if promo:
+        screen_feat = "True Tone, ProMotion 120 Гц и влагозащиту"
+        screen_feat_short = "True Tone и частоту обновления ProMotion 120 Гц"
+        disp_q = f"Сохранится ли True Tone и ProMotion 120 Гц после замены экрана {name}?"
+        disp_a = f"Да. Мы переносим данные дисплея — True Tone и частота обновления ProMotion 120 Гц сохраняются как на оригинальных, так и на качественных совместимых экранах."
+    else:
+        screen_feat = "True Tone и влагозащиту"
+        screen_feat_short = "True Tone"
+        disp_q = f"Сохранится ли True Tone после замены экрана {name}?"
+        disp_a = f"Да. Мы переносим данные дисплея — функция True Tone сохраняется как на оригинальных, так и на качественных совместимых экранах {name}."
+    disp_human = "OLED-дисплей" if disp == "OLED" else "ЖК-дисплей (LCD)"
+
+    # Прайс-таблица
+    rows = ['<tr><td class="svc-name free">Диагностика</td><td class="pr free">Бесплатно</td><td class="time">при вас</td></tr>']
+    for key, t in SVC_ORDER:
+        label = charge_label if key == "__CHARGE__" else key
+        pkey = "Не заряжается (разъём)" if key == "__CHARGE__" else key
+        rows.append(f'<tr><td class="svc-name">{label}</td><td class="pr">{rng(pr[pkey])}</td><td class="time">{t}</td></tr>')
+    price_rows = "\n            ".join(rows)
+
+    # FAQ (видимый + JSON-LD)
+    faq = [
+        (f"Сколько стоит замена экрана {name}?",
+         f"От {money(pr['Замена экрана (дисплея)'][0])} до {money(pr['Замена экрана (дисплея)'][1])} ₴ в зависимости от типа запчасти (оригинал или качественный совместимый дисплей). Точную цену мастер назовёт после бесплатной диагностики."),
+        ("Сколько времени занимает ремонт?",
+         f"Замена экрана и аккумулятора {name} — 30-60 минут при вас. Ремонт после воды и микропайка платы — от нескольких часов до 1-3 дней."),
+        (disp_q, disp_a),
+        (f"Ремонтируете ли вы {port} разъём {name}?",
+         f"Да. Если {name} не заряжается или заряд идёт через раз — чистим или меняем {port} разъём. Стоимость от {money(pr['Не заряжается (разъём)'][0])} ₴, ремонт 30-50 минут."),
+        (f"Можно ли починить {name} после воды?",
+         "В 70-80% случаев — да. Важно не пытаться заряжать и не сушить феном, а сразу привезти к нам. Чем раньше — тем выше шанс на успешный ремонт."),
+        ("Какая гарантия на ремонт?",
+         "До 12 месяцев на запчасти и работы. Срок указан в чеке для каждой услуги."),
+    ]
+    faq_json = ",\n    ".join(
+        '{"@type":"Question","name":%s,"acceptedAnswer":{"@type":"Answer","text":%s}}' % (jstr(q), jstr(a))
+        for q, a in faq)
+    faq_html_items = []
+    for i, (q, a) in enumerate(faq):
+        op = " open" if i == 0 else ""
+        faq_html_items.append(f'<details{op}><summary>{q}</summary><div class="a">{a}</div></details>')
+    faq_html = "\n        ".join(faq_html_items)
+
+    # Соседние модели (топ-6 других по приоритету) + хаб
+    others = [x for x in MODELS if x["slug"] != slug][:6]
+    other_links = "\n          ".join(f'<a href="../{x["slug"]}/">{x["name"]}</a>' for x in others)
+    other_links += '\n          <a href="../">Все модели iPhone →</a>'
+
+    # Опции в формах
+    opts = "\n              ".join("<option>%s</option>" % o for o in [
+        f"{name} — разбит экран", f"{name} — не держит батарея", f"{name} — не заряжается",
+        f"{name} — после воды / не включается", f"{name} — Face ID не работает",
+        f"{name} — проблема с камерой", f"{name} — другое"])
+
+    # Hero-арт: реальное фото если есть <slug>.webp, иначе SVG-макет
+    out_dir = os.path.join(REPO, "remont-iphone", slug)
+    has_photo = os.path.exists(os.path.join(out_dir, slug + ".webp"))
+    svg = (
+        '<svg class="phone" viewBox="0 0 300 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="%s">\n'
+        '              <defs>\n'
+        '                <linearGradient id="frm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a3d45"/><stop offset=".5" stop-color="#15171c"/><stop offset="1" stop-color="#2b2e36"/></linearGradient>\n'
+        '                <linearGradient id="scr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c1f27"/><stop offset="1" stop-color="#0f1117"/></linearGradient>\n'
+        '              </defs>\n'
+        '              <rect x="284" y="150" width="5" height="58" rx="2.5" fill="#2c2f38"/>\n'
+        '              <rect x="11" y="150" width="5" height="34" rx="2.5" fill="#2c2f38"/>\n'
+        '              <rect x="11" y="196" width="5" height="34" rx="2.5" fill="#2c2f38"/>\n'
+        '              <rect x="16" y="6" width="268" height="588" rx="48" fill="url(#frm)"/>\n'
+        '              <rect x="22" y="12" width="256" height="576" rx="43" fill="#0a0b0e"/>\n'
+        '              <rect x="28" y="18" width="244" height="564" rx="38" fill="url(#scr)"/>\n'
+        '              <rect x="120" y="30" width="60" height="20" rx="10" fill="#000"/>\n'
+        '              <text x="50" y="44" fill="#aeb3bf" font-family="-apple-system,Arial" font-size="14" font-weight="600">9:41</text>\n'
+        '              <rect x="231" y="34" width="22" height="11" rx="3" fill="none" stroke="#aeb3bf" stroke-width="1.3"/>\n'
+        '              <rect x="233" y="36" width="15" height="7" rx="1.5" fill="#aeb3bf"/>\n'
+        '              <text x="150" y="290" text-anchor="middle" fill="#fff" font-family="-apple-system,Arial" font-size="22" font-weight="700">%s</text>\n'
+        '              <text x="150" y="318" text-anchor="middle" fill="#878d99" font-family="-apple-system,Arial" font-size="13">Ремонт · SPARK · Одесса</text>\n'
+        '            </svg>' % (esc_attr(name), name)
+    )
+    if has_photo:
+        hero_art = (
+            '<div class="model-photo-wrap">\n'
+            '          <img class="model-photo" src="%s.webp" alt="Ремонт %s в Одессе — сервисный центр SPARK" width="500" height="500" fetchpriority="high" onload="var f=document.getElementById(\'photoFallback\');if(f)f.remove()" onerror="this.remove()">\n'
+            '          <div id="photoFallback" class="photo-fallback">\n            %s\n          </div>\n'
+            '        </div>' % (slug, esc_attr(name), svg)
+        )
+    else:
+        hero_art = (
+            '<div class="model-photo-wrap">\n'
+            '          <div class="photo-fallback">\n            %s\n          </div>\n'
+            '        </div>' % svg
+        )
+
+    repl = {
+        "@@NAME@@": name,
+        "@@TRANSLIT@@": translit(name),
+        "@@CANON@@": canon,
+        "@@OG_IMAGE@@": OG_IMAGE,
+        "@@OFFER_PRICE@@": str(batt_low),
+        "@@OFFER_BATT@@": money(batt_low),
+        "@@SCREEN_RNG@@": screen_rng,
+        "@@FROM_PRICE@@": money(batt_low),
+        "@@PORT@@": port,
+        "@@SCREEN_FEAT@@": screen_feat,
+        "@@SCREEN_FEAT_SHORT@@": screen_feat_short,
+        "@@DISP_HUMAN@@": disp_human,
+        "@@FAQ_JSON@@": faq_json,
+        "@@FAQ_HTML@@": faq_html,
+        "@@PRICE_ROWS@@": price_rows,
+        "@@OTHER_MODELS@@": other_links,
+        "@@BOOK_OPTIONS@@": opts,
+        "@@HERO_ART@@": hero_art,
+        "@@CHARGE_LABEL@@": charge_label,
+    }
+    html = TEMPLATE
+    for k, v in repl.items():
+        html = html.replace(k, v)
+    return html, out_dir
+
+
+def jstr(s):
+    """JSON-строка с экранированием."""
+    return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+TEMPLATE = r'''<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ремонт iPhone 17 Pro Max в Одессе — замена экрана, батареи, Face ID | SPARK</title>
-<meta name="description" content="Ремонт iPhone 17 Pro Max в Одессе: замена экрана, аккумулятора, Face ID, USB-C разъёма, после воды. Бесплатная диагностика, оригинальные запчасти, гарантия 12 мес, ремонт за 30-60 мин. ☎ +38 (096) 075-54-52">
-<meta name="keywords" content="ремонт iPhone 17 Pro Max, ремонт айфон 17 про макс Одесса, замена экрана iPhone 17 Pro Max, замена дисплея iPhone 17 Pro Max, замена батареи iPhone 17 Pro Max, замена аккумулятора iPhone 17 Pro Max, Face ID iPhone 17 Pro Max, замена стекла iPhone 17 Pro Max, сервисный центр Apple Одесса">
+<title>Ремонт @@NAME@@ в Одессе — замена экрана, батареи, Face ID | SPARK</title>
+<meta name="description" content="Ремонт @@NAME@@ в Одессе: замена экрана, аккумулятора, Face ID, @@PORT@@ разъёма, после воды. Бесплатная диагностика, оригинальные запчасти, гарантия 12 мес, ремонт за 30-60 мин. ☎ +38 (096) 075-54-52">
+<meta name="keywords" content="ремонт @@NAME@@, ремонт @@TRANSLIT@@ Одесса, замена экрана @@NAME@@, замена дисплея @@NAME@@, замена батареи @@NAME@@, замена аккумулятора @@NAME@@, Face ID @@NAME@@, замена стекла @@NAME@@, сервисный центр Apple Одесса">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://sparkservice.od.ua/remont-iphone/iphone-17-pro-max/">
+<link rel="canonical" href="@@CANON@@">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Ремонт iPhone 17 Pro Max в Одессе | SPARK">
-<meta property="og:description" content="Замена экрана, батареи, Face ID, USB-C. Бесплатная диагностика, гарантия 12 мес. ул. Академика Королёва, 23, Одесса.">
-<meta property="og:url" content="https://sparkservice.od.ua/remont-iphone/iphone-17-pro-max/">
+<meta property="og:title" content="Ремонт @@NAME@@ в Одессе | SPARK">
+<meta property="og:description" content="Замена экрана, батареи, Face ID, @@PORT@@. Бесплатная диагностика, гарантия 12 мес. ул. Академика Королёва, 23, Одесса.">
+<meta property="og:url" content="@@CANON@@">
 <meta property="og:locale" content="ru_RU">
-<meta property="og:image" content="https://sparkservice.od.ua/remont-iphone/iphone-17-pro-max/iphone-17-pro-max.webp">
+<meta property="og:image" content="@@OG_IMAGE@@">
 
 <script type="application/ld+json">
 {
-  "@context":"https://schema.org","@type":"Service","@id":"https://sparkservice.od.ua/remont-iphone/iphone-17-pro-max/#service",
-  "name":"Ремонт iPhone 17 Pro Max в Одессе","description":"Профессиональный ремонт iPhone 17 Pro Max: замена экрана, аккумулятора, Face ID, USB-C разъёма, задней крышки, ремонт после воды и микропайка платы. Гарантия до 12 месяцев.",
+  "@context":"https://schema.org","@type":"Service","@id":"@@CANON@@#service",
+  "name":"Ремонт @@NAME@@ в Одессе","description":"Профессиональный ремонт @@NAME@@: замена экрана, аккумулятора, Face ID, @@PORT@@ разъёма, задней крышки, ремонт после воды и микропайка платы. Гарантия до 12 месяцев.",
   "provider":{"@type":"Organization","name":"SPARK","url":"https://sparkservice.od.ua/","telephone":"+380960755452","address":{"@type":"PostalAddress","streetAddress":"ул. Академика Королёва, 23","addressLocality":"Одесса","addressCountry":"UA"}},
   "areaServed":{"@type":"City","name":"Одесса"},
-  "serviceType":"Ремонт iPhone 17 Pro Max",
-  "offers":{"@type":"Offer","priceCurrency":"UAH","price":"2000","description":"Замена аккумулятора iPhone 17 Pro Max от 2000 ₴"}
+  "serviceType":"Ремонт @@NAME@@",
+  "offers":{"@type":"Offer","priceCurrency":"UAH","price":"@@OFFER_PRICE@@","description":"Замена аккумулятора @@NAME@@ от @@OFFER_BATT@@ ₴"}
 }
 </script>
 <script type="application/ld+json">
@@ -32,18 +240,14 @@
   "itemListElement":[
     {"@type":"ListItem","position":1,"name":"Главная","item":"https://sparkservice.od.ua/"},
     {"@type":"ListItem","position":2,"name":"Ремонт iPhone","item":"https://sparkservice.od.ua/remont-iphone/"},
-    {"@type":"ListItem","position":3,"name":"iPhone 17 Pro Max","item":"https://sparkservice.od.ua/remont-iphone/iphone-17-pro-max/"}
+    {"@type":"ListItem","position":3,"name":"@@NAME@@","item":"@@CANON@@"}
   ]
 }
 </script>
 <script type="application/ld+json">
 {
   "@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-    {"@type":"Question","name":"Сколько стоит замена экрана iPhone 17 Pro Max?","acceptedAnswer":{"@type":"Answer","text":"Замена экрана (дисплея) iPhone 17 Pro Max — от 7 500 до 8 800 ₴ в зависимости от типа запчасти (оригинал или совместимый). Точную цену мастер назовёт после бесплатной диагностики."}},
-    {"@type":"Question","name":"Сколько времени занимает ремонт iPhone 17 Pro Max?","acceptedAnswer":{"@type":"Answer","text":"Замена экрана и аккумулятора iPhone 17 Pro Max — 30-60 минут при вас. Ремонт после воды и микропайка платы — от нескольких часов до 1-3 дней."}},
-    {"@type":"Question","name":"Сохранится ли True Tone и ProMotion 120 Гц после замены экрана?","acceptedAnswer":{"@type":"Answer","text":"Да. Мы переносим данные дисплея, True Tone и частота обновления ProMotion 120 Гц сохраняются. Это касается оригинальных и качественных совместимых дисплеев."}},
-    {"@type":"Question","name":"Ремонтируете ли вы USB-C разъём iPhone 17 Pro Max?","acceptedAnswer":{"@type":"Answer","text":"Да. Если iPhone 17 Pro Max не заряжается или заряд идёт через раз — меняем USB-C разъём. Стоимость от 1 500 ₴, ремонт 30-50 минут."}},
-    {"@type":"Question","name":"Даёте ли гарантию на ремонт iPhone 17 Pro Max?","acceptedAnswer":{"@type":"Answer","text":"Да, гарантия до 12 месяцев на запчасти и работы. Срок указан в чеке для каждой услуги."}}
+    @@FAQ_JSON@@
   ]
 }
 </script>
@@ -63,14 +267,10 @@
   .page-hero .quick b{color:var(--text);font-weight:600}
   @media(min-width:920px){.page-hero .wrap{grid-template-columns:1.15fr .85fr;gap:48px;padding-top:20px}}
 
-  /* --- Слот под реальное фото --- */
   .model-photo-wrap{display:flex;justify-content:center;align-items:center}
   .model-photo{width:100%;max-width:360px;height:auto;display:block;filter:drop-shadow(0 22px 38px rgba(16,18,26,.20))}
   @media(min-width:920px){.model-photo{max-width:430px}}
   .photo-fallback{position:relative;width:100%;max-width:340px}
-  .photo-fallback .ph-note{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);font-size:.72rem;color:#878d99;background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.25);border-radius:8px;padding:4px 10px;white-space:nowrap}
-
-  /* .price-table / .ptable-wrap — адаптивные, вынесены в styles.css */
 
   .repair-types{display:grid;grid-template-columns:1fr;gap:14px;margin-top:24px}
   .rtype{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:22px;transition:transform .3s,box-shadow .3s,border-color .3s}
@@ -161,62 +361,30 @@
 
   <div class="wrap">
     <div class="bc" aria-label="Хлебные крошки">
-      <a href="../../">Главная</a><span>›</span><a href="../../remont-iphone/">Ремонт iPhone</a><span>›</span><span>iPhone 17 Pro Max</span>
+      <a href="../../">Главная</a><span>›</span><a href="../../remont-iphone/">Ремонт iPhone</a><span>›</span><span>@@NAME@@</span>
     </div>
   </div>
 
   <section class="page-hero">
     <div class="wrap">
       <div class="page-hero-copy">
-        <span class="eyebrow">Ремонт iPhone 17 Pro Max в Одессе</span>
-        <h1>Ремонт iPhone 17 Pro Max</h1>
-        <p class="sub">Замена экрана и аккумулятора, восстановление Face ID, ремонт USB-C разъёма, задней крышки и платы. Сохраняем True Tone и ProMotion 120 Гц. Бесплатная диагностика, оригинальные запчасти и гарантия до 12 месяцев. Чаще всего — за 30-60 минут при вас.</p>
+        <span class="eyebrow">Ремонт @@NAME@@ в Одессе</span>
+        <h1>Ремонт @@NAME@@</h1>
+        <p class="sub">Замена экрана и аккумулятора, восстановление Face ID, ремонт @@PORT@@ разъёма, задней крышки и платы. Сохраняем @@SCREEN_FEAT@@. Бесплатная диагностика, оригинальные запчасти и гарантия до 12 месяцев. Чаще всего — за 30-60 минут при вас.</p>
         <div class="hero-cta">
           <a class="btn btn-spark" href="#book">Записаться</a>
           <a class="btn btn-line" href="tel:+380960755452">☎ Позвонить</a>
         </div>
         <p class="cta-note">⏱ <b>Перезвоним за 15 минут</b> · без предоплаты</p>
-        <div class="trustbar"><span class="tb-star">★ 4.9</span> <b>Google</b><span class="sep">·</span>127 отзывов<span class="sep">·</span><b>32 000</b> ремонтов<span class="sep">·</span>9 лет</div>
+        <div class="trustbar"><span class="tb-star">★ 4.9</span> <b>Google</b><span class="sep">·</span>127 отзывов<span class="sep">·</span><b>32 000</b> ремонтов<span class="sep">·</span>9 лет</div>
         <div class="quick">
           <span>📍 <b>ул. Академика Королёва, 23</b></span>
           <span>🕐 <b>Пн-Сб 10:00-19:00</b></span>
-          <span>🛠 <b>от 2 000 ₴</b></span>
+          <span>🛠 <b>от @@FROM_PRICE@@ ₴</b></span>
         </div>
       </div>
       <div class="hero-art">
-        <!-- ====================================================================
-             РЕАЛЬНОЕ ФОТО: файл iphone-17-pro-max.webp в этой папке.
-             Чтобы заменить — положите новый файл с тем же именем.
-             Если файла нет — показывается макет-fallback ниже.
-        ===================================================================== -->
-        <div class="model-photo-wrap">
-          <img class="model-photo" src="iphone-17-pro-max.webp"
-               alt="Ремонт iPhone 17 Pro Max в Одессе — сервисный центр SPARK"
-               width="500" height="500" fetchpriority="high"
-               onload="var f=document.getElementById('photoFallback');if(f)f.remove()"
-               onerror="this.remove()">
-          <div id="photoFallback" class="photo-fallback">
-            <svg class="phone" viewBox="0 0 300 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="iPhone 17 Pro Max">
-              <defs>
-                <linearGradient id="frm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a3d45"/><stop offset=".5" stop-color="#15171c"/><stop offset="1" stop-color="#2b2e36"/></linearGradient>
-                <linearGradient id="scr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c1f27"/><stop offset="1" stop-color="#0f1117"/></linearGradient>
-              </defs>
-              <rect x="284" y="150" width="5" height="58" rx="2.5" fill="#2c2f38"/>
-              <rect x="11" y="150" width="5" height="34" rx="2.5" fill="#2c2f38"/>
-              <rect x="11" y="196" width="5" height="34" rx="2.5" fill="#2c2f38"/>
-              <rect x="16" y="6" width="268" height="588" rx="48" fill="url(#frm)"/>
-              <rect x="22" y="12" width="256" height="576" rx="43" fill="#0a0b0e"/>
-              <rect x="28" y="18" width="244" height="564" rx="38" fill="url(#scr)"/>
-              <rect x="120" y="30" width="60" height="20" rx="10" fill="#000"/>
-              <text x="50" y="44" fill="#aeb3bf" font-family="-apple-system,Arial" font-size="14" font-weight="600">9:41</text>
-              <rect x="231" y="34" width="22" height="11" rx="3" fill="none" stroke="#aeb3bf" stroke-width="1.3"/>
-              <rect x="233" y="36" width="15" height="7" rx="1.5" fill="#aeb3bf"/>
-              <text x="150" y="290" text-anchor="middle" fill="#fff" font-family="-apple-system,Arial" font-size="22" font-weight="700">iPhone 17 Pro Max</text>
-              <text x="150" y="318" text-anchor="middle" fill="#878d99" font-family="-apple-system,Arial" font-size="13">Ремонт · SPARK · Одесса</text>
-            </svg>
-            <span class="ph-note">место для фото — iphone-17-pro-max.webp</span>
-          </div>
-        </div>
+        @@HERO_ART@@
       </div>
     </div>
   </section>
@@ -224,8 +392,8 @@
   <section class="sec sec-bg" id="prices">
     <div class="wrap">
       <div class="sec-head reveal">
-        <span class="sec-tag">Цены на ремонт iPhone 17 Pro Max</span>
-        <h2>Прайс на ремонт iPhone 17 Pro Max</h2>
+        <span class="sec-tag">Цены на ремонт @@NAME@@</span>
+        <h2>Прайс на ремонт @@NAME@@</h2>
         <p class="lead-p">Цены ориентировочные и зависят от типа запчасти (оригинал или совместимый). Точную стоимость мастер назовёт после бесплатной диагностики.</p>
       </div>
       <div class="ptable-wrap reveal">
@@ -234,20 +402,11 @@
             <tr><th>Услуга</th><th>Цена</th><th>Срок</th></tr>
           </thead>
           <tbody>
-            <tr><td class="svc-name free">Диагностика</td><td class="pr free">Бесплатно</td><td class="time">при вас</td></tr>
-            <tr><td class="svc-name">Замена экрана (дисплея)</td><td class="pr">7 500 — 8 800 ₴</td><td class="time">30-60 мин</td></tr>
-            <tr><td class="svc-name">Замена аккумулятора</td><td class="pr">2 000 — 2 600 ₴</td><td class="time">30-40 мин</td></tr>
-            <tr><td class="svc-name">Замена заднего стекла</td><td class="pr">3 200 — 4 200 ₴</td><td class="time">1-2 часа</td></tr>
-            <tr><td class="svc-name">Не заряжается (USB-C разъём)</td><td class="pr">1 500 — 2 100 ₴</td><td class="time">30-50 мин</td></tr>
-            <tr><td class="svc-name">После воды</td><td class="pr">1 700 — 4 800 ₴</td><td class="time">от 2 часов</td></tr>
-            <tr><td class="svc-name">Замена камеры</td><td class="pr">2 400 — 3 500 ₴</td><td class="time">40-60 мин</td></tr>
-            <tr><td class="svc-name">Динамик / микрофон</td><td class="pr">1 600 — 2 400 ₴</td><td class="time">30-50 мин</td></tr>
-            <tr><td class="svc-name">Face ID</td><td class="pr">3 200 — 4 800 ₴</td><td class="time">1-3 часа</td></tr>
-            <tr><td class="svc-name">Ремонт платы</td><td class="pr">2 800 — 7 500 ₴</td><td class="time">1-3 дня</td></tr>
+            @@PRICE_ROWS@@
           </tbody>
         </table>
       </div>
-      <p class="lead-p" style="margin-top:18px;font-size:.88rem">Цены указаны в гривнах. Диагностика iPhone 17 Pro Max бесплатная.</p>
+      <p class="lead-p" style="margin-top:18px;font-size:.88rem">Цены указаны в гривнах. Диагностика @@NAME@@ бесплатная.</p>
     </div>
   </section>
 
@@ -255,53 +414,53 @@
     <div class="wrap">
       <div class="sec-head reveal">
         <span class="sec-tag">Виды ремонта</span>
-        <h2>Что ремонтируем в iPhone 17 Pro Max</h2>
-        <p class="lead-p">Беремся за любые неисправности iPhone 17 Pro Max — от замены стекла до микропайки платы. Точную цену и срок назовём после бесплатной диагностики.</p>
+        <h2>Что ремонтируем в @@NAME@@</h2>
+        <p class="lead-p">Беремся за любые неисправности @@NAME@@ — от замены стекла до микропайки платы. Точную цену и срок назовём после бесплатной диагностики.</p>
       </div>
       <div class="repair-types">
         <div class="rtype reveal">
           <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg></span> Замена экрана</h3>
-          <p>Разбит дисплей iPhone 17 Pro Max или не реагирует на касания. Сохраняем True Tone, ProMotion 120 Гц и влагозащиту.</p>
+          <p>Разбит дисплей @@NAME@@ или не реагирует на касания. Сохраняем @@SCREEN_FEAT@@.</p>
           <div class="meta"><span>30-60 мин</span><span class="green">Гарантия 12 мес</span></div>
         </div>
         <div class="rtype reveal">
           <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="7" width="12" height="10" rx="1"/><line x1="10" y1="17" x2="10" y2="21"/><line x1="14" y1="17" x2="14" y2="21"/><line x1="8" y1="21" x2="16" y2="21"/><path d="M7 7V5a5 5 0 0110 0v2"/></svg></span> Замена аккумулятора</h3>
-          <p>iPhone 17 Pro Max быстро разряжается или выключается на холоде. Ставим новую батарею с ёмкостью 100%.</p>
+          <p>@@NAME@@ быстро разряжается или выключается на холоде. Ставим новую батарею с ёмкостью 100%.</p>
           <div class="meta"><span>30-40 мин</span><span class="green">Гарантия 12 мес</span></div>
         </div>
         <div class="rtype reveal">
-          <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l1.5 5-2 1.2a12 12 0 005.3 5.3l1.2-2 5 1.5v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg></span> USB-C разъём</h3>
-          <p>iPhone 17 Pro Max не заряжается или заряд идёт через раз. Чистим или меняем USB-C порт.</p>
+          <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l1.5 5-2 1.2a12 12 0 005.3 5.3l1.2-2 5 1.5v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg></span> @@PORT@@ разъём</h3>
+          <p>@@NAME@@ не заряжается или заряд идёт через раз. Чистим или меняем @@PORT@@ порт.</p>
           <div class="meta"><span>30-50 мин</span><span class="green">Гарантия 12 мес</span></div>
         </div>
         <div class="rtype reveal">
           <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg></span> Face ID</h3>
-          <p>Восстановление Face ID и фронтальной камеры iPhone 17 Pro Max. Сложный ремонт с микропайкой.</p>
+          <p>Восстановление Face ID и фронтальной камеры @@NAME@@. Сложный ремонт с микропайкой.</p>
           <div class="meta"><span>1-3 часа</span><span class="green">Гарантия 12 мес</span></div>
         </div>
         <div class="rtype reveal">
           <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></span> Замена камеры</h3>
-          <p>Основная, телеобъектив или фронтальная камера iPhone 17 Pro Max. Решаем проблему с фокусом и тряской.</p>
+          <p>Основная, телеобъектив или фронтальная камера @@NAME@@. Решаем проблему с фокусом и тряской.</p>
           <div class="meta"><span>40-60 мин</span><span class="green">Гарантия 12 мес</span></div>
         </div>
         <div class="rtype reveal">
           <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 3h-8l-2 4h12z"/></svg></span> Замена заднего стекла</h3>
-          <p>Треснула задняя крышка iPhone 17 Pro Max. Восстанавливаем заводской вид без замены всего корпуса.</p>
+          <p>Треснула задняя крышка @@NAME@@. Восстанавливаем заводской вид без замены всего корпуса.</p>
           <div class="meta"><span>1-2 часа</span><span class="green">Гарантия 12 мес</span></div>
         </div>
         <div class="rtype reveal">
           <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08"/></svg></span> Динамик и микрофон</h3>
-          <p>Собеседник вас не слышит или тихий звук в iPhone 17 Pro Max. Меняем разговорный/полифонический динамик и микрофон.</p>
+          <p>Собеседник вас не слышит или тихий звук в @@NAME@@. Меняем разговорный/полифонический динамик и микрофон.</p>
           <div class="meta"><span>30-50 мин</span><span class="green">Гарантия 12 мес</span></div>
         </div>
         <div class="rtype reveal">
           <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3s6 7 6 11a6 6 0 11-12 0c0-4 6-11 6-11z"/></svg></span> После воды</h3>
-          <p>iPhone 17 Pro Max попал в воду и не включается. Ультразвуковая чистка платы — чем раньше, тем больше шансов.</p>
+          <p>@@NAME@@ попал в воду и не включается. Ультразвуковая чистка платы — чем раньше, тем больше шансов.</p>
           <div class="meta"><span>от 2 часов</span><span class="green">Диагностика 0 ₴</span></div>
         </div>
         <div class="rtype reveal">
           <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></span> Ремонт платы</h3>
-          <p>Микропайка BGA, восстановление цепей питания, замена контроллеров iPhone 17 Pro Max. Сложный ремонт — наша специализация.</p>
+          <p>Микропайка BGA, восстановление цепей питания, замена контроллеров @@NAME@@. Сложный ремонт — наша специализация.</p>
           <div class="meta"><span>1-3 дня</span><span class="green">Диагностика 0 ₴</span></div>
         </div>
       </div>
@@ -312,13 +471,13 @@
     <div class="wrap">
       <div class="sec-head reveal">
         <span class="sec-tag">Как мы работаем</span>
-        <h2 style="color:#fff">Ремонт iPhone 17 Pro Max за 4 шага</h2>
+        <h2 style="color:#fff">Ремонт @@NAME@@ за 4 шага</h2>
       </div>
       <div class="steps">
-        <div class="step reveal"><h3>Приём устройства</h3><p>Привезите iPhone 17 Pro Max или оставьте заявку — зафиксируем состояние и выдадим квитанцию.</p></div>
+        <div class="step reveal"><h3>Приём устройства</h3><p>Привезите @@NAME@@ или оставьте заявку — зафиксируем состояние и выдадим квитанцию.</p></div>
         <div class="step reveal"><h3>Бесплатная диагностика</h3><p>Находим причину поломки и называем точную цену. Начинаем только с вашего согласия.</p><span class="badge">Бесплатно</span></div>
         <div class="step reveal"><h3>Ремонт и тестирование</h3><p>Меняем запчасть или паяем плату, проверяем по чек-листу из 15+ пунктов.</p></div>
-        <div class="step reveal"><h3>Выдача с гарантией</h3><p>Отдаём iPhone 17 Pro Max с чеком и гарантийным талоном. Влагозащита восстановлена.</p><span class="badge w">До 12 месяцев</span></div>
+        <div class="step reveal"><h3>Выдача с гарантией</h3><p>Отдаём @@NAME@@ с чеком и гарантийным талоном. Влагозащита восстановлена.</p><span class="badge w">До 12 месяцев</span></div>
       </div>
     </div>
   </section>
@@ -327,13 +486,13 @@
     <div class="wrap">
       <div class="sec-head reveal">
         <span class="sec-tag">Почему выбирают нас</span>
-        <h2>Преимущества ремонта iPhone 17 Pro Max в SPARK</h2>
+        <h2>Преимущества ремонта @@NAME@@ в SPARK</h2>
       </div>
       <div class="why-grid">
         <div class="why reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></div><h3>Бесплатная диагностика</h3><p>Найдём причину бесплатно — даже если откажетесь от ремонта.</p></div>
         <div class="why reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Гарантия до 12 месяцев</h3><p>На запчасти и работу. Срок фиксируется в чеке.</p></div>
         <div class="why reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 .5-4.5 4 1.5 6-6-3.5L6 18.5 7.5 12.5 3 8.5 9 8z"/></svg></div><h3>Оригинальные запчасти</h3><p>Оригинал или качественный аналог — выбор за вами, разницу объясним.</p></div>
-        <div class="why reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Ремонт за 30-60 минут</h3><p>Большинство ремонтов iPhone 17 Pro Max выполняется при вас за полчаса-час.</p></div>
+        <div class="why reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Ремонт за 30-60 минут</h3><p>Большинство ремонтов @@NAME@@ выполняется при вас за полчаса-час.</p></div>
       </div>
     </div>
   </section>
@@ -341,24 +500,19 @@
   <section class="sec" id="seo-text">
     <div class="wrap">
       <div class="reveal" style="max-width:80ch">
-        <h2 style="font-size:1.3rem;margin-bottom:14px">Ремонт iPhone 17 Pro Max в Одессе — сервисный центр SPARK</h2>
+        <h2 style="font-size:1.3rem;margin-bottom:14px">Ремонт @@NAME@@ в Одессе — сервисный центр SPARK</h2>
         <p style="color:var(--muted);font-size:.95rem;line-height:1.7;margin-bottom:14px">
-          Сервисный центр SPARK выполняет ремонт iPhone 17 Pro Max в Одессе любой сложности. Меняем разбитый экран (дисплей), вздувшийся или быстро разряжающийся аккумулятор, восстанавливаем Face ID и фронтальную камеру, ремонтируем USB-C разъём зарядки, заднее стекло, основную и телефото-камеру, разговорный и полифонический динамики, микрофон. Делаем микропайку материнской платы и восстановление после попадания воды.
+          Сервисный центр SPARK выполняет ремонт @@NAME@@ в Одессе любой сложности. Меняем разбитый экран (дисплей), вздувшийся или быстро разряжающийся аккумулятор, восстанавливаем Face ID и фронтальную камеру, ремонтируем @@PORT@@ разъём зарядки, заднее стекло, основную и фронтальную камеру, разговорный и полифонический динамики, микрофон. Делаем микропайку материнской платы и восстановление после попадания воды.
         </p>
         <p style="color:var(--muted);font-size:.95rem;line-height:1.7;margin-bottom:14px">
-          При замене дисплея iPhone 17 Pro Max сохраняем True Tone и частоту обновления ProMotion 120 Гц, при ремонте — восстанавливаем заводскую влагозащиту. Используем оригинальные или качественные совместимые запчасти на ваш выбор — разницу мастер объясняет и показывает до начала ремонта. На все работы и детали — гарантия до 12 месяцев, указанная в чеке.
+          При замене экрана @@NAME@@ (@@DISP_HUMAN@@) сохраняем @@SCREEN_FEAT_SHORT@@, при ремонте — восстанавливаем заводскую влагозащиту. Используем оригинальные или качественные совместимые запчасти на ваш выбор — разницу мастер объясняет и показывает до начала ремонта. На все работы и детали — гарантия до 12 месяцев, указанная в чеке.
         </p>
         <p style="color:var(--muted);font-size:.95rem;line-height:1.7">
           Бесплатная диагностика, ремонт чаще всего за 30-60 минут при вас. Находимся по адресу: ул. Академика Королёва, 23, Одесса. Работаем Пн-Сб с 10:00 до 19:00. Звоните: +38 (096) 075-54-52.
         </p>
         <p style="margin-top:18px;font-weight:600;color:var(--ink)">Ремонт других моделей iPhone:</p>
         <div class="other-models">
-          <a href="../../remont-iphone/">iPhone 17 Pro</a>
-          <a href="../../remont-iphone/">iPhone 17</a>
-          <a href="../iphone-16-pro-max/">iPhone 16 Pro Max</a>
-          <a href="../iphone-16/">iPhone 16</a>
-          <a href="../iphone-15-pro-max/">iPhone 15 Pro Max</a>
-          <a href="../../remont-iphone/">Все модели iPhone →</a>
+          @@OTHER_MODELS@@
         </div>
       </div>
     </div>
@@ -368,20 +522,15 @@
     <div class="wrap">
       <div class="sec-head reveal">
         <span class="sec-tag">Частые вопросы</span>
-        <h2>Вопросы о ремонте iPhone 17 Pro Max</h2>
+        <h2>Вопросы о ремонте @@NAME@@</h2>
       </div>
       <div class="faq reveal">
-        <details open><summary>Сколько стоит замена экрана iPhone 17 Pro Max?</summary><div class="a">От 7 500 до 8 800 ₴ в зависимости от типа запчасти (оригинал или качественный совместимый дисплей). Точную цену мастер назовёт после бесплатной диагностики.</div></details>
-        <details><summary>Сколько времени занимает ремонт?</summary><div class="a">Замена экрана и аккумулятора iPhone 17 Pro Max — 30-60 минут при вас. Ремонт после воды и микропайка платы — от нескольких часов до 1-3 дней.</div></details>
-        <details><summary>Сохранится ли True Tone и ProMotion 120 Гц?</summary><div class="a">Да. Мы переносим данные дисплея — True Tone и частота обновления ProMotion 120 Гц сохраняются как на оригинальных, так и на качественных совместимых экранах.</div></details>
-        <details><summary>Ремонтируете ли USB-C разъём?</summary><div class="a">Да. Если iPhone 17 Pro Max не заряжается или заряд идёт через раз — чистим или меняем USB-C порт. Стоимость от 1 500 ₴, ремонт 30-50 минут.</div></details>
-        <details><summary>Можно ли починить iPhone 17 Pro Max после воды?</summary><div class="a">В 70-80% случаев — да. Важно не пытаться заряжать и не сушить феном, а сразу привезти к нам. Чем раньше — тем выше шанс на успешный ремонт.</div></details>
-        <details><summary>Какая гарантия на ремонт?</summary><div class="a">До 12 месяцев на запчасти и работы. Срок указан в чеке для каждой услуги.</div></details>
+        @@FAQ_HTML@@
       </div>
     </div>
   </section>
 
-    <section class="sec" id="blog-related">
+  <section class="sec" id="blog-related">
     <div class="wrap">
       <div class="sec-head reveal"><span class="sec-tag">Полезные статьи</span><h2>Из нашего блога</h2></div>
       <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:14px">
@@ -396,14 +545,14 @@
     <div class="wrap">
       <div class="book">
         <div class="copy reveal">
-          <span class="sec-tag">Запись на ремонт iPhone 17 Pro Max</span>
+          <span class="sec-tag">Запись на ремонт @@NAME@@</span>
           <h2>Опишите поломку — перезвоним за 15 минут</h2>
           <p>Подскажем предварительную цену и срок, забронируем время. Или просто позвоните — мастер на связи.</p>
         </div>
         <div class="form sf reveal" id="bookFormInline">
           <div class="sf-body">
             <div class="mf-progress"><div class="mf-progress-row"><span>Заполнение заявки</span><b class="js-pct">0%</b></div><div class="mf-progress-track"><i class="js-bar"></i></div></div>
-            <h3 class="sf-title">Заявка на ремонт iPhone 17 Pro Max</h3>
+            <h3 class="sf-title">Заявка на ремонт @@NAME@@</h3>
             <div class="mf-field"><label>Ваше имя</label><div class="mf-input"><input class="js-name" type="text" autocomplete="name" placeholder="Как к вам обращаться"><span class="mf-ok">✓</span></div></div>
             <div class="mf-field"><label>Телефон</label>
               <div class="mf-input"><span class="mf-pre">+38</span><input class="js-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(0__) ___-__-__"><span class="mf-ok">✓</span></div>
@@ -411,13 +560,7 @@
               <div class="mf-hint js-hint">Введите номер мобильного оператора Украины</div>
             </div>
             <div class="mf-field"><label>Что случилось</label><div class="mf-input"><select class="js-device" aria-label="Что случилось">
-              <option>iPhone 17 Pro Max — разбит экран</option>
-              <option>iPhone 17 Pro Max — не держит батарея</option>
-              <option>iPhone 17 Pro Max — не заряжается</option>
-              <option>iPhone 17 Pro Max — после воды / не включается</option>
-              <option>iPhone 17 Pro Max — Face ID не работает</option>
-              <option>iPhone 17 Pro Max — проблема с камерой</option>
-              <option>iPhone 17 Pro Max — другое</option>
+              @@BOOK_OPTIONS@@
             </select></div></div>
             <button class="btn btn-spark mf-submit js-submit" type="button" disabled>Отправить заявку</button>
             <p class="mf-note">Нажимая кнопку, вы соглашаетесь на обработку данных.</p>
@@ -487,8 +630,7 @@
           <li><a href="../../diagnostika/">Диагностика</a></li>
           <li><a href="../../vosstanovlenie-dannyh/">Восстановление данных</a></li>
           <li><a href="../../blog/">Блог</a></li>
-          <li><a href="../../o-kompanii/">О компании</a></li>
-          <li><a href="../../#reviews">Отзывы</a></li>
+          <li><a href="../../kontakty/">Контакты</a></li>
         </ul>
       </div>
       <div class="foot reveal">
@@ -521,7 +663,7 @@
     <div class="modal-body">
       <div class="mf-progress"><div class="mf-progress-row"><span>Заполнение заявки</span><b id="mPct">0%</b></div><div class="mf-progress-track"><i id="mpBar"></i></div></div>
       <div class="mf-head">
-        <span class="eyebrow">Ремонт iPhone 17 Pro Max</span>
+        <span class="eyebrow">Ремонт @@NAME@@</span>
         <h3 id="bookTitle">Оставьте заявку</h3>
         <p>Перезвоним за 15 минут, подскажем цену и срок. Диагностика бесплатная.</p>
       </div>
@@ -538,13 +680,7 @@
       <div class="mf-field">
         <label for="mDevice">Что случилось</label>
         <div class="mf-input"><select id="mDevice" aria-label="Что случилось">
-          <option>iPhone 17 Pro Max — разбит экран</option>
-          <option>iPhone 17 Pro Max — не держит батарея</option>
-          <option>iPhone 17 Pro Max — не заряжается</option>
-          <option>iPhone 17 Pro Max — после воды / не включается</option>
-          <option>iPhone 17 Pro Max — Face ID не работает</option>
-          <option>iPhone 17 Pro Max — проблема с камерой</option>
-          <option>iPhone 17 Pro Max — другое</option>
+          @@BOOK_OPTIONS@@
         </select></div>
       </div>
       <button class="btn btn-spark mf-submit" id="mSubmit" type="button" disabled>Отправить заявку</button>
@@ -659,8 +795,28 @@
     function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(check); } }
     window.addEventListener('scroll', onScroll, {passive:true});
     window.addEventListener('resize', function(){ measure(); check(); }, {passive:true});
+    window.addEventListener('load', measure, {passive:true});
     measure(); check();
   })();
 </script>
 </body>
 </html>
+'''
+
+
+def main():
+    written = []
+    for m in MODELS:
+        html, out_dir = render(m)
+        os.makedirs(out_dir, exist_ok=True)
+        with open(os.path.join(out_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(html)
+        written.append((m["slug"], len(html)))
+    print("=== WRITTEN ===")
+    for slug, n in written:
+        print("  ✓ remont-iphone/%s (%d симв.)" % (slug, n))
+    print("Итого: %d страниц моделей" % len(written))
+
+
+if __name__ == "__main__":
+    main()

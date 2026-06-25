@@ -21,6 +21,7 @@
     function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(check); } }
     window.addEventListener('scroll', onScroll, {passive:true});
     window.addEventListener('resize', function(){ measure(); check(); }, {passive:true});
+    window.addEventListener('load', measure, {passive:true});
     measure(); check();
   })();
 
