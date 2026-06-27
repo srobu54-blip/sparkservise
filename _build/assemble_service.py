@@ -31,6 +31,7 @@ def resolve(t):
 _LINK = re.compile(r"\{\{L:([^|}]+)\|([^}]+)\}\}")
 def linkify(s): return _LINK.sub(lambda m: '<a href="%s">%s</a>' % (resolve(m.group(1)), m.group(2).strip()), s)
 def rich(t): return linkify(esc(t))
+def plaintext(t): return _LINK.sub(lambda m: m.group(2).strip(), t)  # {{L:..|текст}} -> текст (для JSON-LD: без HTML, чтобы финальный linkify не ломал JSON)
 
 LEGAL_CSS = ('''  .legal-box{background:#fff;border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:var(--r);padding:22px 24px;margin-top:8px}
   .legal-box ul{list-style:none;display:grid;gap:11px}
@@ -79,7 +80,7 @@ def build(slug, name, c):
     blocks = [service, crumb]
     if faq:
         blocks.append({"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-            {"@type":"Question","name":f.get("q",""),"acceptedAnswer":{"@type":"Answer","text":f.get("a","")}} for f in faq]})
+            {"@type":"Question","name":plaintext(f.get("q","")),"acceptedAnswer":{"@type":"Answer","text":plaintext(f.get("a",""))}} for f in faq]})
     schema_html = "\n".join('<script type="application/ld+json">\n'+json.dumps(x, ensure_ascii=False)+'\n</script>' for x in blocks)
 
     cards = "\n        ".join('<div class="rtype reveal">\n          <h3><span class="ri">%s</span> %s</h3>\n          <p>%s</p>\n        </div>' % (
