@@ -539,8 +539,9 @@ def build(slug, device, c):
     # popular sub-models (spoke-страницы) — только если у устройства они есть
     _subs = _DEV_SUBMODELS.get(slug.replace("remont-", ""), [])
     if _subs:
-        _mlinks = "\n          ".join('<a href="%s/">Ремонт %s</a>'%(esc(x["slug"]), esc(x["name"])) for x in _subs)
-        page += '  <section class="sec" id="models">\n    <div class="wrap">\n      <div class="sec-head reveal">\n        <span class="sec-tag">Модели</span>\n        <h2>Ремонт %s по моделям</h2>\n        <p class="lead-p">У популярных моделей — отдельная страница с ценами и видами ремонта.</p>\n      </div>\n      <div class="other-models reveal">\n          %s\n      </div>\n    </div>\n  </section>\n\n'%(esc(device), _mlinks)
+        _CH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>'
+        _mlinks = "\n        ".join('<a class="mcard" href="%s/"><span class="nm">%s%s</span></a>'%(esc(x["slug"]), esc(x["name"]), _CH) for x in _subs)
+        page += '  <section class="sec" id="models">\n    <div class="wrap">\n      <div class="sec-head reveal">\n        <span class="sec-tag">Модели</span>\n        <h2>Ремонт %s по моделям</h2>\n        <p class="lead-p">У популярных моделей — отдельная страница с ценами и видами ремонта.</p>\n      </div>\n      <div class="models-grid reveal">\n        %s\n      </div>\n    </div>\n  </section>\n\n'%(esc(device), _mlinks)
     page += '  <section class="sec sec-bg" id="prices">\n    <div class="wrap">\n      <div class="sec-head reveal">\n        <span class="sec-tag">Цены на ремонт %s</span>\n        <h2>Прайс на ремонт %s</h2>\n        <p class="lead-p">Цены ориентировочные. Точную стоимость мастер назовёт после бесплатной диагностики.</p>\n      </div>\n'%(esc(device), esc(device))
     page += '      <div class="ptable-wrap reveal">\n        <table class="price-table">\n          <thead><tr><th>Услуга</th><th>Цена</th><th>Срок</th></tr></thead>\n          <tbody>\n            %s\n          </tbody>\n        </table>\n      </div>\n      <p class="lead-p" style="margin-top:18px;font-size:.88rem">Цены указаны в гривнах. Диагностика %s бесплатная.</p>\n    </div>\n  </section>\n\n'%(pricerows, esc(device))
     # repair types
