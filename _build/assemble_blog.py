@@ -11,6 +11,7 @@ ARTICLES = [
     ("iphone-upal-v-vodu-chto-delat", "Первая помощь", "water", "2026-06-21", "21 июня 2026"),
     ("pochemu-bystro-saditsya-batareya", "Аккумулятор", "battery", "2026-06-24", "24 июня 2026"),
     ("iphone-ne-zaryazhaetsya", "Зарядка", "charge", "2026-06-28", "28 июня 2026"),
+    ("iphone-ne-vklyuchaetsya", "Диагностика", "power", "2026-06-28", "28 июня 2026"),
 ]
 SLUGS = [a[0] for a in ARTICLES]
 MODIFIED_ISO = "2026-06-28"
