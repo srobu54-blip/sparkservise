@@ -12,10 +12,23 @@ ARTICLES = [
     ("pochemu-bystro-saditsya-batareya", "Аккумулятор", "battery", "2026-06-24", "24 июня 2026"),
     ("iphone-ne-zaryazhaetsya", "Зарядка", "charge", "2026-06-28", "28 июня 2026"),
     ("iphone-ne-vklyuchaetsya", "Диагностика", "power", "2026-06-28", "28 июня 2026"),
+    ("iphone-greetsya", "Диагностика", "heat", "2026-06-28", "28 июня 2026"),
 ]
 SLUGS = [a[0] for a in ARTICLES]
 MODIFIED_ISO = "2026-06-28"
 MODIFIED_DISP = "28 июня 2026"
+
+# Краткие тизеры для карточек на ГЛАВНОЙ (homepage показывает последние HOME_CARDS_N статей).
+# Правило: новые статьи появляются на главной автоматически (новые сверху), всего не больше HOME_CARDS_N.
+HOME_CARDS_N = 6
+CARD_TEASERS = {
+    "original-ili-kopiya-displeya-iphone": "Как отличить и что выбрать, чтобы не переплатить и не потерять качество.",
+    "iphone-upal-v-vodu-chto-delat": "Пошагово, что можно и чего категорически нельзя делать с мокрым телефоном.",
+    "pochemu-bystro-saditsya-batareya": "Когда дело в настройках, а когда пора на замену аккумулятора.",
+    "iphone-ne-zaryazhaetsya": "Кабель, разъём или уже сервис? Простые проверки дома и момент, когда пора в ремонт.",
+    "iphone-ne-vklyuchaetsya": "Чёрный экран, завис на яблоке или после воды — что сделать самому и когда в сервис.",
+    "iphone-greetsya": "Игры, зарядка или поломка? Когда нагрев — это норма, а когда сигнал о проблеме.",
+}
 
 def word_count(a):
     txt = (a.get("lead","") or "") + " " + (a.get("conclusion","") or "")
@@ -33,6 +46,7 @@ ICON = {
  "battery": '<rect x="3" y="8" width="16" height="8" rx="2"/><path d="M21 11v2M7 12h6"/>',
  "charge": '<path d="M13 3 L6 13 H11 L10 21 L18 10 H13 Z"/>',
  "power": '<path d="M12 4 V12"/><path d="M7.8 6.3 a7 7 0 1 0 8.4 0"/>',
+ "heat": '<path d="M14 14.76V5a2 2 0 0 0-4 0v9.76a4 4 0 1 0 4 0z"/>',
 }
 
 def esc(s): return html.escape(str(s), quote=False)
@@ -531,9 +545,27 @@ def build_article(slug, category, icon_key, iso, disp, a, meta):
     p += MODAL_JS
     return p
 
+def build_home_cards(meta):
+    """HTML карточек блога для главной — последние HOME_CARDS_N статей, новые сверху."""
+    out = []
+    for (slug, category, icon_key, iso, disp) in reversed(ARTICLES):
+        a = meta.get(slug)
+        if not a:
+            continue
+        h1 = a.get("h1") or a.get("title") or slug
+        teaser = CARD_TEASERS.get(slug) or excerpt(a)
+        out.append(
+            '<a class="blogc reveal" href="./blog/%s/">\n'
+            '          <span class="ph"><span class="cat">%s</span></span>\n'
+            '          <span class="bd"><h3>%s</h3><p>%s</p><span class="more">Читать <span class="ar">→</span></span></span>\n'
+            '        </a>' % (slug, esc(category), esc(h1), esc(teaser)))
+        if len(out) >= HOME_CARDS_N:
+            break
+    return "\n        ".join(out)
+
 def build_index(meta):
     cards = ""
-    for (slug, category, icon_key, iso, disp) in ARTICLES:
+    for (slug, category, icon_key, iso, disp) in reversed(ARTICLES):
         a = meta.get(slug, {})
         cards += ('<a class="blogc reveal" href="%s/">\n'
                   '          <span class="ph"><span class="cat">%s</span></span>\n'
@@ -588,7 +620,21 @@ def main():
     os.makedirs(os.path.join(REPO, "blog"), exist_ok=True)
     idx = build_index(meta)
     open(os.path.join(REPO, "blog", "index.html"), "w", encoding="utf-8").write(idx)
-    written.append("blog/ (индекс, %d симв.)" % len(idx))
+    written.append("blog/ (индекс, %d симв., %d статей)" % (len(idx), len([s for s in SLUGS if meta.get(s)])))
+    # главная: подставить последние HOME_CARDS_N карточек между маркерами
+    home_path = os.path.join(REPO, "index.html")
+    if os.path.exists(home_path):
+        ht = open(home_path, encoding="utf-8").read()
+        if "<!--blog-cards-->" in ht and "<!--/blog-cards-->" in ht:
+            cards = build_home_cards(meta)
+            new_ht = re.sub(r"<!--blog-cards-->.*?<!--/blog-cards-->",
+                            "<!--blog-cards-->\n        " + cards + "\n      <!--/blog-cards-->",
+                            ht, count=1, flags=re.S)
+            if new_ht != ht:
+                open(home_path, "w", encoding="utf-8").write(new_ht)
+                written.append("index.html (главная: %d карточек блога)" % min(HOME_CARDS_N, len([s for s in SLUGS if meta.get(s)])))
+        else:
+            written.append("⚠ index.html: маркеры <!--blog-cards--> не найдены — карточки не обновлены")
     print("=== WRITTEN ===")
     for w in written: print("  ✓", w)
 
