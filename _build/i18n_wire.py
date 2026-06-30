@@ -93,7 +93,9 @@ def wire_ua(t, ua_dir, UA):
         if base in ASSETS:
             return '%s="%s%s"' % (attr, prefix, base)
         cleanp = path[2:] if path.startswith('./') else path
-        if '/' not in cleanp and cleanp.lower().endswith(IMG_EXT):
+        # single-source изображений: и co-located (cover.webp), и в подпапке (модель/фото.webp)
+        # → ссылаемся на RU-дерево (фото кладётся один раз в RU). Пропускаем только восходящие ../ пути.
+        if not cleanp.startswith('../') and cleanp.lower().endswith(IMG_EXT):
             sp_ru = ua_dir[3:].strip('/') if ua_dir.startswith('ua/') else ''
             return '%s="%s%s%s"' % (attr, '../' * len(segs(ua_dir)), (sp_ru + '/' if sp_ru else ''), cleanp)
         if path.endswith('/'):

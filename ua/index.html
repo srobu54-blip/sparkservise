@@ -211,6 +211,10 @@
   .mcard .pr b{color:var(--spark);font-weight:700}
   .mcard .hit{position:absolute;top:-8px;left:14px;font-size:.66rem;font-weight:700;letter-spacing:.02em;color:#fff;background:var(--spark);padding:2px 8px;border-radius:999px}
   .mcard.hide{display:none}
+  .mcard .mph{height:110px;display:flex;align-items:center;justify-content:center;margin:-1px 0 9px;border-radius:10px;background:#f5f6f8;overflow:hidden}
+  .mcard .mph img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block;transition:transform .2s}
+  .mcard:hover .mph img{transform:scale(1.04)}
+  .mcard .mph .ph-ic{width:32px;height:42px;color:#c6ccd6}
 
   .svc-grid{display:grid;grid-template-columns:1fr;gap:16px}
   .svc{position:relative;display:flex;flex-direction:column;background:var(--ink-2);border:1px solid #262936;border-radius:var(--r-lg);padding:54px 26px 26px;cursor:pointer;transition:transform .34s cubic-bezier(.22,.61,.36,1),box-shadow .34s cubic-bezier(.22,.61,.36,1),border-color .34s ease,background .34s ease}
