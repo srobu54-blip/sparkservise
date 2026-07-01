@@ -586,8 +586,8 @@ def build_index(meta):
         "publisher":{"@type":"Organization","name":"SPARK","url":"https://sparkservice.od.ua/"}}
     sc = "\n".join('<script type="application/ld+json">\n'+json.dumps(x, ensure_ascii=False)+'\n</script>' for x in [blog, crumb])
     p = '<!DOCTYPE html>\n<html lang="ru">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-    p += '<title>Блог SPARK — статьи о ремонте техники Apple в Одессе</title>\n'
-    p += '<meta name="description" content="Полезные статьи сервисного центра SPARK: ремонт iPhone, замена дисплея и батареи, что делать если телефон упал в воду. Экспертные советы от мастеров Apple в Одессе.">\n'
+    p += '<title>Блог SPARK: статьи о ремонте техники Apple в Одессе</title>\n'
+    p += '<meta name="description" content="Статьи сервисного центра SPARK: ремонт iPhone, замена дисплея и батареи, что делать если телефон упал в воду. Советы мастеров Apple в Одессе.">\n'
     p += '<meta name="keywords" content="блог ремонт apple, советы по ремонту iphone, замена дисплея, iphone упал в воду, замена батареи, SPARK Одесса">\n'
     p += '<meta name="robots" content="index, follow">\n<link rel="canonical" href="https://sparkservice.od.ua/blog/">\n'
     p += '<meta name="theme-color" content="#ffffff">\n<meta property="og:type" content="website">\n'

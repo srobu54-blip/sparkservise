@@ -315,7 +315,7 @@ def render(tid):
     repl = {
         "@@NAME@@": name, "@@TRANSLIT@@": translit(name), "@@CANON@@": canon, "@@OG_IMAGE@@": OG_IMAGE,
         "@@OFFER_PRICE@@": str(batt_low), "@@OFFER_BATT@@": money(batt_low), "@@FROM_PRICE@@": money(batt_low),
-        "@@PORT@@": port, "@@BIO_HUMAN@@": bio_human, "@@BIO_SEO@@": bio_seo, "@@BACK_SEO@@": back_seo,
+        "@@PORT@@": port, "@@BIO_HUMAN@@": bio_human, "@@BIO_SHORT@@": bio_short, "@@BIO_SEO@@": bio_seo, "@@BACK_SEO@@": back_seo,
         "@@SCREEN_FEAT@@": screen_feat, "@@SAVE_LINE@@": save_line, "@@DISP_HUMAN@@": disp_human,
         "@@BACK_HERO@@": ("задней крышки и " if has_back else ""),
         "@@FAQ_JSON@@": faq_json, "@@FAQ_HTML@@": faq_html, "@@PRICE_ROWS@@": price_rows,
@@ -333,8 +333,8 @@ TEMPLATE = r'''<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ремонт @@NAME@@ в Одессе — замена экрана, батареи, @@BIO_HUMAN@@ | SPARK</title>
-<meta name="description" content="Ремонт @@NAME@@ в Одессе: замена экрана, аккумулятора, @@BIO_HUMAN@@, @@PORT@@ разъёма, после воды. Бесплатная диагностика, оригинальные запчасти, гарантия 12 мес, ремонт за 30-60 мин. ☎ +38 (096) 075-54-52">
+<title>Ремонт @@NAME@@ в Одессе: экран, батарея | SPARK</title>
+<meta name="description" content="Ремонт @@NAME@@ в Одессе: экран, аккумулятор, @@BIO_SHORT@@, @@PORT@@-разъём. Бесплатная диагностика, гарантия 12 мес, ремонт за 30-60 минут.">
 <meta name="keywords" content="ремонт @@NAME@@, ремонт @@TRANSLIT@@ Одесса, замена экрана @@NAME@@, замена дисплея @@NAME@@, замена батареи @@NAME@@, замена аккумулятора @@NAME@@, @@NAME@@ Одесса, замена стекла @@NAME@@, сервисный центр Apple Одесса">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="@@CANON@@">
