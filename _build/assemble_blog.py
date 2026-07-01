@@ -569,9 +569,9 @@ def build_home_cards(meta):
         teaser = CARD_TEASERS.get(slug) or excerpt(a)
         out.append(
             '<a class="blogc reveal" href="./blog/%s/">\n'
-            '          <span class="ph"><span class="cat">%s</span></span>\n'
+            '          <span class="ph"><img src="./blog/%s/%s" alt="%s" loading="lazy" decoding="async"><span class="cat">%s</span></span>\n'
             '          <span class="bd"><h3>%s</h3><p>%s</p><span class="more">Читать <span class="ar">→</span></span></span>\n'
-            '        </a>' % (slug, esc(category), esc(h1), esc(teaser)))
+            '        </a>' % (slug, slug, cover_file(slug), escA(a.get("coverAlt") or h1), esc(category), esc(h1), esc(teaser)))
         if len(out) >= HOME_CARDS_N:
             break
     return "\n        ".join(out)
@@ -580,10 +580,11 @@ def build_index(meta):
     cards = ""
     for (slug, category, icon_key, iso, disp) in reversed(ARTICLES):
         a = meta.get(slug, {})
+        h1 = a.get("h1") or a.get("title") or slug
         cards += ('<a class="blogc reveal" href="%s/">\n'
-                  '          <span class="ph"><span class="cat">%s</span></span>\n'
+                  '          <span class="ph"><img src="%s/%s" alt="%s" loading="lazy" decoding="async"><span class="cat">%s</span></span>\n'
                   '          <span class="bd"><h3>%s</h3><p>%s</p><span class="more">Читать <span class="ar">→</span></span></span>\n'
-                  '        </a>\n        ') % (slug, esc(category), esc(a.get("h1") or a.get("title") or slug), esc(excerpt(a)))
+                  '        </a>\n        ') % (slug, slug, cover_file(slug), escA(a.get("coverAlt") or h1), esc(category), esc(h1), esc(excerpt(a)))
     crumb = {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
         {"@type":"ListItem","position":1,"name":"Главная","item":"https://sparkservice.od.ua/"},
         {"@type":"ListItem","position":2,"name":"Блог","item":"https://sparkservice.od.ua/blog/"}]}

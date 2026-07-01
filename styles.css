@@ -254,8 +254,10 @@
   .blog-grid{display:grid;grid-template-columns:1fr;gap:16px}
   .blogc{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;transition:transform .3s cubic-bezier(.22,.61,.36,1),box-shadow .3s cubic-bezier(.22,.61,.36,1)}
   .blogc:hover{transform:translateY(-4px);box-shadow:0 22px 48px -22px rgba(16,18,26,.3)}
-  .blogc .ph{height:148px;flex-shrink:0;background:linear-gradient(135deg,#1c1f27,#2b2f3a);position:relative;display:flex;align-items:flex-end;padding:14px}
-  .blogc .ph .cat{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:rgba(225,29,42,.92);padding:5px 10px;border-radius:999px}
+  .blogc .ph{height:148px;flex-shrink:0;background:linear-gradient(135deg,#1c1f27,#2b2f3a);position:relative;display:flex;align-items:flex-end;padding:14px;overflow:hidden}
+  .blogc .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .3s cubic-bezier(.22,.61,.36,1)}
+  .blogc:hover .ph img{transform:scale(1.045)}
+  .blogc .ph .cat{position:relative;z-index:1;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:rgba(225,29,42,.92);padding:5px 10px;border-radius:999px}
   .blogc .bd{padding:20px;display:flex;flex-direction:column;flex:1}
   .blogc h3{font-size:1.12rem;font-weight:650;line-height:1.3}
   .blogc p{color:var(--muted);font-size:.92rem;margin-top:8px}

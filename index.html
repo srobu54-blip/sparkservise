@@ -310,8 +310,10 @@
   .blog-grid{display:grid;grid-template-columns:1fr;gap:16px}
   .blogc{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;transition:transform .3s cubic-bezier(.22,.61,.36,1),box-shadow .3s cubic-bezier(.22,.61,.36,1)}
   .blogc:hover{transform:translateY(-4px);box-shadow:0 22px 48px -22px rgba(16,18,26,.3)}
-  .blogc .ph{height:148px;flex-shrink:0;background:linear-gradient(135deg,#1c1f27,#2b2f3a);position:relative;display:flex;align-items:flex-end;padding:14px}
-  .blogc .ph .cat{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:rgba(225,29,42,.92);padding:5px 10px;border-radius:999px}
+  .blogc .ph{height:148px;flex-shrink:0;background:linear-gradient(135deg,#1c1f27,#2b2f3a);position:relative;display:flex;align-items:flex-end;padding:14px;overflow:hidden}
+  .blogc .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .3s cubic-bezier(.22,.61,.36,1)}
+  .blogc:hover .ph img{transform:scale(1.045)}
+  .blogc .ph .cat{position:relative;z-index:1;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:rgba(225,29,42,.92);padding:5px 10px;border-radius:999px}
   .blogc .bd{padding:20px;display:flex;flex-direction:column;flex:1}
   .blogc h3{font-size:1.12rem;font-weight:650;line-height:1.3}
   .blogc p{color:var(--muted);font-size:.92rem;margin-top:8px}
@@ -828,27 +830,27 @@
       <div class="blog-grid">
         <!--blog-cards-->
         <a class="blogc reveal" href="./blog/iphone-greetsya/">
-          <span class="ph"><span class="cat">Диагностика</span></span>
+          <span class="ph"><img src="./blog/iphone-greetsya/cover.jpg" alt="iPhone с предупреждением о высокой температуре на экране" loading="lazy" decoding="async"><span class="cat">Диагностика</span></span>
           <span class="bd"><h3>Почему iPhone греется и что с этим делать</h3><p>Игры, зарядка или поломка? Когда нагрев — это норма, а когда сигнал о проблеме.</p><span class="more">Читать <span class="ar">→</span></span></span>
         </a>
         <a class="blogc reveal" href="./blog/iphone-ne-vklyuchaetsya/">
-          <span class="ph"><span class="cat">Диагностика</span></span>
+          <span class="ph"><img src="./blog/iphone-ne-vklyuchaetsya/cover.jpg" alt="iPhone с чёрным экраном, который не реагирует на нажатие кнопки питания" loading="lazy" decoding="async"><span class="cat">Диагностика</span></span>
           <span class="bd"><h3>iPhone не включается: почему так бывает и что делать</h3><p>Чёрный экран, завис на яблоке или после воды — что сделать самому и когда в сервис.</p><span class="more">Читать <span class="ar">→</span></span></span>
         </a>
         <a class="blogc reveal" href="./blog/iphone-ne-zaryazhaetsya/">
-          <span class="ph"><span class="cat">Зарядка</span></span>
+          <span class="ph"><img src="./blog/iphone-ne-zaryazhaetsya/cover.jpg" alt="iPhone с подключённым кабелем Lightning и значком зарядки на экране" loading="lazy" decoding="async"><span class="cat">Зарядка</span></span>
           <span class="bd"><h3>iPhone не заряжается: почему так происходит и что делать</h3><p>Кабель, разъём или уже сервис? Простые проверки дома и момент, когда пора в ремонт.</p><span class="more">Читать <span class="ar">→</span></span></span>
         </a>
         <a class="blogc reveal" href="./blog/pochemu-bystro-saditsya-batareya/">
-          <span class="ph"><span class="cat">Аккумулятор</span></span>
+          <span class="ph"><img src="./blog/pochemu-bystro-saditsya-batareya/cover.jpg" alt="iPhone с почти разряженной батареей на экране, рядом кабель зарядки" loading="lazy" decoding="async"><span class="cat">Аккумулятор</span></span>
           <span class="bd"><h3>Почему iPhone быстро разряжается и когда менять батарею</h3><p>Когда дело в настройках, а когда пора на замену аккумулятора.</p><span class="more">Читать <span class="ar">→</span></span></span>
         </a>
         <a class="blogc reveal" href="./blog/iphone-upal-v-vodu-chto-delat/">
-          <span class="ph"><span class="cat">Первая помощь</span></span>
+          <span class="ph"><img src="./blog/iphone-upal-v-vodu-chto-delat/cover.jpg" alt="iPhone лежит на сухом полотенце рядом с каплями воды, первая помощь после попадания влаги" loading="lazy" decoding="async"><span class="cat">Первая помощь</span></span>
           <span class="bd"><h3>iPhone попал в воду: пошаговая первая помощь и что делать нельзя</h3><p>Пошагово, что можно и чего категорически нельзя делать с мокрым телефоном.</p><span class="more">Читать <span class="ar">→</span></span></span>
         </a>
         <a class="blogc reveal" href="./blog/original-ili-kopiya-displeya-iphone/">
-          <span class="ph"><span class="cat">Дисплеи</span></span>
+          <span class="ph"><img src="./blog/original-ili-kopiya-displeya-iphone/cover.jpg" alt="Сравнение оригинального OLED и копийного дисплея iPhone на столе мастера" loading="lazy" decoding="async"><span class="cat">Дисплеи</span></span>
           <span class="bd"><h3>Оригинальный и копийный дисплей iPhone: чем реально отличаются</h3><p>Как отличить и что выбрать, чтобы не переплатить и не потерять качество.</p><span class="more">Читать <span class="ar">→</span></span></span>
         </a>
       <!--/blog-cards-->
