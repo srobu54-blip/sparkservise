@@ -519,7 +519,8 @@ def build(slug, device, c):
     page += schema_html + '\n\n'
     page += '<link rel="stylesheet" href="../styles.css">\n' + STYLE + '\n</head>\n<body>\n'
     page += '<a class="skip" href="#main">Перейти к содержимому</a>\n\n'
-    page += NAV + '\n'
+    nav = NAV.replace('href="../remont-iphone/" role="button"', 'href="../%s/" role="button"' % slug, 1)
+    page += nav + '\n'
     page += '<main id="main">\n\n'
     page += '  <div class="wrap">\n    <div class="bc" aria-label="Хлебные крошки">\n      <a href="../">Главная</a><span>›</span><span>Ремонт %s</span>\n    </div>\n  </div>\n\n'%esc(device)
     # hero
