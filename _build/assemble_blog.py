@@ -72,6 +72,12 @@ def linkify(escaped_text):
 def rich(text):  # escape then resolve link tokens
     return linkify(esc(text))
 
+def cover_file(slug):
+    for ext in (".webp", ".jpg", ".jpeg", ".png"):
+        if os.path.exists(os.path.join(REPO, "blog", slug, "cover" + ext)):
+            return "cover" + ext
+    return "cover.webp"
+
 def cover(slug, icon_key, alt):
     inner = ICON.get(icon_key, ICON["screen"])
     svg = ('<svg class="cov" viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="%s">'
@@ -84,9 +90,9 @@ def cover(slug, icon_key, alt):
            '<text x="400" y="320" text-anchor="middle" fill="#9aa0ad" font-family="-apple-system,Arial" font-size="20" font-weight="600">SPARK · Блог</text>'
            '</svg>') % (escA(alt), slug, slug, inner)
     return ('<figure class="art-cover">'
-            '<img src="cover.webp" alt="%s" width="800" height="380" '
+            '<img src="%s" alt="%s" width="800" height="380" '
             'onload="var f=this.nextElementSibling;if(f)f.style.display=\'none\'" onerror="this.remove()">'
-            '%s</figure>') % (escA(alt), svg)
+            '%s</figure>') % (cover_file(slug), escA(alt), svg)
 
 def inline_figure(alt, caption):
     return ('<figure class="art-fig">'
@@ -444,7 +450,7 @@ POLL_HTML = '''<div class="poll" id="spark-poll">
 
 def schema_blocks(slug, a, iso, miso, category):
     url = "https://sparkservice.od.ua/blog/%s/" % slug
-    img = url + "cover.webp"
+    img = url + cover_file(slug)
     post = {"@context":"https://schema.org","@type":"BlogPosting","@id":url+"#article",
         "mainEntityOfPage":{"@type":"WebPage","@id":url},
         "headline": a.get("title") or a.get("h1"), "description": a.get("metaDescription",""),
@@ -526,7 +532,7 @@ def build_article(slug, category, icon_key, iso, disp, a, meta):
     p += '<meta property="og:description" content="%s">\n' % escA(a.get("ogDescription") or desc)
     p += '<meta property="og:url" content="https://sparkservice.od.ua/blog/%s/">\n' % slug
     p += '<meta property="og:locale" content="ru_RU">\n'
-    p += '<meta property="og:image" content="https://sparkservice.od.ua/blog/%s/cover.webp">\n\n' % slug
+    p += '<meta property="og:image" content="https://sparkservice.od.ua/blog/%s/%s">\n\n' % (slug, cover_file(slug))
     p += schema_blocks(slug, a, iso, miso, category) + "\n\n"
     p += '<link rel="stylesheet" href="../../styles.css">\n' + ART_CSS + '\n</head>\n<body>\n'
     p += '<a class="skip" href="#main">Перейти к содержимому</a>\n\n'
