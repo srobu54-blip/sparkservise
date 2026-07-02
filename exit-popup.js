@@ -110,7 +110,7 @@
     phone.addEventListener("input", check);
     submit.addEventListener("click", function () {
       if (submit.disabled) return;
-      ls(K_LEAD, "1");                 // analytics.js поймает этот же клик по .js-submit
+      if (!preview) ls(K_LEAD, "1");   // analytics.js поймает этот же клик по .js-submit
       summary.innerHTML = "<div><span>" + T.sumPhone + "</span><b>+38 " + esc(phone.value) + "</b></div>";
       card.classList.add("done");
     });
@@ -121,7 +121,7 @@
 
   function open() {
     if (shown || suppressed()) return;
-    shown = true; ss(K_SEEN, "1");
+    shown = true; if (!preview) ss(K_SEEN, "1");
     var phone = build();
     modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.classList.add("modal-open");
     requestAnimationFrame(function () { modal.classList.add("show"); });
@@ -129,7 +129,7 @@
   }
   function close() {
     if (!modal) return;
-    if (!lg(K_LEAD)) ls(K_CLOSED, String(Date.now()));
+    if (!preview && !lg(K_LEAD)) ls(K_CLOSED, String(Date.now()));
     modal.classList.remove("show"); modal.setAttribute("aria-hidden", "true"); document.body.classList.remove("modal-open");
     setTimeout(function () { modal.classList.remove("open"); }, 300);
   }
@@ -137,6 +137,8 @@
   // --- триггеры ---
   if (preview) { setTimeout(open, 600); return; }
 
+  // ПК: курсор ушёл за верхнюю границу окна (mouseleave надёжнее; mouseout — запасной)
+  document.addEventListener("mouseleave", function (e) { if (e.clientY <= 0 && engaged()) open(); });
   document.addEventListener("mouseout", function (e) {
     if (e.clientY <= 0 && !e.relatedTarget && !e.toElement && engaged()) open();
   });
