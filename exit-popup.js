@@ -154,6 +154,10 @@
     addEventListener("popstate", function () {
       if (armed && !shown && !suppressed()) { try { history.pushState({ spkExit: 1 }, "", location.href); } catch (e) {} open(); }
     });
+    // свернул вкладку / переключился в другое приложение / закрывает — покажем (увидит при возврате)
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden" && engaged() && !shown && !suppressed()) open();
+    });
     var lastY = scrollY, lastT = Date.now();
     addEventListener("scroll", function () {
       var y = scrollY, t = Date.now(), dt = t - lastT;
