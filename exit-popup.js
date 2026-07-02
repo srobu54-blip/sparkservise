@@ -145,12 +145,15 @@
 
   var touch = matchMedia("(hover:none)").matches || "ontouchstart" in window;
   if (touch) {
+    // ловушку «назад» ставим раньше (8с ИЛИ 20% скролла) — так свайп/кнопка «назад» на iOS ловятся надёжнее
+    function armReady() { return (Date.now() - start) >= 8000 || maxScroll >= 0.2; }
     function arm() {
-      if (armed || shown || suppressed() || !engaged()) return;
+      if (armed || shown || suppressed() || !armReady()) return;
       armed = true; try { history.pushState({ spkExit: 1 }, "", location.href); } catch (e) {}
     }
     addEventListener("scroll", arm, { passive: true });
-    setTimeout(arm, MIN_MS + 200);
+    addEventListener("touchend", arm, { passive: true });
+    setTimeout(arm, 8200);
     addEventListener("popstate", function () {
       if (armed && !shown && !suppressed()) { try { history.pushState({ spkExit: 1 }, "", location.href); } catch (e) {} open(); }
     });
