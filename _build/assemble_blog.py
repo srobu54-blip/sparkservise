@@ -78,6 +78,21 @@ def cover_file(slug):
             return "cover" + ext
     return "cover.webp"
 
+def inline_file(slug):
+    # реальный файл inline-фото статьи (как cover_file); файла нет -> inline.webp:
+    # onerror в разметке уберёт <img> и оставит заглушку «Фото скоро добавим»
+    for ext in (".webp", ".jpg", ".jpeg", ".png"):
+        if os.path.exists(os.path.join(REPO, "blog", slug, "inline" + ext)):
+            return "inline" + ext
+    return "inline.webp"
+
+# уникальные alt inline-фото (без em-dash); нет в словаре -> coverAlt статьи
+INLINE_ALT = {
+    "pochemu-bystro-saditsya-batareya": "Замена аккумулятора iPhone на рабочем столе мастера SPARK",
+    "original-ili-kopiya-displeya-iphone": "Мастер SPARK снимает дисплейный модуль iPhone для замены",
+    "iphone-ne-vklyuchaetsya": "Диагностика iPhone с чёрным экраном в сервисном центре SPARK",
+}
+
 def cover(slug, icon_key, alt):
     inner = ICON.get(icon_key, ICON["screen"])
     svg = ('<svg class="cov" viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="%s">'
@@ -94,9 +109,9 @@ def cover(slug, icon_key, alt):
             'onload="var f=this.nextElementSibling;if(f)f.style.display=\'none\'" onerror="this.remove()">'
             '%s</figure>') % (cover_file(slug), escA(alt), svg)
 
-def inline_figure(alt, caption):
+def inline_figure(slug, alt, caption):
     return ('<figure class="art-fig">'
-            '<img src="inline.webp" alt="%s" width="800" height="500" loading="lazy" decoding="async" '
+            '<img src="' + inline_file(slug) + '" alt="%s" width="800" height="500" loading="lazy" decoding="async" '
             'onload="var p=this.nextElementSibling;if(p)p.style.display=\'none\'" onerror="this.remove()">'
             '<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Фото скоро добавим</div>'
             '<figcaption>%s</figcaption></figure>') % (escA(alt), esc(caption))
@@ -485,7 +500,7 @@ def build_article(slug, category, icon_key, iso, disp, a, meta):
         body.append('<h2 id="s%d">%s</h2>' % (i, esc(s.get("h2",""))))
         body.append(render_blocks(s.get("blocks")))
         if i == 0 and len(sections) >= 3:
-            body.append(inline_figure(a.get("coverAlt", a.get("h1","")), a.get("h1","")))
+            body.append(inline_figure(slug, INLINE_ALT.get(slug) or a.get("coverAlt", a.get("h1","")), a.get("h1","")))
     body_html = "\n        ".join(body)
     tldr = a.get("tldr") or []
     tldr_html = ('<div class="tldr"><b>Коротко</b><ul>%s</ul></div>' %
