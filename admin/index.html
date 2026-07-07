@@ -308,9 +308,14 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
 
     const chMap = {};
     live.forEach(r => { const t = channelOf(r).t; if (!chMap[t]) chMap[t] = { c: 0, rev: 0 }; chMap[t].c++; chMap[t].rev += Number(r.revenue) || 0; });
+    // каналы по количеству заявок
     const chArr = Object.entries(chMap).sort((a, b) => b[1].c - a[1].c);
     const chMax = Math.max(1, ...chArr.map(x => x[1].c));
-    const chHtml = chArr.length ? chArr.map(([nm, o]) => `<div class="brow"><span class="nm" title="${esc(nm)}">${esc(nm)}</span><span class="bar"><i style="width:${Math.round(o.c / chMax * 100)}%"></i></span><span class="v">${o.c}${o.rev ? " · " + money(o.rev) : ""}</span></div>`).join("") : '<div class="muted">нет данных</div>';
+    const chHtml = chArr.length ? chArr.map(([nm, o]) => `<div class="brow"><span class="nm" title="${esc(nm)}">${esc(nm)}</span><span class="bar"><i style="width:${Math.round(o.c / chMax * 100)}%"></i></span><span class="v">${o.c}</span></div>`).join("") : '<div class="muted">нет данных</div>';
+    // доход по каналам (только с деньгами, по убыванию)
+    const revArr = Object.entries(chMap).filter(x => x[1].rev > 0).sort((a, b) => b[1].rev - a[1].rev);
+    const revMax = Math.max(1, ...revArr.map(x => x[1].rev));
+    const revHtml = revArr.length ? revArr.map(([nm, o]) => `<div class="brow"><span class="nm" title="${esc(nm)}">${esc(nm)}</span><span class="bar"><i style="width:${Math.round(o.rev / revMax * 100)}%"></i></span><span class="v">${money(o.rev)}</span></div>`).join("") : '<div class="muted">доход ещё не отмечен в заявках</div>';
 
     const svMap = {};
     live.forEach(r => { if (r.service) { const s = r.service.trim(); svMap[s] = (svMap[s] || 0) + 1; } });
@@ -334,7 +339,8 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
     const chartHtml = days.map(k => `<div class="col" title="${k}: ${dMap[k] || 0}" style="height:${Math.round((dMap[k] || 0) / dMax * 100)}%"></div>`).join("");
 
     $("panels").innerHTML =
-      `<div class="panel"><h3>Откуда приходят (каналы + доход)</h3>${chHtml}</div>
+      `<div class="panel"><h3>Каналы (кол-во заявок)</h3>${chHtml}</div>
+       <div class="panel"><h3>Доход по каналам</h3>${revHtml}</div>
        <div class="panel"><h3>Топ услуг</h3>${svHtml}</div>
        <div class="panel"><h3>Заявки по дням</h3><div class="chart">${chartHtml}</div><div class="chart-x"><span>${days[0].slice(5)}</span><span>${days[days.length - 1].slice(5)}</span></div></div>`;
   }
