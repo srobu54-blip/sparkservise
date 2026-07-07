@@ -56,14 +56,13 @@
   <!-- ЛОГИН -->
   <div id="loginView" class="card login" style="display:none">
     <h1>Вход в админку</h1>
-    <p>Заявки сервисного центра SPARK</p>
+    <p>Введите email — пришлём ссылку для входа (без пароля).</p>
     <form id="loginForm">
       <label>Email</label>
-      <input id="email" type="email" autocomplete="username" required>
-      <label>Пароль</label>
-      <input id="password" type="password" autocomplete="current-password" required>
-      <button class="btn" type="submit">Войти</button>
+      <input id="email" type="email" autocomplete="email" required>
+      <button class="btn" type="submit">Получить ссылку для входа</button>
       <div class="err" id="loginErr"></div>
+      <div class="ok" id="loginOk" style="display:none;color:#15803D;font-size:.88rem;margin-top:12px">Ссылка отправлена на почту. Откройте её на этом устройстве — вход произойдёт автоматически.</div>
     </form>
   </div>
 
@@ -121,16 +120,33 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
 
   async function showAuth() {
     const { data } = await sb.auth.getSession();
-    if (data.session) { loginView.style.display = "none"; listView.style.display = "block"; logout.style.display = "inline-block"; load(); }
-    else { loginView.style.display = "block"; listView.style.display = "none"; logout.style.display = "none"; }
+    if (data.session) {
+      loginView.style.display = "none"; logout.style.display = "inline-block";
+      // доступ к заявкам — только у email из allowlist (проверяем на стороне БД)
+      const { data: ok } = await sb.rpc("is_admin");
+      if (ok) { listView.style.display = "block"; load(); }
+      else {
+        listView.style.display = "none";
+        $("bootErr").style.display = "block";
+        $("bootErr").innerHTML = "<b>Нет доступа.</b> Этот email не в списке администраторов. <button class='btn line' id='logout2'>Выйти</button>";
+        $("logout2").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
+      }
+    } else {
+      loginView.style.display = "block"; listView.style.display = "none"; logout.style.display = "none";
+    }
   }
 
   $("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault(); $("loginErr").textContent = "";
-    const { error } = await sb.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
-    if (error) $("loginErr").textContent = "Неверный email или пароль.";
-    else showAuth();
+    e.preventDefault(); $("loginErr").textContent = ""; $("loginOk").style.display = "none";
+    const email = $("email").value.trim();
+    const { error } = await sb.auth.signInWithOtp({
+      email, options: { emailRedirectTo: location.origin + location.pathname }
+    });
+    if (error) $("loginErr").textContent = "Не удалось отправить ссылку: " + error.message;
+    else $("loginOk").style.display = "block";
   });
+  // магик-линк возвращает с токеном в URL -> supabase-js подхватит и вызовет это
+  sb.auth.onAuthStateChange(() => showAuth());
   logout.addEventListener("click", async () => { await sb.auth.signOut(); showAuth(); });
   $("refresh").addEventListener("click", load);
   $("filters").addEventListener("click", (e) => {
