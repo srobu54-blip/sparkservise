@@ -55,11 +55,28 @@ supabase secrets set TELEGRAM_BOT_TOKEN="..." TELEGRAM_CHAT_ID="..." WEBHOOK_SEC
 
 **3.1.** Ключи уже вписаны в шаге 1.2.
 
-**3.2. Создать пользователя-админа:** Supabase → Authentication → Users → Add user
-(email + пароль). Вход в админку — этой парой.
+**3.2. Отключить публичную регистрацию** (КРИТИЧНО — иначе любой сможет зарегаться публичным
+ключом и получить доступ): Supabase → Authentication → Sign In / Providers → **отключить Email
+signups**. (В `supabase/config.toml` уже стоит `enable_signup = false` — применяется при деплое
+конфига, но в дашборде продублируй.)
 
-> `/admin/` уже `noindex` и не в sitemap. Только вошедший (`authenticated`) видит заявки;
-> `anon` не видит ничего (RLS). Логика: смотреть все заявки, менять статус (новая/в работе/готово/спам).
+**3.3. Создать пользователя-админа:** Supabase → Authentication → Users → Add user (email + пароль).
+
+**3.4. Внести админа в allowlist** (только он будет видеть заявки — не любой авторизованный):
+скопируй `User UID` созданного юзера и в SQL Editor выполни:
+```sql
+insert into public.app_admins (user_id) values ('<UID-админа>');
+```
+
+> `/admin/` уже `noindex` и не в sitemap. Заявки видит ТОЛЬКО пользователь из `app_admins`
+> (RLS через `is_admin()`); `anon` и «просто authenticated» — ничего. Меняет только статус/заметку.
+
+> **Антиспам.** На INSERT стоит throttle: один и тот же телефон не чаще раза в 30 сек (гасит
+> наивный флуд и двойные отправки). Клиентские honeypot/тайм-трап (`lead-submit.js`) отсекают
+> ботов, идущих через форму, но НЕ защищают прямые запросы в REST. Если пойдёт спам —
+> подключить **Cloudflare Turnstile**: капча-токен проверять в Edge-функции-прокси, а прямой
+> `insert` у `anon` отобрать (вставку делать от service_role внутри функции). Пока трафик
+> небольшой — throttle + honeypot достаточно.
 
 ---
 

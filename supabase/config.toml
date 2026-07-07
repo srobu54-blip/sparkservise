@@ -2,5 +2,12 @@
 # Связать локально: `supabase link --project-ref <ref>`.
 project_id = "REPLACE_WITH_PROJECT_REF"
 
+[auth]
+# Выключаем публичную саморегистрацию: иначе любой через публичный anon-ключ мог бы
+# зарегаться и получить роль authenticated. Админов заводим вручную (см. SUPABASE_SETUP.md).
+# ВАЖНО: этот флаг применяется при `supabase db push`/деплое конфига; в дашборде продублировать
+# Authentication -> Sign In / Providers -> отключить Email signups, если правишь там.
+enable_signup = false
+
 [functions.notify-telegram]
 verify_jwt = false   # вызывается Database Webhook'ом (не пользователем); защита — свой x-webhook-secret

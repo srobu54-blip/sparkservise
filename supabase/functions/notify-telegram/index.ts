@@ -15,6 +15,11 @@ const SECRET = Deno.env.get("WEBHOOK_SECRET") ?? "";
 function esc(s: unknown): string {
   return String(s ?? "").replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c] as string));
 }
+// поля заявки приходят от анонимов: оборачиваем в <code> — Telegram НЕ авто-линкует
+// содержимое code, поэтому вредоносный URL в имени/услуге/странице не станет кликабельным
+function code(s: unknown): string {
+  return "<code>" + esc(s) + "</code>";
+}
 
 function fmtDate(iso: string | null): string {
   try {
@@ -51,13 +56,15 @@ Deno.serve(async (req) => {
     return new Response("Bad payload", { status: 400 });
   }
 
+  // source/lang — из контролируемого enum (безопасны через esc); phone/name/service/page_url —
+  // произвольный ввод анонима -> в <code>, чтобы Telegram не сделал из них кликабельную ссылку
   const lines = [
     "🔔 <b>Новая заявка — SPARK</b>",
-    `📞 <b>${esc(rec.phone)}</b>`,
-    rec.name ? `👤 ${esc(rec.name)}` : "",
-    rec.service ? `🛠 ${esc(rec.service)}` : "",
+    `📞 ${code(rec.phone)}`,
+    rec.name ? `👤 ${code(rec.name)}` : "",
+    rec.service ? `🛠 ${code(rec.service)}` : "",
     `🌐 ${esc(SRC[String(rec.source)] ?? rec.source)}${rec.lang ? " · " + esc(rec.lang) : ""}`,
-    rec.page_url ? `🔗 ${esc(rec.page_url)}` : "",
+    rec.page_url ? `🔗 ${code(rec.page_url)}` : "",
     `🕒 ${esc(fmtDate((rec.created_at as string) ?? null))}`,
   ].filter(Boolean);
 
