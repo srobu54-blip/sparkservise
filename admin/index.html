@@ -45,6 +45,16 @@
   .s-new{color:#B45309}.s-in_progress{color:#1D4ED8}.s-done{color:#15803D}.s-spam{color:#9CA3AF}
   .src{display:inline-block;font-size:.74rem;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--muted)}
   .muted{color:var(--muted)}
+  .ch{display:inline-block;font-size:.76rem;font-weight:700;border-radius:6px;padding:3px 8px;white-space:nowrap}
+  .ch-ads{background:#FEF3C7;color:#92400E}       /* Google Ads / платная реклама */
+  .ch-seo{background:#DCFCE7;color:#166534}       /* поиск / органика */
+  .ch-social{background:#EDE9FE;color:#5B21B6}    /* соцсети */
+  .ch-email{background:#FFEDD5;color:#9A3412}     /* email */
+  .ch-ref{background:#CCFBF1;color:#115E59}       /* переход с сайта */
+  .ch-utm{background:#E0E7FF;color:#3730A3}       /* кампания с меткой */
+  .ch-direct{background:#F1F5F9;color:#475569}    /* прямой заход */
+  .ch-note{display:block;font-size:.72rem;color:var(--muted);margin-top:3px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  td .page{font-size:.82rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
   .empty{text-align:center;color:var(--muted);padding:40px}
   .count{font-size:.85rem;color:var(--muted)}
 </style>
@@ -84,7 +94,7 @@
     </div>
     <div class="card tablewrap">
       <table>
-        <thead><tr><th>Дата</th><th>Телефон</th><th>Имя</th><th>Услуга</th><th>Источник</th><th>Статус</th></tr></thead>
+        <thead><tr><th>Дата</th><th>Телефон</th><th>Имя</th><th>Услуга</th><th>Канал</th><th>Страница</th><th>Статус</th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
       <div class="empty" id="empty" style="display:none">Заявок пока нет.</div>
@@ -118,6 +128,33 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
     } catch { return iso; }
   }
   function esc(s) { return String(s ?? "").replace(/[<>&]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c])); }
+  function host(u) { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return u || ""; } }
+  const has = (s, arr) => arr.some(x => s.indexOf(x) > -1);
+
+  // человекочитаемый канал трафика из UTM + gclid/fbclid + реферера
+  function channelOf(r) {
+    const u = r.utm || {}, src = (u.source || "").toLowerCase(), med = (u.medium || "").toLowerCase(),
+          ref = (r.referrer || "").toLowerCase();
+    const camp = u.campaign ? " · " + u.campaign : "";
+    if (u.gclid || med === "cpc" || med === "ppc" || has(med, ["paid"]) || (src === "google" && has(med, ["cpc", "ad"])))
+      return { t: "Google Ads", c: "ads", d: "платная реклама Google" + camp };
+    if (u.fbclid || (has(src, ["facebook", "instagram", "fb", "ig", "meta"]) && (med === "cpc" || has(med, ["paid", "social"]))))
+      return { t: "Реклама в соцсетях", c: "ads", d: (src || "Meta") + camp };
+    if (med === "email" || src === "email") return { t: "Email-рассылка", c: "email", d: (u.campaign || "рассылка") };
+    if (has(src, ["facebook", "instagram", "tiktok", "youtube", "telegram", "t.me"]) || has(med, ["social"]))
+      return { t: "Соцсети", c: "social", d: (src || "соцсеть") + camp };
+    if (has(med, ["organic"])) return { t: "Поиск (SEO)", c: "seo", d: (src || "органический поиск") };
+    if (src || med) return { t: "Кампания с меткой", c: "utm", d: (src || "?") + " / " + (med || "?") + camp };
+    // без UTM — определяем по рефереру
+    if (!ref) return { t: "Прямой заход", c: "direct", d: "набрал адрес / закладка / мессенджер" };
+    if (has(ref, ["google.", "bing.", "yahoo", "duckduckgo", "yandex"]))
+      return { t: "Поиск (SEO)", c: "seo", d: "органический переход из поиска" };
+    if (has(ref, ["facebook.", "instagram.", "t.co", "twitter", "x.com", "tiktok", "youtube.", "t.me"]))
+      return { t: "Соцсети", c: "social", d: "переход из соцсети" };
+    if (has(ref, ["sparkservice", "maxsushek.github.io"]))
+      return { t: "Прямой заход", c: "direct", d: "внутренний переход по сайту" };
+    return { t: "Переход с сайта", c: "ref", d: host(r.referrer) };
+  }
 
   async function showAuth() {
     const { data } = await sb.auth.getSession();
@@ -163,12 +200,22 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
     empty.textContent = "Заявок пока нет.";
     rows.innerHTML = data.map(r => {
       const opts = STAT.map(s => `<option value="${s}"${s === r.status ? " selected" : ""}>${STAT_RU[s]}</option>`).join("");
+      const ch = channelOf(r);
+      const u = r.utm || {};
+      // полные детали в подсказке при наведении
+      const tip = ["Форма: " + (SRC_RU[r.source] || r.source),
+        u.source ? "utm_source: " + u.source : "", u.medium ? "utm_medium: " + u.medium : "",
+        u.campaign ? "utm_campaign: " + u.campaign : "", u.gclid ? "gclid: " + u.gclid : "",
+        u.fbclid ? "fbclid: " + u.fbclid : "", r.referrer ? "referrer: " + r.referrer : "",
+        u.landing ? "вход: " + u.landing : ""].filter(Boolean).join("\n");
+      const page = r.page_url || (u.landing || "");
       return `<tr>
         <td class="when">${fmt(r.created_at)}</td>
         <td><span class="phone">${esc(r.phone)}</span></td>
         <td>${r.name ? esc(r.name) : '<span class="muted">—</span>'}</td>
         <td>${r.service ? esc(r.service) : '<span class="muted">—</span>'}</td>
-        <td><span class="src">${SRC_RU[r.source] || esc(r.source)}</span>${r.lang ? ' <span class="muted">' + esc(r.lang) + '</span>' : ''}</td>
+        <td title="${esc(tip)}"><span class="ch ch-${ch.c}">${esc(ch.t)}</span><span class="ch-note">${esc(ch.d)}</span></td>
+        <td><span class="page" title="${esc(page)}">${page ? esc(page) : '<span class="muted">—</span>'}</span><span class="ch-note">${SRC_RU[r.source] || esc(r.source)}${r.lang ? ' · ' + esc(r.lang) : ''}</span></td>
         <td><select class="status s-${r.status}" data-id="${r.id}">${opts}</select></td>
       </tr>`;
     }).join("");

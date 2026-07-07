@@ -38,14 +38,29 @@
 
   function val(box, sel) { var el = box.querySelector(sel); return el ? (el.value || "").trim() : ""; }
 
-  function utm() {
+  // Источник «первого касания»: UTM-метки + gclid(Google Ads)/fbclid(Meta) + реферер +
+  // страница входа. Сохраняется в sessionStorage при ПЕРВОМ заходе -> если человек полистал
+  // сайт и отправил заявку на другой странице, метки не теряются. Кладём в utm (jsonb).
+  function firstTouch() {
     try {
-      var q = new URLSearchParams(location.search), o = {}, k,
-          keys = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
-      for (var i = 0; i < keys.length; i++) { k = q.get(keys[i]); if (k) o[keys[i].slice(4)] = k.slice(0, 120); }
-      return Object.keys(o).length ? o : null;
-    } catch (e) { return null; }
+      var K = "spk_attr", saved = sessionStorage.getItem(K);
+      if (saved) return JSON.parse(saved);
+      var q = new URLSearchParams(location.search), u = {}, p, v,
+          keys = ["source", "medium", "campaign", "term", "content"];
+      for (var i = 0; i < keys.length; i++) { v = q.get("utm_" + keys[i]); if (v) u[keys[i]] = v.slice(0, 120); }
+      var g = q.get("gclid"), f = q.get("fbclid");
+      if (g) u.gclid = g.slice(0, 120);
+      if (f) u.fbclid = f.slice(0, 120);
+      u.landing = (location.pathname + location.search).slice(0, 300);   // страница входа
+      var o = {
+        utm: u,
+        referrer: (document.referrer || "").slice(0, 300) || null        // откуда пришёл
+      };
+      sessionStorage.setItem(K, JSON.stringify(o));
+      return o;
+    } catch (e) { return { utm: null, referrer: (document.referrer || "").slice(0, 300) || null }; }
   }
+  firstTouch();   // зафиксировать источник как можно раньше (на первой странице сессии)
 
   document.addEventListener("click", function (e) {
     var t = e.target;
@@ -68,15 +83,16 @@
       : (btn.id === "mSubmit" ? "modal_callback"
       : (box.id === "bookFormInline" ? "inline_form" : "unknown"));
 
+    var attr = firstTouch();
     var row = {
       name: (val(box, ".js-name") || val(box, "#mName")) || null,
       phone: phone.slice(0, 32),
       service: (val(box, ".js-device") || val(box, "#mDevice")) || null,
       source: source,
-      page_url: location.pathname.slice(0, 500),
+      page_url: location.pathname.slice(0, 500),   // страница, где отправили заявку
       lang: (document.documentElement.lang || "ru").toLowerCase().indexOf("uk") === 0 ? "uk" : "ru",
-      utm: utm(),
-      referrer: (document.referrer || "").slice(0, 500) || null
+      utm: (attr.utm && Object.keys(attr.utm).length) ? attr.utm : null,   // источник + gclid/fbclid + landing
+      referrer: attr.referrer || null
     };
 
     // fire-and-forget: UI-успех рисует main.js/exit-popup.js; сеть не блокирует
