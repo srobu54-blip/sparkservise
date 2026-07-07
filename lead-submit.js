@@ -13,8 +13,8 @@
 (function () {
   "use strict";
   var CFG = {
-    url: "REPLACE_WITH_SUPABASE_URL",          // https://<ref>.supabase.co
-    anonKey: "REPLACE_WITH_SUPABASE_ANON_KEY"  // публичный anon-ключ
+    url: "https://xvqqoyttvfmrjvufkkzm.supabase.co",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2cXFveXR0dmZtcmp2dWZra3ptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MDQwMDgsImV4cCI6MjA5ODk4MDAwOH0.yaUDu6A4ajFSKx7Xn51BEUgMgkpF47HOhRocCYfjpSU"
   };
   function ready(v) { return v && v.indexOf("REPLACE_") !== 0; }
   if (!ready(CFG.url) || !ready(CFG.anonKey)) return; // спит до заполнения
