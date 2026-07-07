@@ -1,0 +1,6 @@
+# Supabase project config (CLI). project_id = ref проекта (Project Settings -> General).
+# Связать локально: `supabase link --project-ref <ref>`.
+project_id = "REPLACE_WITH_PROJECT_REF"
+
+[functions.notify-telegram]
+verify_jwt = false   # вызывается Database Webhook'ом (не пользователем); защита — свой x-webhook-secret

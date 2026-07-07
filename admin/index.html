@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>SPARK — Заявки</title>
+<!-- CFG: те же публичные значения, что в lead-submit.js -->
+<script>
+  window.SB_CFG = {
+    url: "REPLACE_WITH_SUPABASE_URL",          // https://<ref>.supabase.co
+    anonKey: "REPLACE_WITH_SUPABASE_ANON_KEY"  // публичный anon-ключ
+  };
+</script>
+<style>
+  :root{--spark:#E11D2A;--ink:#0E0F12;--line:#e5e7eb;--muted:#697086;--bg:#f5f6f8}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#23252B;background:var(--bg)}
+  header{background:var(--ink);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  header b{font-size:1.05rem;letter-spacing:.02em}
+  header .sp{color:var(--spark)}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px}
+  .login{max-width:360px;margin:8vh auto}
+  .login h1{font-size:1.15rem;margin:0 0 4px}
+  .login p{color:var(--muted);font-size:.9rem;margin:0 0 18px}
+  label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin:12px 0 5px}
+  input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-size:.95rem}
+  input:focus{outline:none;border-color:var(--spark)}
+  button{cursor:pointer;font-weight:600;border:none;border-radius:9px;font-size:.92rem}
+  .btn{background:var(--spark);color:#fff;padding:12px 18px;width:100%;margin-top:16px}
+  .btn.line{background:#fff;color:var(--ink);border:1px solid var(--line);width:auto;padding:8px 14px;margin:0}
+  .err{color:var(--spark);font-size:.85rem;margin-top:10px;min-height:1em}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .filters{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{background:#fff;border:1px solid var(--line);color:var(--muted);padding:6px 12px;border-radius:999px;font-size:.84rem}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tablewrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:760px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  td .phone{font-weight:700;white-space:nowrap}
+  td .when{color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+  select.status{padding:6px 8px;border:1px solid var(--line);border-radius:7px;font-size:.85rem;font-weight:600}
+  .s-new{color:#B45309}.s-in_progress{color:#1D4ED8}.s-done{color:#15803D}.s-spam{color:#9CA3AF}
+  .src{display:inline-block;font-size:.74rem;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--muted)}
+  .muted{color:var(--muted)}
+  .empty{text-align:center;color:var(--muted);padding:40px}
+  .count{font-size:.85rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header><b>SPARK <span class="sp">·</span> Заявки</b><button id="logout" class="btn line" style="display:none">Выйти</button></header>
+
+<div class="wrap">
+  <!-- ЛОГИН -->
+  <div id="loginView" class="card login" style="display:none">
+    <h1>Вход в админку</h1>
+    <p>Заявки сервисного центра SPARK</p>
+    <form id="loginForm">
+      <label>Email</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label>Пароль</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button class="btn" type="submit">Войти</button>
+      <div class="err" id="loginErr"></div>
+    </form>
+  </div>
+
+  <!-- СПИСОК -->
+  <div id="listView" style="display:none">
+    <div class="bar">
+      <div class="filters" id="filters">
+        <button class="chip on" data-f="all">Все</button>
+        <button class="chip" data-f="new">Новые</button>
+        <button class="chip" data-f="in_progress">В работе</button>
+        <button class="chip" data-f="done">Готово</button>
+        <button class="chip" data-f="spam">Спам</button>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="count" id="count"></span>
+        <button class="btn line" id="refresh">Обновить</button>
+      </div>
+    </div>
+    <div class="card tablewrap">
+      <table>
+        <thead><tr><th>Дата</th><th>Телефон</th><th>Имя</th><th>Услуга</th><th>Источник</th><th>Статус</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" style="display:none">Заявок пока нет.</div>
+    </div>
+  </div>
+
+  <div id="bootErr" class="card" style="display:none">
+    <b>Не настроено.</b> Впишите <code>url</code> и <code>anonKey</code> в <code>window.SB_CFG</code> вверху этого файла.
+  </div>
+</div>
+
+<script type="module">
+const CFG = window.SB_CFG || {};
+if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
+  document.getElementById("bootErr").style.display = "block";
+} else {
+  const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  const sb = createClient(CFG.url, CFG.anonKey);
+
+  const $ = (id) => document.getElementById(id);
+  const loginView = $("loginView"), listView = $("listView"), logout = $("logout");
+  const STAT = ["new", "in_progress", "done", "spam"];
+  const STAT_RU = { new: "Новая", in_progress: "В работе", done: "Готово", spam: "Спам" };
+  const SRC_RU = { exit_popup: "Exit-попап", modal_callback: "Модалка", inline_form: "Форма", unknown: "Форма" };
+  let filter = "all";
+
+  function fmt(iso) {
+    try {
+      return new Intl.DateTimeFormat("ru-UA", { timeZone: "Europe/Kyiv",
+        day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+    } catch { return iso; }
+  }
+  function esc(s) { return String(s ?? "").replace(/[<>&]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c])); }
+
+  async function showAuth() {
+    const { data } = await sb.auth.getSession();
+    if (data.session) { loginView.style.display = "none"; listView.style.display = "block"; logout.style.display = "inline-block"; load(); }
+    else { loginView.style.display = "block"; listView.style.display = "none"; logout.style.display = "none"; }
+  }
+
+  $("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault(); $("loginErr").textContent = "";
+    const { error } = await sb.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
+    if (error) $("loginErr").textContent = "Неверный email или пароль.";
+    else showAuth();
+  });
+  logout.addEventListener("click", async () => { await sb.auth.signOut(); showAuth(); });
+  $("refresh").addEventListener("click", load);
+  $("filters").addEventListener("click", (e) => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    filter = b.dataset.f;
+    document.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === b));
+    load();
+  });
+
+  async function load() {
+    let q = sb.from("leads").select("*").order("created_at", { ascending: false }).limit(500);
+    if (filter !== "all") q = q.eq("status", filter);
+    const { data, error } = await q;
+    const rows = $("rows"), empty = $("empty");
+    if (error) { rows.innerHTML = ""; empty.style.display = "block"; empty.textContent = "Ошибка загрузки: " + error.message; return; }
+    $("count").textContent = data.length + " заявок";
+    empty.style.display = data.length ? "none" : "block";
+    empty.textContent = "Заявок пока нет.";
+    rows.innerHTML = data.map(r => {
+      const opts = STAT.map(s => `<option value="${s}"${s === r.status ? " selected" : ""}>${STAT_RU[s]}</option>`).join("");
+      return `<tr>
+        <td class="when">${fmt(r.created_at)}</td>
+        <td><span class="phone">${esc(r.phone)}</span></td>
+        <td>${r.name ? esc(r.name) : '<span class="muted">—</span>'}</td>
+        <td>${r.service ? esc(r.service) : '<span class="muted">—</span>'}</td>
+        <td><span class="src">${SRC_RU[r.source] || esc(r.source)}</span>${r.lang ? ' <span class="muted">' + esc(r.lang) + '</span>' : ''}</td>
+        <td><select class="status s-${r.status}" data-id="${r.id}">${opts}</select></td>
+      </tr>`;
+    }).join("");
+    rows.querySelectorAll("select.status").forEach(sel => {
+      sel.addEventListener("change", async () => {
+        const { error } = await sb.from("leads").update({ status: sel.value }).eq("id", sel.dataset.id);
+        if (error) { alert("Не удалось обновить статус: " + error.message); return; }
+        sel.className = "status s-" + sel.value;
+        if (filter !== "all" && filter !== sel.value) load();
+      });
+    });
+  }
+
+  showAuth();
+}
+</script>
+</body>
+</html>

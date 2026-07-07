@@ -8,6 +8,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = [
     ('<!--spark-analytics-->', '<!--/spark-analytics-->', 'analytics.js'),
     ('<!--spark-exit-->', '<!--/spark-exit-->', 'exit-popup.js'),
+    ('<!--spark-lead-->', '<!--/spark-lead-->', 'lead-submit.js'),
 ]
 
 def process(f):
@@ -29,7 +30,7 @@ def process(f):
 def main():
     n = tot = 0
     for f in glob.glob(os.path.join(REPO, '**', 'index.html'), recursive=True):
-        if '_build' in f:
+        if '_build' in f or os.sep + 'admin' in f:   # админку не трекаем и не показываем попап
             continue
         tot += 1
         if process(f):
