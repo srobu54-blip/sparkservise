@@ -57,6 +57,7 @@
   td .page{font-size:.82rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
   .empty{text-align:center;color:var(--muted);padding:40px}
   .count{font-size:.85rem;color:var(--muted)}
+  tr.hl td{background:#FEF9C3;transition:background 1.2s}   /* подсветка лида из ссылки CRM */
 </style>
 </head>
 <body>
@@ -209,7 +210,7 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
         u.fbclid ? "fbclid: " + u.fbclid : "", r.referrer ? "referrer: " + r.referrer : "",
         u.landing ? "вход: " + u.landing : ""].filter(Boolean).join("\n");
       const page = r.page_url || (u.landing || "");
-      return `<tr>
+      return `<tr data-lead="${r.id}">
         <td class="when">${fmt(r.created_at)}</td>
         <td><span class="phone">${esc(r.phone)}</span></td>
         <td>${r.name ? esc(r.name) : '<span class="muted">—</span>'}</td>
@@ -227,6 +228,12 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
         if (filter !== "all" && filter !== sel.value) load();
       });
     });
+    // прямая ссылка из Telegram: ?lead=<id> -> подсветить и прокрутить к заявке
+    const target = new URLSearchParams(location.search).get("lead");
+    if (target) {
+      const tr = rows.querySelector('tr[data-lead="' + target + '"]');
+      if (tr) { tr.classList.add("hl"); tr.scrollIntoView({ block: "center" }); }
+    }
   }
 
   showAuth();
