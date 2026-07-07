@@ -88,10 +88,19 @@
   .note-inp{width:150px;padding:6px 8px;font-size:.82rem}
   .empty{text-align:center;color:var(--muted);padding:40px}
   tr.hl td{background:#FEF9C3;transition:background 1.2s}
+  .rev-inp{width:90px;padding:6px 8px;font-size:.85rem;font-weight:700;text-align:right}
+  /* панель настроек счётчиков */
+  #settings{margin-bottom:18px}
+  #settings .row{display:grid;grid-template-columns:200px 1fr;gap:10px;align-items:center;margin:9px 0}
+  #settings .row label{margin:0}
+  #settings .hint{font-size:.76rem;color:var(--muted);margin-top:2px}
+  #settings .save{width:auto;padding:10px 22px;margin-top:8px}
+  #settings .ok{color:#15803D;font-size:.85rem;margin-left:12px}
+  @media(max-width:640px){#settings .row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header><b>SPARK <span class="sp">·</span> Заявки</b><button id="logout" class="btn line" style="display:none">Выйти</button></header>
+<header><b>SPARK <span class="sp">·</span> Заявки</b><div style="display:flex;gap:8px"><button id="settingsBtn" class="btn line" style="display:none">⚙ Счётчики</button><button id="logout" class="btn line" style="display:none">Выйти</button></div></header>
 
 <div class="wrap">
   <!-- ЛОГИН -->
@@ -110,6 +119,18 @@
 
   <!-- РАБОЧАЯ ОБЛАСТЬ -->
   <div id="listView" style="display:none">
+    <!-- НАСТРОЙКИ СЧЁТЧИКОВ (скрыто, по кнопке ⚙) -->
+    <div id="settings" class="card" style="display:none">
+      <h3 style="margin:0 0 4px">Рекламные счётчики</h3>
+      <p class="muted" style="font-size:.86rem;margin:0 0 14px">Вставьте ID и нажмите «Сохранить» — сайт подхватит сам, без пересбора. Пустое поле = выключено.</p>
+      <div class="row"><label>Google Analytics 4<div class="hint">Measurement ID, вид <code>G-XXXXXXX</code></div></label><input id="s_ga4" placeholder="G-XXXXXXX"></div>
+      <div class="row"><label>Meta Pixel<div class="hint">Pixel ID (число ~15 цифр)</div></label><input id="s_px" placeholder="123456789012345"></div>
+      <div class="row"><label>Google Ads — ID<div class="hint"><code>AW-XXXXXXXXX</code></div></label><input id="s_ads" placeholder="AW-XXXXXXXXX"></div>
+      <div class="row"><label>Google Ads — ярлык конверсии<div class="hint">часть после «/» в send_to</div></label><input id="s_lbl" placeholder="AbCdEfGh123"></div>
+      <div class="row"><label>Search Console<div class="hint">токен из способа «HTML-тег» (лучше DNS)</div></label><input id="s_gsc" placeholder="content=…"></div>
+      <button class="btn save" id="s_save">Сохранить</button><span class="ok" id="s_ok"></span>
+    </div>
+
     <div class="kpis" id="kpis"></div>
     <div class="panels" id="panels"></div>
 
@@ -131,7 +152,7 @@
 
     <div class="card tablewrap">
       <table>
-        <thead><tr><th>Дата</th><th>Контакт</th><th>Услуга</th><th>Канал / страница</th><th>Заметка</th><th>Статус</th></tr></thead>
+        <thead><tr><th>Дата</th><th>Контакт</th><th>Услуга</th><th>Канал / страница</th><th>Доход, ₴</th><th>Заметка</th><th>Статус</th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
       <div class="empty" id="empty" style="display:none">Заявок пока нет.</div>
@@ -195,23 +216,27 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
     const cnt = s => ALL.filter(r => r.status === s).length;
     const done = cnt("done");
     const conv = live.length ? Math.round(done / live.length * 100) : 0;
+    const money = (n) => Math.round(n || 0).toLocaleString("ru-RU") + " ₴";
+    const revSum = live.reduce((s, r) => s + (Number(r.revenue) || 0), 0);
+    const revCnt = live.filter(r => Number(r.revenue) > 0).length;
+    const avg = revCnt ? Math.round(revSum / revCnt) : 0;
 
     $("kpis").innerHTML = [
       ["Всего заявок", total, ""],
       ["Сегодня", today, "за неделю: " + week],
       ["Новые", cnt("new"), "ждут обработки", cnt("new") > 0],
-      ["В работе", cnt("in_progress"), ""],
       ["Готово", done, "конверсия " + conv + "%"],
-      ["Спам", cnt("spam"), ""]
+      ["Доход", money(revSum), revCnt + " с оплатой", true],
+      ["Средний чек", money(avg), ""]
     ].map(([l, n, s, acc]) => `<div class="kpi${acc ? " accent" : ""}"><div class="n">${n}</div><div class="l">${l}</div>${s ? `<div class="s">${s}</div>` : ""}</div>`).join("");
 
-    // разбивка по каналам
+    // разбивка по каналам (кол-во + доход)
     const chMap = {};
-    live.forEach(r => { const t = channelOf(r).t; chMap[t] = (chMap[t] || 0) + 1; });
-    const chArr = Object.entries(chMap).sort((a, b) => b[1] - a[1]);
-    const chMax = Math.max(1, ...chArr.map(x => x[1]));
-    const chHtml = chArr.length ? chArr.map(([nm, v]) =>
-      `<div class="brow"><span class="nm" title="${esc(nm)}">${esc(nm)}</span><span class="bar"><i style="width:${Math.round(v / chMax * 100)}%"></i></span><span class="v">${v}</span></div>`).join("") : '<div class="muted">нет данных</div>';
+    live.forEach(r => { const t = channelOf(r).t; if (!chMap[t]) chMap[t] = { c: 0, rev: 0 }; chMap[t].c++; chMap[t].rev += Number(r.revenue) || 0; });
+    const chArr = Object.entries(chMap).sort((a, b) => b[1].c - a[1].c);
+    const chMax = Math.max(1, ...chArr.map(x => x[1].c));
+    const chHtml = chArr.length ? chArr.map(([nm, o]) =>
+      `<div class="brow"><span class="nm" title="${esc(nm)}">${esc(nm)}</span><span class="bar"><i style="width:${Math.round(o.c / chMax * 100)}%"></i></span><span class="v">${o.c}${o.rev ? " · " + money(o.rev) : ""}</span></div>`).join("") : '<div class="muted">нет данных</div>';
 
     // топ услуг
     const svMap = {};
@@ -275,6 +300,7 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
         </td>
         <td>${r.service ? esc(r.service) : '<span class="muted">—</span>'}<div class="ch-note">${SRC_RU[r.source] || esc(r.source)}${r.lang ? ' · ' + esc(r.lang) : ''}</div></td>
         <td title="${esc(tip)}"><span class="ch ch-${ch.c}">${esc(ch.t)}</span><span class="ch-note">${esc(ch.d)}</span><span class="ch-note" title="${esc(page)}">${page ? esc(page) : ''}</span></td>
+        <td><input class="rev-inp" type="number" min="0" step="1" data-id="${r.id}" value="${r.revenue != null ? esc(r.revenue) : ''}" placeholder="0"></td>
         <td><input class="note-inp" data-id="${r.id}" value="${esc(r.note || '')}" placeholder="заметка…"></td>
         <td><select class="status s-${r.status}" data-id="${r.id}">${opts}</select></td>
       </tr>`;
@@ -292,6 +318,14 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
       if (error) { alert("Не удалось сохранить заметку: " + error.message); return; }
       const r = ALL.find(x => x.id === inp.dataset.id); if (r) r.note = inp.value;
       inp.style.borderColor = "#15803D"; setTimeout(() => inp.style.borderColor = "", 900);
+    }));
+    rows.querySelectorAll(".rev-inp").forEach(inp => inp.addEventListener("change", async () => {
+      const v = inp.value === "" ? null : Number(inp.value);
+      const { error } = await sb.from("leads").update({ revenue: v }).eq("id", inp.dataset.id);
+      if (error) { alert("Не удалось сохранить доход: " + error.message); return; }
+      const r = ALL.find(x => x.id === inp.dataset.id); if (r) r.revenue = v;
+      inp.style.borderColor = "#15803D"; setTimeout(() => inp.style.borderColor = "", 900);
+      renderDash();   // деньги влияют на статистику
     }));
 
     const target = new URLSearchParams(location.search).get("lead");
@@ -311,7 +345,7 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
     if (data.session) {
       loginView.style.display = "none"; logout.style.display = "inline-block";
       const { data: ok } = await sb.rpc("is_admin");
-      if (ok) { listView.style.display = "block"; fetchAll(); }
+      if (ok) { $("settingsBtn").style.display = "inline-block"; listView.style.display = "block"; fetchAll(); }
       else {
         listView.style.display = "none"; $("bootErr").style.display = "block";
         $("bootErr").innerHTML = "<b>Нет доступа.</b> Этот email не в списке администраторов. <button class='btn line' id='logout2'>Выйти</button>";
@@ -335,6 +369,33 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
     renderTable();
   });
   $("search").addEventListener("input", (e) => { search = e.target.value.trim(); renderTable(); });
+
+  // ── настройки счётчиков (site_settings) ──
+  let settingsLoaded = false;
+  $("settingsBtn").addEventListener("click", async () => {
+    const p = $("settings"), showing = p.style.display !== "none";
+    p.style.display = showing ? "none" : "block";
+    if (!showing && !settingsLoaded) {
+      const { data } = await sb.from("site_settings").select("*").eq("id", 1).maybeSingle();
+      if (data) {
+        $("s_ga4").value = data.ga4_id || ""; $("s_px").value = data.meta_pixel_id || "";
+        $("s_ads").value = data.google_ads_id || ""; $("s_lbl").value = data.google_ads_label || "";
+        $("s_gsc").value = data.gsc_verification || "";
+      }
+      settingsLoaded = true;
+    }
+  });
+  $("s_save").addEventListener("click", async () => {
+    $("s_ok").textContent = "";
+    const payload = {
+      ga4_id: $("s_ga4").value.trim() || null, meta_pixel_id: $("s_px").value.trim() || null,
+      google_ads_id: $("s_ads").value.trim() || null, google_ads_label: $("s_lbl").value.trim() || null,
+      gsc_verification: $("s_gsc").value.trim() || null
+    };
+    const { error } = await sb.from("site_settings").update(payload).eq("id", 1);
+    $("s_ok").textContent = error ? ("Ошибка: " + error.message) : "Сохранено ✓ — новые визиты подхватят счётчики";
+    if (!error) { try { sessionStorage.removeItem("spk_cfg"); } catch (e) {} }
+  });
 
   // автообновление раз в 30 сек (не мешаем, если пользователь печатает заметку)
   setInterval(() => {
