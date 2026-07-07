@@ -56,13 +56,14 @@
   <!-- ЛОГИН -->
   <div id="loginView" class="card login" style="display:none">
     <h1>Вход в админку</h1>
-    <p>Введите email — пришлём ссылку для входа (без пароля).</p>
+    <p>Заявки сервисного центра SPARK</p>
     <form id="loginForm">
       <label>Email</label>
-      <input id="email" type="email" autocomplete="email" required>
-      <button class="btn" type="submit">Получить ссылку для входа</button>
+      <input id="email" type="email" autocomplete="username" required>
+      <label>Пароль</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button class="btn" type="submit">Войти</button>
       <div class="err" id="loginErr"></div>
-      <div class="ok" id="loginOk" style="display:none;color:#15803D;font-size:.88rem;margin-top:12px">Ссылка отправлена на почту. Откройте её на этом устройстве — вход произойдёт автоматически.</div>
     </form>
   </div>
 
@@ -137,16 +138,11 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
   }
 
   $("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault(); $("loginErr").textContent = ""; $("loginOk").style.display = "none";
-    const email = $("email").value.trim();
-    const { error } = await sb.auth.signInWithOtp({
-      email, options: { emailRedirectTo: location.origin + location.pathname }
-    });
-    if (error) $("loginErr").textContent = "Не удалось отправить ссылку: " + error.message;
-    else $("loginOk").style.display = "block";
+    e.preventDefault(); $("loginErr").textContent = "";
+    const { error } = await sb.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
+    if (error) $("loginErr").textContent = "Неверный email или пароль.";
+    else showAuth();
   });
-  // магик-линк возвращает с токеном в URL -> supabase-js подхватит и вызовет это
-  sb.auth.onAuthStateChange(() => showAuth());
   logout.addEventListener("click", async () => { await sb.auth.signOut(); showAuth(); });
   $("refresh").addEventListener("click", load);
   $("filters").addEventListener("click", (e) => {
