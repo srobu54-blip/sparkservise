@@ -3,9 +3,975 @@
   "trailingSlash": true,
   "cleanUrls": false,
   "redirects": [
-    { "source": "/iphone_11", "destination": "/remont-iphone/iphone-11/", "permanent": true },
-    { "source": "/iphone_11/", "destination": "/remont-iphone/iphone-11/", "permanent": true },
-    { "source": "/zamena-batarei-iphone", "destination": "/remont-iphone/", "permanent": true },
-    { "source": "/zamena-batarei-iphone/", "destination": "/remont-iphone/", "permanent": true }
+    {
+      "source": "/contacts",
+      "destination": "/kontakty/",
+      "permanent": true
+    },
+    {
+      "source": "/contacts/",
+      "destination": "/kontakty/",
+      "permanent": true
+    },
+    {
+      "source": "/copy_spark_service",
+      "destination": "/o-kompanii/",
+      "permanent": true
+    },
+    {
+      "source": "/copy_spark_service/",
+      "destination": "/o-kompanii/",
+      "permanent": true
+    },
+    {
+      "source": "/i_fon",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/i_fon/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/imac_2009-2012",
+      "destination": "/remont-imac/",
+      "permanent": true
+    },
+    {
+      "source": "/imac_2009-2012/",
+      "destination": "/remont-imac/",
+      "permanent": true
+    },
+    {
+      "source": "/imac_2012-2019",
+      "destination": "/remont-imac/",
+      "permanent": true
+    },
+    {
+      "source": "/imac_2012-2019/",
+      "destination": "/remont-imac/",
+      "permanent": true
+    },
+    {
+      "source": "/imac_pro",
+      "destination": "/remont-imac/",
+      "permanent": true
+    },
+    {
+      "source": "/imac_pro/",
+      "destination": "/remont-imac/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_2",
+      "destination": "/remont-ipad/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_2/",
+      "destination": "/remont-ipad/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_3",
+      "destination": "/remont-ipad/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_3/",
+      "destination": "/remont-ipad/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_4",
+      "destination": "/remont-ipad/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_4/",
+      "destination": "/remont-ipad/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_air",
+      "destination": "/remont-ipad/ipad-air/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_air/",
+      "destination": "/remont-ipad/ipad-air/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_air_2",
+      "destination": "/remont-ipad/ipad-air/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_air_2/",
+      "destination": "/remont-ipad/ipad-air/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_mini",
+      "destination": "/remont-ipad/ipad-mini/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_mini/",
+      "destination": "/remont-ipad/ipad-mini/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_mini_2",
+      "destination": "/remont-ipad/ipad-mini/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_mini_2/",
+      "destination": "/remont-ipad/ipad-mini/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_mini_3",
+      "destination": "/remont-ipad/ipad-mini/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_mini_3/",
+      "destination": "/remont-ipad/ipad-mini/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_mini_4",
+      "destination": "/remont-ipad/ipad-mini/",
+      "permanent": true
+    },
+    {
+      "source": "/ipad_mini_4/",
+      "destination": "/remont-ipad/ipad-mini/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone13",
+      "destination": "/remont-iphone/iphone-13/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone13/",
+      "destination": "/remont-iphone/iphone-13/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone13mini",
+      "destination": "/remont-iphone/iphone-13-mini/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone13mini/",
+      "destination": "/remont-iphone/iphone-13-mini/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone13pro",
+      "destination": "/remont-iphone/iphone-13-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone13pro/",
+      "destination": "/remont-iphone/iphone-13-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone13promax",
+      "destination": "/remont-iphone/iphone-13-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone13promax/",
+      "destination": "/remont-iphone/iphone-13-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_11",
+      "destination": "/remont-iphone/iphone-11/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_11/",
+      "destination": "/remont-iphone/iphone-11/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_11_pro",
+      "destination": "/remont-iphone/iphone-11-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_11_pro/",
+      "destination": "/remont-iphone/iphone-11-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_11_pro_max",
+      "destination": "/remont-iphone/iphone-11-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_11_pro_max/",
+      "destination": "/remont-iphone/iphone-11-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_14",
+      "destination": "/remont-iphone/iphone-14/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_14/",
+      "destination": "/remont-iphone/iphone-14/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_14_plus",
+      "destination": "/remont-iphone/iphone-14-plus/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_14_plus/",
+      "destination": "/remont-iphone/iphone-14-plus/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_14_pro",
+      "destination": "/remont-iphone/iphone-14-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_14_pro/",
+      "destination": "/remont-iphone/iphone-14-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_14_pro_max",
+      "destination": "/remont-iphone/iphone-14-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_14_pro_max/",
+      "destination": "/remont-iphone/iphone-14-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_15",
+      "destination": "/remont-iphone/iphone-15/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_15/",
+      "destination": "/remont-iphone/iphone-15/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_15_plus",
+      "destination": "/remont-iphone/iphone-15-plus/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_15_plus/",
+      "destination": "/remont-iphone/iphone-15-plus/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_15_pro",
+      "destination": "/remont-iphone/iphone-15-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_15_pro/",
+      "destination": "/remont-iphone/iphone-15-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_15_pro_max",
+      "destination": "/remont-iphone/iphone-15-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_15_pro_max/",
+      "destination": "/remont-iphone/iphone-15-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_5",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_5/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_5_c",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_5_c/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_5_s",
+      "destination": "/remont-iphone/iphone-se-2016/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_5_s/",
+      "destination": "/remont-iphone/iphone-se-2016/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_6",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_6/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_6_plus",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_6_plus/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_6_s",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_6_s/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_6_s_plus",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_6_s_plus/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_7",
+      "destination": "/remont-iphone/iphone-7/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_7/",
+      "destination": "/remont-iphone/iphone-7/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_7_plus",
+      "destination": "/remont-iphone/iphone-7-plus/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_7_plus/",
+      "destination": "/remont-iphone/iphone-7-plus/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_8",
+      "destination": "/remont-iphone/iphone-8/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_8/",
+      "destination": "/remont-iphone/iphone-8/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_8_plus",
+      "destination": "/remont-iphone/iphone-8-plus/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_8_plus/",
+      "destination": "/remont-iphone/iphone-8-plus/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_se",
+      "destination": "/remont-iphone/iphone-se-2020/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_se/",
+      "destination": "/remont-iphone/iphone-se-2020/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_x",
+      "destination": "/remont-iphone/iphone-x/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_x/",
+      "destination": "/remont-iphone/iphone-x/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_xr",
+      "destination": "/remont-iphone/iphone-xr/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_xr/",
+      "destination": "/remont-iphone/iphone-xr/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_xs",
+      "destination": "/remont-iphone/iphone-xs/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_xs/",
+      "destination": "/remont-iphone/iphone-xs/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_xs_max",
+      "destination": "/remont-iphone/iphone-xs-max/",
+      "permanent": true
+    },
+    {
+      "source": "/iphone_xs_max/",
+      "destination": "/remont-iphone/iphone-xs-max/",
+      "permanent": true
+    },
+    {
+      "source": "/macbook_air",
+      "destination": "/remont-macbook/macbook-air/",
+      "permanent": true
+    },
+    {
+      "source": "/macbook_air/",
+      "destination": "/remont-macbook/macbook-air/",
+      "permanent": true
+    },
+    {
+      "source": "/macbook_pro_retina",
+      "destination": "/remont-macbook/macbook-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/macbook_pro_retina/",
+      "destination": "/remont-macbook/macbook-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/macbookpro",
+      "destination": "/remont-macbook/macbook-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/macbookpro/",
+      "destination": "/remont-macbook/macbook-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/of_copy_11",
+      "destination": "/remont-iphone/iphone-11/",
+      "permanent": true
+    },
+    {
+      "source": "/of_copy_11/",
+      "destination": "/remont-iphone/iphone-11/",
+      "permanent": true
+    },
+    {
+      "source": "/of_copy_11_pro",
+      "destination": "/remont-iphone/iphone-11-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/of_copy_11_pro/",
+      "destination": "/remont-iphone/iphone-11-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-ekrana-iphone",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-ekrana-iphone/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-16-odessa",
+      "destination": "/remont-iphone/iphone-16/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-16-odessa/",
+      "destination": "/remont-iphone/iphone-16/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-16-plus-odessa",
+      "destination": "/remont-iphone/iphone-16-plus/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-16-plus-odessa/",
+      "destination": "/remont-iphone/iphone-16-plus/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-16-pro-max-odessa",
+      "destination": "/remont-iphone/iphone-16-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-16-pro-max-odessa/",
+      "destination": "/remont-iphone/iphone-16-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-16-pro-odessa",
+      "destination": "/remont-iphone/iphone-16-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-16-pro-odessa/",
+      "destination": "/remont-iphone/iphone-16-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-16e-odessa",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-16e-odessa/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-17-air-odessa",
+      "destination": "/remont-iphone/iphone-17-air/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-17-air-odessa/",
+      "destination": "/remont-iphone/iphone-17-air/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-17-odessa",
+      "destination": "/remont-iphone/iphone-17/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-17-odessa/",
+      "destination": "/remont-iphone/iphone-17/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-17-pro-max-odessa",
+      "destination": "/remont-iphone/iphone-17-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-17-pro-max-odessa/",
+      "destination": "/remont-iphone/iphone-17-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-17-pro-odessa",
+      "destination": "/remont-iphone/iphone-17-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-17-pro-odessa/",
+      "destination": "/remont-iphone/iphone-17-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-17e-odessa",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/remont-iphone-17e-odessa/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_android",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_android/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_1_38_mm",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_1_38_mm/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_1_42_mm",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_1_42_mm/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_2_38_mm",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_2_38_mm/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_2_42_mm",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_2_42_mm/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_3_38_mm",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_3_38_mm/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_3_42_mm",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_3_42_mm/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_4_40_mm",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_4_40_mm/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_4_44_mm",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_4_44_mm/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_5",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_5/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_6",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_6/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_se",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_apple_watch_se/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_imac",
+      "destination": "/remont-imac/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_imac/",
+      "destination": "/remont-imac/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_ipad",
+      "destination": "/remont-ipad/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_ipad/",
+      "destination": "/remont-ipad/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_iphone",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_iphone/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_iphone_12",
+      "destination": "/remont-iphone/iphone-12/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_iphone_12/",
+      "destination": "/remont-iphone/iphone-12/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_iphone_12_pro",
+      "destination": "/remont-iphone/iphone-12-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_iphone_12_pro/",
+      "destination": "/remont-iphone/iphone-12-pro/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_iphone_12_pro_max",
+      "destination": "/remont-iphone/iphone-12-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_iphone_12_pro_max/",
+      "destination": "/remont-iphone/iphone-12-pro-max/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_macbook",
+      "destination": "/remont-macbook/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_macbook/",
+      "destination": "/remont-macbook/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_telefonov",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_telefonov/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/repair-iphone",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/repair-iphone/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/service-iphone",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/service-iphone/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/spark-service",
+      "destination": "/o-kompanii/",
+      "permanent": true
+    },
+    {
+      "source": "/spark-service/",
+      "destination": "/o-kompanii/",
+      "permanent": true
+    },
+    {
+      "source": "/spark-service-1-1",
+      "destination": "/o-kompanii/",
+      "permanent": true
+    },
+    {
+      "source": "/spark-service-1-1/",
+      "destination": "/o-kompanii/",
+      "permanent": true
+    },
+    {
+      "source": "/spark-service-11",
+      "destination": "/o-kompanii/",
+      "permanent": true
+    },
+    {
+      "source": "/spark-service-11/",
+      "destination": "/o-kompanii/",
+      "permanent": true
+    },
+    {
+      "source": "/spark-service-11-1",
+      "destination": "/o-kompanii/",
+      "permanent": true
+    },
+    {
+      "source": "/spark-service-11-1/",
+      "destination": "/o-kompanii/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-batarei-iphone",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-batarei-iphone/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-battery",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-battery/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-display",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-display/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-displeya-iphone",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-displeya-iphone/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-ekrana",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-ekrana/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-ekrana-iphone",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-ekrana-iphone/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-stekla-iphone",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena-stekla-iphone/",
+      "destination": "/remont-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena_stekla_apple_watch",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena_stekla_apple_watch/",
+      "destination": "/remont-apple-watch/",
+      "permanent": true
+    }
   ]
 }
