@@ -52,6 +52,11 @@ def set_canonical(t, url):
 def set_og_url(t, url):
     return re.sub(r'(<meta property="og:url" content=")[^"]*(">)', lambda m: m.group(1) + url + m.group(2), t, count=1)
 
+def fix_breadcrumb_urls(t):
+    # UA: BreadcrumbList item URLs должны указывать на /ua/ (совпадать с canonical), а не на RU-дерево.
+    # "item" встречается только в BreadcrumbList → таргетно; провайдер/@id (ключ "url"/"@id") не трогаем.
+    return re.sub(r'("item":\s*")' + re.escape(BASE) + r'/(?!ua/)', lambda m: m.group(1) + BASE + '/ua/', t)
+
 def set_hreflang(t, P):
     block = ('<link rel="alternate" hreflang="ru-UA" href="%s">\n'
              '<link rel="alternate" hreflang="uk-UA" href="%s">\n'
@@ -127,6 +132,7 @@ def main():
         t = set_canonical(t, url_ua(sp))
         t = set_og_url(t, url_ua(sp))
         t = set_hreflang(t, sp)
+        t = fix_breadcrumb_urls(t)
         t = add_mnav_lang(t)
         t = set_switcher(t, True, reldir(sp, ua_dir))   # RU counterpart (wires topbar + mnav .lang)
         t = add_redirect(t)
