@@ -9,9 +9,9 @@
    История браузера НЕ трогаем: back-ловушка удалена (политика Google «back button hijacking»,
    enforcement 15.06.2026). visibilitychange удалён (ловил вернувшихся, не уходящих).
 
-   Гейт показа: >=25с на странице И (>=50% прокрутки ИЛИ >=1200px вглубь) — для всех триггеров.
+   Гейт показа («тихий» пресет): >=40с на странице И (>=60% прокрутки ИЛИ >=1500px вглубь) — для всех триггеров.
    Не показываем: открыта модалка записи / фокус в поле ввода / юзер открывал форму записи в сессии.
-   Лимиты: показ -> 3 дня тишины; закрыл -> 30 дней; 2 закрытия -> никогда; заявка (любой формой) -> никогда.
+   Лимиты: показ -> 14 дней тишины; закрыл -> 30 дней; 2 закрытия -> никогда; заявка (любой формой) -> никогда.
    (Safari ITP режет localStorage до ~7 дней — длинные кулдауны там best-effort.)
    Превью без лимитов: ?popup=1. Классы .js-submit/.js-phone/.js-device -> лид ловит analytics.js.
    Воронка: exit_popup_show {trigger} / exit_popup_close {time_open_ms, fast_close} -> dataLayer
@@ -45,10 +45,10 @@
     }
   }[lang];
 
-  var MIN_MS = 25000, MIN_SCROLL = 0.5, MIN_DEPTH_PX = 1200;      // гейт вовлечённости
+  var MIN_MS = 40000, MIN_SCROLL = 0.6, MIN_DEPTH_PX = 1500;      // гейт вовлечённости («тихий» пресет)
   var GRACE_MS = 1000;                                            // ПК: отмена при возврате курсора
   var UP_RUN = 0.45, UP_VEL = 1.2, UP_TOP = 0.5;                  // мобайл: рывок к верху
-  var CLOSE_DAYS = 30, SEEN_DAYS = 3, MAX_CLOSES = 2;             // лимиты частоты
+  var CLOSE_DAYS = 30, SEEN_DAYS = 14, MAX_CLOSES = 2;            // лимиты частоты (gentle-уровень)
   var K_SEEN = "spark_exit_seen", K_SEEN_AT = "spark_exit_seen_at", K_CLOSED = "spark_exit_closed",
       K_CLOSES = "spark_exit_closes", K_LEAD = "spark_exit_lead", K_BOOK = "spark_exit_book";
   var preview = /[?&]popup=1/.test(location.search);          // мгновенный показ без условий
@@ -81,7 +81,7 @@
     if (sg(K_SEEN)) return true;                                            // уже показан в этой вкладке
     if (sg(K_BOOK)) return true;                                            // открывал форму записи — сессию не трогаем
     var sa = parseInt(lg(K_SEEN_AT) || "0", 10);
-    if (sa && (Date.now() - sa) < SEEN_DAYS * 864e5) return true;           // показ — 3 дня тишины
+    if (sa && (Date.now() - sa) < SEEN_DAYS * 864e5) return true;           // показ — 14 дней тишины
     var c = parseInt(lg(K_CLOSED) || "0", 10);
     return !!(c && (Date.now() - c) < CLOSE_DAYS * 864e5);                  // закрыл — 30 дней
   }
