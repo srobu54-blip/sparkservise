@@ -154,6 +154,7 @@
       <a data-view="dash" class="active">📊 Дашборд</a>
       <a data-view="leads">📋 Лиды <span class="badge" id="navCount"></span></a>
       <a data-view="analytics">🔌 Установка аналитики</a>
+      <a data-view="guide">📖 Памятка: откуда лиды</a>
     </nav>
     <div class="side-foot">
       <div class="who" id="who"></div>
@@ -217,6 +218,127 @@
         <div class="set-row"><label><span class="set-ico">🎯</span>Google Ads — ярлык конверсии<div class="hint">часть после «/» в send_to</div></label><input id="s_lbl" placeholder="AbCdEfGh123"></div>
         <div class="set-row"><label><span class="set-ico">🔍</span>Search Console<div class="hint">токен из способа «HTML-тег» (для домена надёжнее DNS)</div></label><input id="s_gsc" placeholder="content=…"></div>
         <button class="btn" id="s_save">Сохранить</button><span id="s_ok"></span>
+      </div>
+    </div>
+
+    <!-- ПАМЯТКА -->
+    <div class="view" id="view-guide">
+      <style>
+        .guide{max-width:900px}
+        .guide h2{font-size:1.15rem;margin:26px 0 12px;display:flex;align-items:center;gap:8px}
+        .guide h2:first-of-type{margin-top:4px}
+        .guide .card p{font-size:.92rem;line-height:1.6;color:var(--text);margin:0 0 10px}
+        .guide .card p:last-child{margin-bottom:0}
+        .guide .lead{background:var(--spark-soft,#fdeaec);border:1px solid #f3cdd2;border-radius:12px;padding:16px 18px}
+        .guide ul{margin:0;padding-left:18px;display:grid;gap:7px}
+        .guide li{font-size:.9rem;line-height:1.5;color:var(--text)}
+        .guide .steps{counter-reset:s;display:grid;gap:10px;margin-top:4px}
+        .guide .step{display:flex;gap:12px;font-size:.9rem;line-height:1.5}
+        .guide .step .n{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--spark);color:#fff;font-weight:700;font-size:.8rem;display:grid;place-items:center}
+        .guide table{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:4px}
+        .guide th,.guide td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+        .guide th{font-size:.76rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:700}
+        .guide td b{color:var(--ink)}
+        .utmbox{display:flex;align-items:center;gap:10px;background:#0f1117;border-radius:10px;padding:11px 13px;margin:8px 0;flex-wrap:wrap}
+        .utmbox code{color:#e6e9ef;font-size:.82rem;word-break:break-all;flex:1;min-width:200px;font-family:ui-monospace,Menlo,monospace}
+        .utmbox .g-copy{flex-shrink:0;background:var(--spark);color:#fff;border:0;border-radius:7px;padding:7px 12px;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap}
+        .utmbox .g-copy:hover{filter:brightness(1.08)}
+        .utmbox .g-copy.done{background:var(--ok,#1FAE5A)}
+        .utmlbl{font-size:.82rem;font-weight:700;color:var(--ink);margin:16px 0 2px;display:flex;align-items:center;gap:7px}
+        .utmlbl small{font-weight:500;color:var(--muted)}
+        .warn{background:#FEF3C7;border:1px solid #FCD34D;border-radius:10px;padding:12px 14px;font-size:.88rem;line-height:1.55;color:#78350F;margin-top:10px}
+        .tip{background:#DCFCE7;border:1px solid #86EFAC;border-radius:10px;padding:12px 14px;font-size:.88rem;line-height:1.55;color:#14532D;margin-top:10px}
+        .guide code.inl{background:#eef0f4;border-radius:5px;padding:1px 6px;font-size:.85em;font-family:ui-monospace,Menlo,monospace}
+      </style>
+      <h1>Памятка: откуда приходят клиенты</h1>
+      <div class="card guide">
+
+        <div class="lead">
+          <p style="font-weight:600;color:var(--ink)">Каждая заявка автоматически помечается <b>каналом</b> — откуда пришёл клиент. Это видно в колонке «Канал» на вкладке «Лиды» и в сводке «Каналы» / «Доход по каналам» на Дашборде. Ниже — как это работает, какие бывают каналы и как настраивать ссылки, чтобы видеть источник точнее.</p>
+        </div>
+
+        <h2>🧠 Как это работает</h2>
+        <p>Когда человек впервые заходит на сайт, мы запоминаем его <b>«первое касание»</b> и храним до конца визита — даже если он ходит по страницам, метка не теряется. Запоминаем:</p>
+        <ul>
+          <li><b>UTM-метки</b> из ссылки (<code class="inl">utm_source</code>, <code class="inl">utm_medium</code>, <code class="inl">utm_campaign</code>) — если ссылка размечена.</li>
+          <li><b>gclid</b> — авто-метка Google Ads (появляется сама при клике по объявлению).</li>
+          <li><b>fbclid</b> — авто-метка рекламы Facebook / Instagram.</li>
+          <li><b>Реферер</b> — сайт, с которого перешли (например, google.com, instagram.com).</li>
+          <li><b>Страницу входа</b> и страницу, с которой оставили заявку.</li>
+        </ul>
+        <p style="margin-top:10px">Когда клиент оставляет заявку — всё это летит вместе с ней. В таблице «Лиды» ты видишь <b>цветной бейдж канала</b>, а <b>наведя мышкой на заявку</b> — полную расшифровку (utm, gclid, реферер, страницы).</p>
+
+        <h2>🎨 Какие бывают каналы</h2>
+        <p>Система сама определяет канал по приоритету — от платного к бесплатному. Вот все варианты:</p>
+        <table>
+          <thead><tr><th>Канал</th><th>Когда так помечается</th><th>Что значит</th></tr></thead>
+          <tbody>
+            <tr><td><span class="ch ch-ads">Google Ads</span></td><td>есть <code class="inl">gclid</code> или <code class="inl">utm_medium=cpc</code></td><td>платный клик из Google Ads</td></tr>
+            <tr><td><span class="ch ch-ads">Реклама в соцсетях</span></td><td>есть <code class="inl">fbclid</code> или соцсеть + <code class="inl">medium=cpc/paid</code></td><td>платная реклама Facebook / Instagram</td></tr>
+            <tr><td><span class="ch ch-insta">Instagram</span></td><td><code class="inl">source=instagram</code> или переход из Instagram</td><td>органика из Instagram (шапка профиля, посты)</td></tr>
+            <tr><td><span class="ch ch-social">TikTok</span></td><td><code class="inl">source=tiktok</code> или переход из TikTok</td><td>органика из TikTok</td></tr>
+            <tr><td><span class="ch ch-social">Соцсети</span></td><td>Facebook / YouTube / Telegram или <code class="inl">medium=social</code></td><td>органика из прочих соцсетей</td></tr>
+            <tr><td><span class="ch ch-maps">Google Maps</span></td><td><code class="inl">source=google-maps</code> (метка в профиле Google)</td><td>переход из карточки Google / карт</td></tr>
+            <tr><td><span class="ch ch-seo">Поиск (SEO)</span></td><td><code class="inl">medium=organic</code> или переход из поисковика</td><td>бесплатный поиск (Google, Bing и т.п.)</td></tr>
+            <tr><td><span class="ch ch-email">Email</span></td><td><code class="inl">medium=email</code> или <code class="inl">source=email</code></td><td>переход из рассылки</td></tr>
+            <tr><td><span class="ch ch-utm">Кампания</span></td><td>есть UTM, но не подошёл под каналы выше</td><td>прочие размеченные ссылки</td></tr>
+            <tr><td><span class="ch ch-ref">Переход с сайта</span></td><td>реферер с другого сайта (без UTM)</td><td>кто-то поставил ссылку на тебя</td></tr>
+            <tr><td><span class="ch ch-direct">Прямой заход</span></td><td>нет ни реферера, ни меток</td><td>набрал адрес / закладка / мессенджер / QR без метки</td></tr>
+          </tbody>
+        </table>
+
+        <h2>🔗 Как делать UTM-ссылки</h2>
+        <p><b>UTM</b> — это «хвост» к адресу сайта, который говорит, откуда пришёл человек. Ставится <b>только на входящие ссылки</b> (которые ведут НА твой сайт) — в профилях, постах, визитках. <u>Не на кнопки, которые уводят с сайта.</u></p>
+        <p style="margin-top:8px"><b>Формула:</b></p>
+        <div class="utmbox"><code>https://sparkservice.od.ua/?utm_source=<b style="color:#ff9aa2">где</b>&amp;utm_medium=<b style="color:#ff9aa2">тип</b>&amp;utm_campaign=<b style="color:#ff9aa2">метка</b></code></div>
+
+        <p style="margin-top:14px;font-weight:700;color:var(--ink)">Готовые ссылки — жми «Копировать» и вставляй, куда указано:</p>
+
+        <div class="utmlbl">📍 Google Maps <small>— в поле «Сайт» профиля Google Business</small></div>
+        <div class="utmbox">
+          <code>https://sparkservice.od.ua/?utm_source=google-maps&amp;utm_medium=organic&amp;utm_campaign=google-maps</code>
+          <button class="g-copy" data-copy="https://sparkservice.od.ua/?utm_source=google-maps&amp;utm_medium=organic&amp;utm_campaign=google-maps">⧉ Копировать</button>
+        </div>
+
+        <div class="utmlbl">📷 Instagram <small>— в шапку профиля (Редактировать профиль → Ссылки)</small></div>
+        <div class="utmbox">
+          <code>https://sparkservice.od.ua/?utm_source=instagram&amp;utm_medium=social&amp;utm_campaign=instagram-bio</code>
+          <button class="g-copy" data-copy="https://sparkservice.od.ua/?utm_source=instagram&amp;utm_medium=social&amp;utm_campaign=instagram-bio">⧉ Копировать</button>
+        </div>
+
+        <div class="utmlbl">🎵 TikTok <small>— в шапку профиля</small></div>
+        <div class="utmbox">
+          <code>https://sparkservice.od.ua/?utm_source=tiktok&amp;utm_medium=social&amp;utm_campaign=tiktok-bio</code>
+          <button class="g-copy" data-copy="https://sparkservice.od.ua/?utm_source=tiktok&amp;utm_medium=social&amp;utm_campaign=tiktok-bio">⧉ Копировать</button>
+        </div>
+
+        <div class="utmlbl">✈️ Telegram <small>— в описание канала / бота</small></div>
+        <div class="utmbox">
+          <code>https://sparkservice.od.ua/?utm_source=telegram&amp;utm_medium=social&amp;utm_campaign=telegram</code>
+          <button class="g-copy" data-copy="https://sparkservice.od.ua/?utm_source=telegram&amp;utm_medium=social&amp;utm_campaign=telegram">⧉ Копировать</button>
+        </div>
+
+        <div class="utmlbl">🧾 Визитки / листовки (QR-код) <small>— закодируй эту ссылку в QR</small></div>
+        <div class="utmbox">
+          <code>https://sparkservice.od.ua/?utm_source=qr&amp;utm_medium=offline&amp;utm_campaign=vizitka</code>
+          <button class="g-copy" data-copy="https://sparkservice.od.ua/?utm_source=qr&amp;utm_medium=offline&amp;utm_campaign=vizitka">⧉ Копировать</button>
+        </div>
+
+        <p style="margin-top:16px;font-weight:700;color:var(--ink)">Что писать в <code class="inl">utm_medium</code> (это определяет канал):</p>
+        <ul>
+          <li><code class="inl">organic</code> — бесплатное: SEO-поиск, Google Maps.</li>
+          <li><code class="inl">social</code> — органика соцсетей: Instagram / TikTok / Telegram (шапка, посты).</li>
+          <li><code class="inl">cpc</code> — платная реклама (обычно проставляется автоматически, вручную ставить не нужно).</li>
+          <li><code class="inl">email</code> — рассылки.</li>
+          <li><code class="inl">offline</code> — визитки, листовки, QR-коды.</li>
+        </ul>
+
+        <div class="warn">⚠️ <b>Не ставь <code class="inl">utm_medium=cpc</code> на бесплатные ссылки</b> (профиль, bio, визитка) — система посчитает это платной рекламой и статистика поедет. Для органики — <code class="inl">organic</code>, <code class="inl">social</code> или <code class="inl">offline</code>.</div>
+        <div class="tip">💡 <b>Меняешь только <code class="inl">utm_campaign</code></b>, чтобы различать площадки внутри одного источника. Пример: сторис → <code class="inl">instagram-stories</code>, акция по батарее → <code class="inl">akb-promo</code>. Источник (Instagram) остаётся, а в деталях заявки видно, откуда именно.</div>
+
+        <h2>🎯 Зачем это нужно</h2>
+        <p>На <b>Дашборде</b> в блоках «Каналы» и «Доход по каналам» ты видишь, какой источник приносит больше <b>заявок и денег</b>. Это даёт понять, куда вкладываться (реклама, соцсети, SEO), а что не работает. Без меток весь трафик сливается в кучу — с ними видно каждый источник по отдельности.</p>
+
       </div>
     </div>
   </main>
@@ -421,6 +543,16 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
     if (v === "analytics") loadSettings();
   }
   $("nav").addEventListener("click", (e) => { const a = e.target.closest("a"); if (!a) return; e.preventDefault(); showView(a.dataset.view); });
+
+  // ── кнопки «Копировать» в Памятке ──
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest(".g-copy"); if (!b) return;
+    const text = b.dataset.copy;
+    const done = () => { const o = b.textContent; b.textContent = "✓ Скопировано"; b.classList.add("done"); setTimeout(() => { b.textContent = o; b.classList.remove("done"); }, 1600); };
+    const fb = () => { try { const ta = document.createElement("textarea"); ta.value = text; ta.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); done(); } catch (_) {} };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(fb);
+    else fb();
+  });
 
   // ── настройки счётчиков ──
   let settingsLoaded = false;
