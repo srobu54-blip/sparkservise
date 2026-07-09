@@ -1,10 +1,21 @@
 /* SPARK exit-intent popup — компактный: заголовок «Не нашли что искали?» + ОДНО поле телефона
    с «начинкой» основной формы сайта (маска, точки-индикатор, определение оператора).
-   Shell/анимация/поведение — как у модалки сайта (.modal / .mf-*). Появляется при попытке уйти.
-   Показ: ≥15с И ≥30% прокрутки И exit-intent. Лимиты: 1/сессия · 7 дней после закрытия · никогда после заявки.
-   Превью без лимитов: ?popup=1. Классы .js-submit/.js-phone/.js-device → лид ловит analytics.js
-   (событие generate_lead в dataLayer). Сам попап шлёт в dataLayer: exit_popup_show (с trigger)
-   и exit_popup_close (закрыт без заявки) — воронка настраивается в GTM. */
+   Shell/анимация/поведение — как у модалки сайта (.modal / .mf-*).
+
+   Триггеры (только реальный уход, CRO-аудит 2026-07-08):
+     ПК     — курсор ушёл за верх окна (clientY<=10) + грейс-период 1000мс: вернулся — не показываем.
+     Мобайл — «рывок к верху»: непрерывный подъём >=45% высоты экрана со скоростью >=1.2px/мс,
+              закончившийся у верха страницы. Защита iOS: rubber-band (y<0), клавиатура (blackout 1с).
+   История браузера НЕ трогаем: back-ловушка удалена (политика Google «back button hijacking»,
+   enforcement 15.06.2026). visibilitychange удалён (ловил вернувшихся, не уходящих).
+
+   Гейт показа: >=25с на странице И (>=50% прокрутки ИЛИ >=1200px вглубь) — для всех триггеров.
+   Не показываем: открыта модалка записи / фокус в поле ввода / юзер открывал форму записи в сессии.
+   Лимиты: показ -> 3 дня тишины; закрыл -> 30 дней; 2 закрытия -> никогда; заявка (любой формой) -> никогда.
+   (Safari ITP режет localStorage до ~7 дней — длинные кулдауны там best-effort.)
+   Превью без лимитов: ?popup=1. Классы .js-submit/.js-phone/.js-device -> лид ловит analytics.js.
+   Воронка: exit_popup_show {trigger} / exit_popup_close {time_open_ms, fast_close} -> dataLayer
+   (+ дублируются в GA4 напрямую через gtag, если счётчик настроен). */
 (function () {
   "use strict";
   if (window.__sparkExit) return;
@@ -14,8 +25,8 @@
   var T = {
     ru: {
       badge: "Бесплатная консультация", title: "Не нашли что искали?",
-      desc: "Оставьте номер телефона — наш специалист свяжется с вами и бесплатно ответит на вопросы.",
-      submit: "Жду звонка", note: "Перезвоним в течение 15 минут. Данные не передаём третьим лицам.",
+      desc: "Оставьте номер — мастер перезвонит в течение 15 минут, бесплатно подскажет цену и срок ремонта.",
+      submit: "Жду звонка", note: "Позвоним один раз по вашему вопросу. Данные не передаём третьим лицам.",
       trust: ["Бесплатная диагностика", "Гарантия 12 месяцев", "Без предоплаты"],
       hint: "Введите номер мобильного оператора Украины", hintFull: "Введите номер полностью",
       hintErr: "Проверьте код оператора", hintOk: "номер распознан", sumPhone: "Телефон",
@@ -24,8 +35,8 @@
     },
     uk: {
       badge: "Безкоштовна консультація", title: "Не знайшли те, що шукали?",
-      desc: "Залиште номер телефону — наш спеціаліст зв'яжеться з вами й безкоштовно відповість на запитання.",
-      submit: "Чекаю на дзвінок", note: "Передзвонимо протягом 15 хвилин. Дані не передаємо третім особам.",
+      desc: "Залиште номер — майстер передзвонить протягом 15 хвилин, безкоштовно підкаже ціну та термін ремонту.",
+      submit: "Чекаю на дзвінок", note: "Зателефонуємо один раз щодо вашого питання. Дані не передаємо третім особам.",
       trust: ["Безкоштовна діагностика", "Гарантія 12 місяців", "Без передоплати"],
       hint: "Введіть номер мобільного оператора України", hintFull: "Введіть номер повністю",
       hintErr: "Перевірте код оператора", hintOk: "номер розпізнано", sumPhone: "Телефон",
@@ -34,18 +45,27 @@
     }
   }[lang];
 
-  var MIN_MS = 15000, MIN_SCROLL = 0.3, CLOSE_DAYS = 7;
-  var K_SEEN = "spark_exit_seen", K_CLOSED = "spark_exit_closed", K_LEAD = "spark_exit_lead";
+  var MIN_MS = 25000, MIN_SCROLL = 0.5, MIN_DEPTH_PX = 1200;      // гейт вовлечённости
+  var GRACE_MS = 1000;                                            // ПК: отмена при возврате курсора
+  var UP_RUN = 0.45, UP_VEL = 1.2, UP_TOP = 0.5;                  // мобайл: рывок к верху
+  var CLOSE_DAYS = 30, SEEN_DAYS = 3, MAX_CLOSES = 2;             // лимиты частоты
+  var K_SEEN = "spark_exit_seen", K_SEEN_AT = "spark_exit_seen_at", K_CLOSED = "spark_exit_closed",
+      K_CLOSES = "spark_exit_closes", K_LEAD = "spark_exit_lead", K_BOOK = "spark_exit_book";
   var preview = /[?&]popup=1/.test(location.search);          // мгновенный показ без условий
   var test = /[?&](popup|test)=1/.test(location.search);       // тест: события с test_mode, флаги не пишем (синхронно с analytics.js)
-  var start = Date.now(), maxScroll = 0, shown = false, armed = false, modal = null, closed = false;
+  var start = Date.now(), maxScroll = 0, maxY = 0, shown = false, modal = null, closed = false, openedAt = 0;
 
-  // событие воронки попапа → dataLayer (GTM подхватит позже; очередь сохраняется)
+  // событие воронки попапа → dataLayer (GTM подхватит) + зеркало в GA4 напрямую, если gtag уже настроен
   function track(ev, extra) {
     try {
       var d = { event: ev, language: lang, test_mode: test };
       if (extra) for (var k in extra) d[k] = extra[k];
       (window.dataLayer = window.dataLayer || []).push(d);
+      if (!test && typeof window.gtag === "function") {
+        var p = { language: lang };
+        if (extra) for (var k2 in extra) p[k2] = extra[k2];
+        window.gtag("event", ev, p);
+      }
     } catch (e) {}
   }
 
@@ -56,17 +76,38 @@
 
   function suppressed() {
     if (preview) return false;
-    if (lg(K_LEAD)) return true;
-    if (sg(K_SEEN)) return true;
+    if (lg(K_LEAD)) return true;                                            // заявка была — никогда
+    if (parseInt(lg(K_CLOSES) || "0", 10) >= MAX_CLOSES) return true;       // 2 закрытия — никогда
+    if (sg(K_SEEN)) return true;                                            // уже показан в этой вкладке
+    if (sg(K_BOOK)) return true;                                            // открывал форму записи — сессию не трогаем
+    var sa = parseInt(lg(K_SEEN_AT) || "0", 10);
+    if (sa && (Date.now() - sa) < SEEN_DAYS * 864e5) return true;           // показ — 3 дня тишины
     var c = parseInt(lg(K_CLOSED) || "0", 10);
-    return c && (Date.now() - c) < CLOSE_DAYS * 864e5;
+    return !!(c && (Date.now() - c) < CLOSE_DAYS * 864e5);                  // закрыл — 30 дней
   }
-  function engaged() { return preview || ((Date.now() - start) >= MIN_MS && maxScroll >= MIN_SCROLL); }
+  function engaged() {
+    return preview || ((Date.now() - start) >= MIN_MS && (maxScroll >= MIN_SCROLL || maxY >= MIN_DEPTH_PX));
+  }
+  // юзер занят конверсией: открыта модалка записи или печатает в поле — не мешаем
+  function uiBusy() {
+    if (document.body.classList.contains("modal-open")) return true;
+    var a = document.activeElement, tn = a && a.tagName;
+    return tn === "INPUT" || tn === "TEXTAREA" || tn === "SELECT";
+  }
 
   addEventListener("scroll", function () {
     var sh = document.documentElement.scrollHeight;
     if (sh > 0) { var p = (scrollY + innerHeight) / sh; if (p > maxScroll) maxScroll = p; }
+    if (scrollY > maxY) maxY = scrollY;
   }, { passive: true });
+
+  // интент записи: открыл модалку — не показываем до конца сессии; отправил ЛЮБУЮ форму — никогда
+  document.addEventListener("click", function (e) {
+    if (!e.target || !e.target.closest) return;
+    if (e.target.closest('a[href="#book"],[data-book]') && !test) ss(K_BOOK, "1");
+    var btn = e.target.closest(".js-submit,#mSubmit");
+    if (btn && !btn.disabled && !btn.closest("#spkExitModal") && !test) ls(K_LEAD, "1");
+  }, true);
 
   // --- телефон (идентично основной форме сайта: маска + точки + оператор) ---
   var OPS = [{ n: "Kyivstar", c: ["67", "68", "96", "97", "98", "77"] }, { n: "Vodafone", c: ["50", "66", "95", "99"] }, { n: "lifecell", c: ["63", "73", "93"] }, { n: "оператор", c: ["91", "92", "94"] }];
@@ -132,8 +173,9 @@
   }
 
   function open(trig) {
-    if (shown || suppressed()) return;
-    shown = true; if (!test) ss(K_SEEN, "1");
+    if (shown || suppressed() || (!preview && uiBusy())) return;
+    shown = true; openedAt = Date.now();
+    if (!test) { ss(K_SEEN, "1"); ls(K_SEEN_AT, String(openedAt)); }
     track("exit_popup_show", { trigger: trig || "unknown" });
     var phone = build();
     modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.classList.add("modal-open");
@@ -144,8 +186,14 @@
     if (!modal || closed) return;   // guard: двойной Escape/клик в окно фейда не задваивает событие
     closed = true;
     var card = modal.querySelector(".modal-card");
-    if (!(card && card.classList.contains("done"))) track("exit_popup_close");
-    if (!test && !lg(K_LEAD)) ls(K_CLOSED, String(Date.now()));
+    if (!(card && card.classList.contains("done"))) {
+      var openMs = Date.now() - openedAt;
+      track("exit_popup_close", { time_open_ms: openMs, fast_close: openMs < 2000 });
+      if (!test) {
+        ls(K_CLOSED, String(Date.now()));
+        ls(K_CLOSES, String(parseInt(lg(K_CLOSES) || "0", 10) + 1));
+      }
+    }
     modal.classList.remove("show"); modal.setAttribute("aria-hidden", "true"); document.body.classList.remove("modal-open");
     setTimeout(function () { modal.classList.remove("open"); }, 300);
   }
@@ -153,35 +201,52 @@
   // --- триггеры ---
   if (preview) { setTimeout(function () { open("preview"); }, 600); return; }
 
-  // ПК: курсор ушёл за верхнюю границу окна (mouseleave надёжнее; mouseout — запасной)
-  document.addEventListener("mouseleave", function (e) { if (e.clientY <= 0 && engaged()) open("mouse_top"); });
-  document.addEventListener("mouseout", function (e) {
-    if (e.clientY <= 0 && !e.relatedTarget && !e.toElement && engaged()) open("mouse_top");
+  var graceT = null, quietUntil = 0;
+  addEventListener("pageshow", function (e) {   // возврат из bfcache: не стреляем «отложенным» показом
+    if (e.persisted) { if (graceT) { clearTimeout(graceT); graceT = null; } quietUntil = Date.now() + 1000; }
   });
 
-  var touch = matchMedia("(hover:none)").matches || "ontouchstart" in window;
-  if (touch) {
-    // ловушку «назад» ставим раньше (8с ИЛИ 20% скролла) — так свайп/кнопка «назад» на iOS ловятся надёжнее
-    function armReady() { return (Date.now() - start) >= 8000 || maxScroll >= 0.2; }
-    function arm() {
-      if (armed || shown || suppressed() || !armReady()) return;
-      armed = true; try { history.pushState({ spkExit: 1 }, "", location.href); } catch (e) {}
-    }
-    addEventListener("scroll", arm, { passive: true });
-    addEventListener("touchend", arm, { passive: true });
-    setTimeout(arm, 8200);
-    addEventListener("popstate", function () {
-      if (armed && !shown && !suppressed()) { try { history.pushState({ spkExit: 1 }, "", location.href); } catch (e) {} open("back_gesture"); }
+  // hover:none — телефоны/планшеты; ноутбук с тачскрином (hover:hover) остаётся на ПК-триггере
+  var touch = matchMedia("(hover: none)").matches;
+
+  if (!touch) {
+    // ПК: курсор ушёл за верхнюю границу окна -> грейс 1с; вернулся до истечения -> отмена (лимиты не тратятся)
+    document.addEventListener("mouseleave", function (e) {
+      if (shown || graceT) return;
+      if (e.clientY > 10) return;
+      if (!engaged() || suppressed() || uiBusy()) return;
+      graceT = setTimeout(function () { graceT = null; open("mouse_top"); }, GRACE_MS);
     });
-    // свернул вкладку / переключился в другое приложение / закрывает — покажем (увидит при возврате)
-    document.addEventListener("visibilitychange", function () {
-      if (document.visibilityState === "hidden" && engaged() && !shown && !suppressed()) open("tab_hidden");
+    document.addEventListener("mouseenter", function () {
+      if (graceT) { clearTimeout(graceT); graceT = null; }
     });
-    var lastY = scrollY, lastT = Date.now();
+  } else {
+    // Мобайл: «рывок к верху» — непрерывный подъём >=45% экрана, быстро, финиш у верха страницы,
+    // и обязательно после реального свайпа пальцем (touchmove <3с — отсекает якорные переходы,
+    // iOS-жест «тап по статус-бару» и программные прокрутки).
+    // Один точный триггер вместо back-ловушки (политика Google) и visibilitychange (ловил вернувшихся).
+    var upStartY = null, upStartT = 0, lastY = scrollY, lastT = Date.now(), lastTouchMove = 0;
+    function resetRun() { upStartY = null; }
+    addEventListener("touchmove", function () { lastTouchMove = Date.now(); }, { passive: true });
+    addEventListener("focusin", function () { quietUntil = Date.now() + 1000; resetRun(); }, true);   // клавиатура дёргает viewport
+    addEventListener("focusout", function () { quietUntil = Date.now() + 1000; resetRun(); }, true);
+    addEventListener("resize", function () { quietUntil = Date.now() + 500; resetRun(); });           // URL-бар/поворот
+    document.addEventListener("click", function (e) {                                                 // якорный переход = скачок, не уход
+      if (e.target && e.target.closest && e.target.closest('a[href*="#"]')) { quietUntil = Date.now() + 1500; resetRun(); }
+    }, true);
     addEventListener("scroll", function () {
-      var y = scrollY, t = Date.now(), dt = t - lastT;
-      if (dt > 0 && (lastY - y) / dt > 1.1 && y < 320 && engaged()) open("scroll_up");
+      var y = scrollY, t = Date.now(), dt = t - lastT, py = lastY;
       lastY = y; lastT = t;
+      if (shown || t < quietUntil) { resetRun(); return; }
+      if (y < 0) { resetRun(); return; }            // iOS rubber-band
+      if (dt > 400) resetRun();                     // пауза — новый жест
+      if (y >= py) { resetRun(); return; }          // вниз/на месте — сброс
+      if (upStartY === null) { upStartY = py; upStartT = t - Math.min(dt, 400); }
+      var dist = upStartY - y, vel = dist / Math.max(t - upStartT, 1);
+      if (dist >= innerHeight * UP_RUN && vel >= UP_VEL && y < innerHeight * UP_TOP &&
+          (t - lastTouchMove) < 3000 && engaged() && !suppressed() && !uiBusy()) {
+        open("scroll_up");
+      }
     }, { passive: true });
   }
 })();
