@@ -80,10 +80,17 @@ def translate_page(sp, ru_html, existing_ua_tokens):
     return ''.join(toks)
 
 def ru_sitepaths():
-    out = []
-    for f in glob.glob(os.path.join(REPO, 'ua', '**', 'index.html'), recursive=True):
-        rel = os.path.relpath(os.path.dirname(f), os.path.join(REPO, 'ua')).replace(os.sep, '/')
-        out.append('' if rel == '.' else rel)
+    # Все RU-страницы (корень), КРОМЕ /ua/ (это выход) и служебных (admin/_*).
+    # Так новые RU-страницы автоматически получают UA-зеркало + hreflang-обвязку.
+    out = set()
+    for f in glob.glob(os.path.join(REPO, '**', 'index.html'), recursive=True):
+        rel = os.path.relpath(os.path.dirname(f), REPO).replace(os.sep, '/')
+        if rel == '.':
+            out.add(''); continue
+        top = rel.split('/', 1)[0]
+        if top in ('ua', 'admin') or top.startswith('_') or top.startswith('.'):
+            continue
+        out.add(rel)
     return sorted(out)
 
 def main():
