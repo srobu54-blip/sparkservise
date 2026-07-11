@@ -85,6 +85,7 @@
   .other-models a{display:inline-flex;padding:7px 13px;border:1px solid var(--line);border-radius:999px;font-size:.88rem;font-weight:500;color:var(--text);background:#fff;transition:.15s}
   .other-models a:hover{border-color:var(--spark);color:var(--spark);transform:translateY(-1px)}
 </style>
+<script defer src="/price-live.js"></script>
 <!--spark-analytics--><script defer src="../../analytics.js"></script><!--/spark-analytics-->
 <!--spark-exit--><script defer src="../../exit-popup.js"></script><!--/spark-exit-->
 <!--spark-lead--><script defer src="../../lead-submit.js"></script><!--/spark-lead-->
@@ -219,21 +220,21 @@
         <p class="lead-p">Цены ориентировочные и зависят от типа запчасти (оригинал или совместимый). Точную стоимость мастер назовёт после бесплатной диагностики.</p>
       </div>
       <div class="ptable-wrap reveal">
-        <table class="price-table">
+        <table class="price-table" data-price-model="15" data-price-dash="em">
           <thead>
             <tr><th>Услуга</th><th>Цена</th><th>Срок</th></tr>
           </thead>
           <tbody>
             <tr><td class="svc-name free">Диагностика</td><td class="pr free">Бесплатно</td><td class="time">при вас</td></tr>
-            <tr><td class="svc-name">Замена экрана (дисплея)</td><td class="pr">4 900 ₴</td><td class="time">30-60 мин</td></tr>
-            <tr><td class="svc-name"><a href="../zamena-akkumulyatora/">Замена аккумулятора</a></td><td class="pr">1 200 — 1 700 ₴</td><td class="time">30-40 мин</td></tr>
-            <tr><td class="svc-name">Замена заднего стекла</td><td class="pr">3 500 ₴</td><td class="time">1-2 часа</td></tr>
-            <tr><td class="svc-name">Не заряжается (USB-C разъём)</td><td class="pr">1 000 — 1 500 ₴</td><td class="time">30-50 мин</td></tr>
-            <tr><td class="svc-name">После воды</td><td class="pr">1 000 — 3 500 ₴</td><td class="time">от 2 часов</td></tr>
-            <tr><td class="svc-name">Замена камеры</td><td class="pr">6 000 ₴</td><td class="time">40-60 мин</td></tr>
-            <tr><td class="svc-name">Динамик / микрофон</td><td class="pr">1 000 — 1 600 ₴</td><td class="time">30-50 мин</td></tr>
-            <tr><td class="svc-name">Face ID</td><td class="pr">2 200 — 3 400 ₴</td><td class="time">1-3 часа</td></tr>
-            <tr><td class="svc-name">Ремонт платы</td><td class="pr">1 800 — 5 200 ₴</td><td class="time">1-3 дня</td></tr>
+            <tr><td class="svc-name">Замена экрана (дисплея)</td><td class="pr" data-svc="Замена экрана (дисплея)">4 900 ₴</td><td class="time">30-60 мин</td></tr>
+            <tr><td class="svc-name"><a href="../zamena-akkumulyatora/">Замена аккумулятора</a></td><td class="pr" data-svc="Замена аккумулятора">1 200 — 1 700 ₴</td><td class="time">30-40 мин</td></tr>
+            <tr><td class="svc-name">Замена заднего стекла</td><td class="pr" data-svc="Замена заднего стекла">3 500 ₴</td><td class="time">1-2 часа</td></tr>
+            <tr><td class="svc-name">Не заряжается (USB-C разъём)</td><td class="pr" data-svc="Не заряжается (разъём)">1 000 — 1 500 ₴</td><td class="time">30-50 мин</td></tr>
+            <tr><td class="svc-name">После воды</td><td class="pr" data-svc="После воды">1 000 — 3 500 ₴</td><td class="time">от 2 часов</td></tr>
+            <tr><td class="svc-name">Замена камеры</td><td class="pr" data-svc="Замена камеры">6 000 ₴</td><td class="time">40-60 мин</td></tr>
+            <tr><td class="svc-name">Динамик / микрофон</td><td class="pr" data-svc="Динамик / микрофон">1 000 — 1 600 ₴</td><td class="time">30-50 мин</td></tr>
+            <tr><td class="svc-name">Face ID</td><td class="pr" data-svc="Face ID">2 200 — 3 400 ₴</td><td class="time">1-3 часа</td></tr>
+            <tr><td class="svc-name">Ремонт платы</td><td class="pr" data-svc="Ремонт платы">1 800 — 5 200 ₴</td><td class="time">1-3 дня</td></tr>
           </tbody>
         </table>
       </div>

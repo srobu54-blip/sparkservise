@@ -56,6 +56,7 @@
   .other-models a{display:inline-flex;padding:7px 13px;border:1px solid var(--line);border-radius:999px;font-size:.88rem;font-weight:500;color:var(--text);background:#fff;transition:.15s}
   .other-models a:hover{border-color:var(--spark);color:var(--spark);transform:translateY(-1px)}
 </style>
+<script defer src="/price-live.js"></script>
 <!--spark-analytics--><script defer src="../../../analytics.js"></script><!--/spark-analytics-->
 <!--spark-exit--><script defer src="../../../exit-popup.js"></script><!--/spark-exit-->
 <!--spark-lead--><script defer src="../../../lead-submit.js"></script><!--/spark-lead-->
@@ -190,20 +191,20 @@
         <p class="lead-p">Ціни орієнтовні та залежать від типу запчастини (оригінал або сумісна). Точну вартість майстер назве після безкоштовної діагностики.</p>
       </div>
       <div class="ptable-wrap reveal">
-        <table class="price-table">
+        <table class="price-table" data-price-model="se2" data-price-dash="em">
           <thead>
             <tr><th>Послуга</th><th>Ціна</th><th>Термін</th></tr>
           </thead>
           <tbody>
             <tr><td class="svc-name free">Діагностика</td><td class="pr free">Безкоштовно</td><td class="time">при вас</td></tr>
-            <tr><td class="svc-name">Заміна екрана (дисплея)</td><td class="pr">900 ₴</td><td class="time">30-60 хв</td></tr>
-            <tr><td class="svc-name"><a href="../zamena-akkumulyatora/">Заміна акумулятора</a></td><td class="pr">900 ₴</td><td class="time">30-40 хв</td></tr>
-            <tr><td class="svc-name">Не заряджається (Lightning розʼєм)</td><td class="pr">700 — 1 000 ₴</td><td class="time">30-50 хв</td></tr>
-            <tr><td class="svc-name">Після води</td><td class="pr">700 — 2 200 ₴</td><td class="time">від 2 годин</td></tr>
-            <tr><td class="svc-name">Заміна камери</td><td class="pr">1 700 ₴</td><td class="time">40-60 хв</td></tr>
-            <tr><td class="svc-name">Динамік / мікрофон</td><td class="pr">1 000 ₴</td><td class="time">30-50 хв</td></tr>
-            <tr><td class="svc-name">Кнопка Home / Touch ID</td><td class="pr">1 000 — 1 600 ₴</td><td class="time">40-60 хв</td></tr>
-            <tr><td class="svc-name">Ремонт плати</td><td class="pr">1 000 — 3 200 ₴</td><td class="time">1-3 дні</td></tr>
+            <tr><td class="svc-name">Заміна екрана (дисплея)</td><td class="pr" data-svc="Замена экрана (дисплея)">900 ₴</td><td class="time">30-60 хв</td></tr>
+            <tr><td class="svc-name"><a href="../zamena-akkumulyatora/">Заміна акумулятора</a></td><td class="pr" data-svc="Замена аккумулятора">900 ₴</td><td class="time">30-40 хв</td></tr>
+            <tr><td class="svc-name">Не заряджається (Lightning розʼєм)</td><td class="pr" data-svc="Не заряжается (разъём)">700 — 1 000 ₴</td><td class="time">30-50 хв</td></tr>
+            <tr><td class="svc-name">Після води</td><td class="pr" data-svc="После воды">700 — 2 200 ₴</td><td class="time">від 2 годин</td></tr>
+            <tr><td class="svc-name">Заміна камери</td><td class="pr" data-svc="Замена камеры">1 700 ₴</td><td class="time">40-60 хв</td></tr>
+            <tr><td class="svc-name">Динамік / мікрофон</td><td class="pr" data-svc="Динамик / микрофон">1 000 ₴</td><td class="time">30-50 хв</td></tr>
+            <tr><td class="svc-name">Кнопка Home / Touch ID</td><td class="pr" data-svc="Кнопка Home / Touch ID">1 000 — 1 600 ₴</td><td class="time">40-60 хв</td></tr>
+            <tr><td class="svc-name">Ремонт плати</td><td class="pr" data-svc="Ремонт платы">1 000 — 3 200 ₴</td><td class="time">1-3 дні</td></tr>
           </tbody>
         </table>
       </div>

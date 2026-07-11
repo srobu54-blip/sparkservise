@@ -189,7 +189,7 @@ def render(tid):
         if key not in pr: continue
         label = label_t.replace("__PORT__", port)
         cell = f'<a href="../zamena-akkumulyatora/">{label}</a>' if key == "Замена аккумулятора" else label
-        rows.append(f'<tr><td class="svc-name">{cell}</td><td class="pr">{rng(pr[key])}</td><td class="time">{t}</td></tr>')
+        rows.append(f'<tr><td class="svc-name">{cell}</td><td class="pr" data-svc="{key}">{rng(pr[key])}</td><td class="time">{t}</td></tr>')
     price_rows = "\n            ".join(rows)
 
     # Карточки «виды ремонта»
@@ -321,7 +321,7 @@ def render(tid):
         "@@PORT@@": port, "@@BIO_HUMAN@@": bio_human, "@@BIO_SHORT@@": bio_short, "@@BIO_SEO@@": bio_seo, "@@BACK_SEO@@": back_seo,
         "@@SCREEN_FEAT@@": screen_feat, "@@SAVE_LINE@@": save_line, "@@DISP_HUMAN@@": disp_human,
         "@@BACK_HERO@@": ("задней крышки и " if has_back else ""),
-        "@@FAQ_JSON@@": faq_json, "@@FAQ_HTML@@": faq_html, "@@PRICE_ROWS@@": price_rows,
+        "@@FAQ_JSON@@": faq_json, "@@FAQ_HTML@@": faq_html, "@@PRICE_ROWS@@": price_rows, "@@MODEL_ID@@": tid,
         "@@REPAIR_CARDS@@": repair_cards, "@@OTHER_MODELS@@": other_links, "@@BOOK_OPTIONS@@": opts,
         "@@HERO_ART@@": hero_art, "@@MODEL_NOTES@@": NOTES.get(slug, f"Сервисный центр SPARK ремонтирует {name} в Одессе — экран, аккумулятор, разъём, камеры, плата."),
     }
@@ -410,6 +410,7 @@ TEMPLATE = r'''<!DOCTYPE html>
   .other-models a{display:inline-flex;padding:7px 13px;border:1px solid var(--line);border-radius:999px;font-size:.88rem;font-weight:500;color:var(--text);background:#fff;transition:.15s}
   .other-models a:hover{border-color:var(--spark);color:var(--spark);transform:translateY(-1px)}
 </style>
+<script defer src="/price-live.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Перейти к содержимому</a>
@@ -517,7 +518,7 @@ TEMPLATE = r'''<!DOCTYPE html>
         <p class="lead-p">Цены ориентировочные и зависят от типа запчасти (оригинал или совместимый). Точную стоимость мастер назовёт после бесплатной диагностики.</p>
       </div>
       <div class="ptable-wrap reveal">
-        <table class="price-table">
+        <table class="price-table" data-price-model="@@MODEL_ID@@" data-price-dash="em">
           <thead>
             <tr><th>Услуга</th><th>Цена</th><th>Срок</th></tr>
           </thead>

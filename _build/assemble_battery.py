@@ -142,7 +142,7 @@ def build():
     p += '<meta property="og:title" content="%s">\n<meta property="og:description" content="%s">\n' % (escA("Замена аккумулятора iPhone в Одессе | SPARK"), escA(desc))
     p += '<meta property="og:url" content="%s">\n<meta property="og:locale" content="ru_RU">\n' % CANON
     p += '<meta property="og:image" content="https://sparkservice.od.ua/og/spark.jpg">\n\n'
-    p += schema_html + '\n\n<link rel="stylesheet" href="../../styles.css">\n' + D.STYLE + '\n</head>\n<body>\n'
+    p += schema_html + '\n\n<link rel="stylesheet" href="../../styles.css">\n' + D.STYLE + '\n<script defer src="/price-live.js"></script>\n</head>\n<body>\n'
     p += '<a class="skip" href="#main">Перейти к содержимому</a>\n\n' + NAV2 + '\n'
 
     # ── breadcrumb (3 уровня) ──
@@ -164,8 +164,8 @@ def build():
 
     # ── таблица цен по моделям (строки ссылаются на модели) ──
     rows = "\n            ".join(
-        '<tr><td class="svc-name"><a href="../../remont-iphone/%s/">Замена аккумулятора %s</a></td><td class="pr">%s ₴</td><td class="time">20-30 мин</td></tr>' % (
-            slug, esc(label), (grn(lo) if lo==hi else grn(lo)+" – "+grn(hi))) for label,slug,lo,hi in MODELS)
+        '<tr><td class="svc-name"><a href="../../remont-iphone/%s/">Замена аккумулятора %s</a></td><td class="pr" data-price-label="%s" data-price-dash="en" data-svc="Замена аккумулятора">%s ₴</td><td class="time">20-30 мин</td></tr>' % (
+            slug, esc(label), esc(label), (grn(lo) if lo==hi else grn(lo)+" – "+grn(hi))) for label,slug,lo,hi in MODELS)
     p += ('  <section class="sec sec-bg" id="prices">\n    <div class="wrap">\n      <div class="sec-head reveal">\n'
           '        <span class="sec-tag">Цены</span>\n        <h2>Стоимость замены аккумулятора по моделям</h2>\n'
           '        <p class="lead-p">Цены ориентировочные. Точную стоимость называем после бесплатной диагностики. Нажмите на модель — там все виды ремонта и цены.</p>\n      </div>\n'

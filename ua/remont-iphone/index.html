@@ -659,6 +659,27 @@
     bodyEl.innerHTML=html;
   }
   buildTabs();renderTable();
+  /* Живое обновление цен из CMS (Supabase published_prices): значения по позиции —
+     ключи услуг остаются локальными (RU на RU, UA на UA), порядок гарантирован.
+     Ошибка/недоступность → остаются запечённые цены. */
+  (function(){try{
+    var SB='https://xvqqoyttvfmrjvufkkzm.supabase.co',
+        AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2cXFveXR0dmZtcmp2dWZra3ptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MDQwMDgsImV4cCI6MjA5ODk4MDAwOH0.yaUDu6A4ajFSKx7Xn51BEUgMgkpF47HOhRocCYfjpSU';
+    fetch(SB+'/rest/v1/model_prices?select=id,prices,published_prices&order=sort.asc',{headers:{apikey:AK,Authorization:'Bearer '+AK}})
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(rows){
+        if(!rows||!rows.length)return;
+        var byId={};rows.forEach(function(r){byId[r.id]=r.published_prices||r.prices;});
+        var n=0;
+        TIERS.forEach(function(t){
+          var pub=byId[t.id];if(!pub)return;
+          var vals=Object.keys(pub).map(function(k){return pub[k];}),keys=Object.keys(t.prices);
+          if(keys.length!==vals.length)return;         // защита: набор услуг должен совпасть
+          keys.forEach(function(k,idx){t.prices[k]=vals[idx];});n++;
+        });
+        if(n)renderTable();
+      })['catch'](function(){});
+  }catch(e){}})();
 
   document.querySelectorAll('.mchip[data-model]').forEach(function(chip){
     chip.addEventListener('click',function(){
