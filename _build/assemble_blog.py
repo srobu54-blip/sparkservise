@@ -19,7 +19,10 @@ SLUGS = [a[0] for a in ARTICLES]
 # Переопределять ТОЛЬКО когда контент статьи реально меняли — иначе будет фейковая «свежесть»
 # (все статьи одной датой), которой Google перестаёт доверять. Формат: slug: ("YYYY-MM-DD", "D месяца YYYY").
 MODIFIED = {
-    # "iphone-greetsya": ("2026-07-10", "10 июля 2026"),
+    # добавлены фирменные inline-иллюстрации → реальное изменение статьи 20.07.2026
+    "iphone-greetsya":            ("2026-07-20", "20 июля 2026"),
+    "iphone-upal-v-vodu-chto-delat": ("2026-07-20", "20 июля 2026"),
+    "iphone-ne-zaryazhaetsya":    ("2026-07-20", "20 июля 2026"),
 }
 def modified_of(slug, iso, disp):
     return MODIFIED.get(slug, (iso, disp))
