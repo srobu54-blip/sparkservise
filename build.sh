@@ -57,6 +57,10 @@ step "i18n_wire — hreflang/canonical (подстраховка)";  $PY _build/
 # 12) Активный пункт меню (после i18n_wire — нужны финальные пути)
 step "mark_current_nav — активное меню";     $PY _build/mark_current_nav.py
 
+# 12.5) Server-render прайса хаба: запекаем строки в <tbody id="priceBody"> (RU+UA),
+#       чтобы цены были в HTML для краулеров. После make_ua (UA-хаб уже собран).
+step "prerender_hub_prices — прайс хаба в HTML"; $PY _build/prerender_hub_prices.py
+
 # 13-16) Инъекции в <head> и финальная оптимизация
 step "inject_favicon — фавикон";             $PY _build/inject_favicon.py
 step "inject_analytics — analytics.js";      $PY _build/inject_analytics.py
