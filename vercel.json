@@ -972,6 +972,51 @@
       "source": "/zamena_stekla_apple_watch/",
       "destination": "/remont-apple-watch/",
       "permanent": true
+    },
+    {
+      "source": "/zayavka_ekr",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/zayavka_ekr/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/pgstart",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/pgstart/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/thank_you_ekr",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/thank_you_ekr/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/lgjlvakjesr",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/lgjlvakjesr/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/sitemap-store.xml",
+      "destination": "/sitemap.xml",
+      "permanent": true
     }
   ],
   "headers": [
