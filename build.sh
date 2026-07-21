@@ -30,6 +30,8 @@ step "assemble — хабы устройств";           $PY _build/assemble.p
 step "assemble_model — модели iPhone";       $PY _build/assemble_model.py
 # 4) Посадочная «Замена аккумулятора»
 step "assemble_battery — АКБ";               $PY _build/assemble_battery.py
+# 4.1) Посадочная «Замена стекла Apple Watch» (нет контент-json → шаг пропускается)
+step "assemble_watch_glass — стекло Watch";  $PY _build/assemble_watch_glass.py
 # 5) Страницы услуг (разблокировка, диагностика, восстановление)
 step "assemble_service — услуги";            $PY _build/assemble_service.py
 # 6) Блог

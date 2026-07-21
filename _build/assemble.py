@@ -458,9 +458,16 @@ def build(slug, device, c):
 
     # price rows
     rows = ['<tr><td class="svc-name free">Диагностика</td><td class="pr free">Бесплатно</td><td class="time">%s</td></tr>'%esc(diagTime)]
+    # Услуги, у которых есть своя посадочная — строка прайса ведёт на неё (внутренняя перелинковка)
+    SPOKE_LINKS = {"Замена защитного стекла": "zamena-stekla/"}
     for r in pr:
+        svc = r.get("service","")
+        cell = esc(svc)
+        href = SPOKE_LINKS.get(svc)
+        if href and slug == "remont-apple-watch":
+            cell = '<a href="%s">%s</a>' % (href, esc(svc))
         rows.append('<tr><td class="svc-name">%s</td><td class="pr">%s</td><td class="time">%s</td></tr>'%(
-            esc(r.get("service","")), esc(normprice(r.get("price",""))), esc(r.get("time",""))))
+            cell, esc(normprice(r.get("price",""))), esc(r.get("time",""))))
     pricerows = "\n            ".join(rows)
 
     # repair cards
