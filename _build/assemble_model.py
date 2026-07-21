@@ -12,7 +12,8 @@ assemble_model.py — генератор spoke-страниц моделей iPh
 топ-модели + хаб. Хаб линкует все модели.
 
 Как добавить модель: добавь спеку в SPEC (id совпадает с TIERS) → python3 _build/assemble_model.py.
-iPhone 17 Pro Max НЕ генерируется (ручная страница с реальным фото).
+Генерируются ВСЕ модели из SPEC, включая iPhone 17 Pro Max (переведён с ручной вёрстки
+21.07.2026: она не имела блоков обогащения, live-цен из админки и фото в герое).
 Если в папке есть <slug>.webp — он покажется как фото; иначе SVG-макет.
 """
 import os, re, json
@@ -24,6 +25,7 @@ OG_IMAGE = BASE + "/og/spark.jpg"
 # ---- Спеки моделей. id == id в TIERS. (slug, port, promotion, display, biometric, truetone, water)
 # biometric: 'faceid' (X и новее) | 'touchid' (8 и старше + SE)
 SPEC = {
+ "17pm":  ("iPhone 17 Pro Max",  "iphone-17-pro-max",  "USB-C",     True,  "OLED", "faceid", True, True),
  "17p":   ("iPhone 17 Pro",      "iphone-17-pro",      "USB-C",     True,  "OLED", "faceid", True, True),
  "17air": ("iPhone 17 Air",      "iphone-17-air",      "USB-C",     True,  "OLED", "faceid", True, True),
  "17":    ("iPhone 17",          "iphone-17",          "USB-C",     True,  "OLED", "faceid", True, True),
@@ -101,7 +103,8 @@ ICONS = {
 
 # Уникальный per-model абзац (типичные поломки поколения). Факты выверены.
 NOTES = {
- "iphone-17-pro": "iPhone 17 Pro (2025) — титановый Pro с USB-C, дисплеем ProMotion 120 Гц и продвинутой системой камер. В ремонт чаще всего попадает с разбитым OLED-дисплеем, износом аккумулятора и проблемами телеобъектива. Восстанавливаем 120 Гц, Dynamic Island и Face ID.",
+ "iphone-17-pro-max": "iPhone 17 Pro Max (2025) — флагман линейки с самым крупным дисплеем ProMotion 120 Гц и самой ёмкой батареей поколения. В ремонт чаще всего попадает с разбитым OLED-дисплеем, износом аккумулятора и неисправностями телеобъектива. Восстанавливаем ProMotion, Dynamic Island и Face ID, меняем заднее стекло отдельным элементом без замены корпуса.",
+ "iphone-17-pro":"iPhone 17 Pro (2025) — титановый Pro с USB-C, дисплеем ProMotion 120 Гц и продвинутой системой камер. В ремонт чаще всего попадает с разбитым OLED-дисплеем, износом аккумулятора и проблемами телеобъектива. Восстанавливаем 120 Гц, Dynamic Island и Face ID.",
  "iphone-17-air": "iPhone 17 Air (2025) — ультратонкий корпус и одна основная камера. Из-за тонкости чаще встречаются деформации корпуса и трещины OLED-дисплея; также меняем аккумулятор и ремонтируем разъём USB-C. Сохраняем ProMotion и Face ID.",
  "iphone-17": "iPhone 17 (2025) — базовая модель, впервые с дисплеем ProMotion 120 Гц и разъёмом USB-C. Типичный ремонт: замена OLED-дисплея и аккумулятора, ремонт USB-C, восстановление после попадания воды.",
  "iphone-16-pro-max": "iPhone 16 Pro Max (2024) — флагман с крупнейшим экраном ProMotion 120 Гц и продвинутой системой камер. В ремонт идёт с разбитым OLED-дисплеем, износом батареи и неисправностями камер, включая 5× телефото. Восстанавливаем ProMotion, Dynamic Island и Camera Control.",
@@ -935,7 +938,7 @@ def main():
     print("=== WRITTEN ===")
     for slug, n in written:
         print("  ✓ remont-iphone/%s (%d симв.)" % (slug, n))
-    print("Итого: %d страниц моделей (iPhone 17 Pro Max — ручная, не трогаем)" % len(written))
+    print("Итого: %d страниц моделей" % len(written))
 
 
 if __name__ == "__main__":

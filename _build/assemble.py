@@ -459,7 +459,8 @@ def build(slug, device, c):
     # price rows
     rows = ['<tr><td class="svc-name free">Диагностика</td><td class="pr free">Бесплатно</td><td class="time">%s</td></tr>'%esc(diagTime)]
     # Услуги, у которых есть своя посадочная — строка прайса ведёт на неё (внутренняя перелинковка)
-    SPOKE_LINKS = {"Замена защитного стекла": "zamena-stekla/"}
+    SPOKE_LINKS = {"Замена защитного стекла": "zamena-stekla/",
+                   "Полировка стекла (царапины)": "zamena-stekla/"}
     for r in pr:
         svc = r.get("service","")
         cell = esc(svc)
