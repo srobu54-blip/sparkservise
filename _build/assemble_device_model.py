@@ -207,6 +207,17 @@ SUBMODELS = {
  ],
 }
 
+# Обогащённый per-model контент: 5 частых поломок + 4 особенности ремонта + 3 модельных FAQ (RU).
+# Лежит в _build/device_content.json (генерируется отдельно, UA — через каталог i18n_ua.json).
+# Файла нет / битый → словарь пустой, блоки просто не выводятся (страница как раньше).
+MODEL_CONTENT = {}
+_MC_PATH = os.path.join(REPO, "_build", "device_content.json")
+if os.path.exists(_MC_PATH):
+    try:
+        MODEL_CONTENT = json.load(open(_MC_PATH, encoding="utf-8"))
+    except Exception as e:
+        print(f"[assemble_device_model] device_content.json не прочитан ({e}) — обогащение пропущено")
+
 
 def render(dev, m):
     name, slug = m["name"], m["slug"]
@@ -255,7 +266,33 @@ def render(dev, m):
         (f"Нужна ли предоплата за ремонт {name}?",
          "Нет. Диагностика бесплатная, оплата — только после ремонта, когда вы убедились, что всё работает."),
     ]
-    faq_json = ",\n    ".join('{"@type":"Question","name":%s,"acceptedAnswer":{"@type":"Answer","text":%s}}' % (jstr(q), jstr(a)) for q, a in faq)
+
+    # ── Обогащение модели: уникальные блоки + модельные FAQ (в HTML и в schema) ──
+    mc = MODEL_CONTENT.get(slug, {})
+    for _it in mc.get("faq", []):
+        faq.append((_it["q_ru"], _it["a_ru"]))
+
+    def _cards(items):
+        return "\n        ".join(
+            f'<div class="rtype reveal"><h3>{i["t_ru"]}</h3><p>{i["d_ru"]}</p></div>'
+            for i in items)
+
+    def _sec(cls, sid, tag, h2, cards):
+        return ('  <section class="%s" id="%s">\n    <div class="wrap">\n'
+                '      <div class="sec-head reveal">\n        <span class="sec-tag">%s</span>\n'
+                '        <h2>%s</h2>\n      </div>\n      <div class="repair-types">\n        %s\n'
+                '      </div>\n    </div>\n  </section>') % (cls, sid, tag, h2, cards)
+
+    _uniq = []
+    if mc.get("fails"):
+        _uniq.append(_sec("sec sec-bg", "model-issues", "Частые случаи",
+                          f"С чем чаще всего приносят {name}", _cards(mc["fails"])))
+    if mc.get("tech"):
+        _uniq.append(_sec("sec", "model-tech", "Особенности модели",
+                          f"Что важно знать о ремонте {name}", _cards(mc["tech"])))
+    model_unique = "\n\n".join(_uniq)
+
+    faq_json =",\n    ".join('{"@type":"Question","name":%s,"acceptedAnswer":{"@type":"Answer","text":%s}}' % (jstr(q), jstr(a)) for q, a in faq)
     faq_html = "\n        ".join(f'<details{" open" if i==0 else ""}><summary>{q}</summary><div class="a">{a}</div></details>' for i, (q, a) in enumerate(faq))
 
     # Перелинковка: соседние под-модели этого устройства + хаб устройства
@@ -298,7 +335,8 @@ def render(dev, m):
         "@@OFFER_PRICE@@": str(pr[cheap_key][0]), "@@OFFER_DESC@@": cat[cheap_key][1] + " " + name + " от " + money(pr[cheap_key][0]) + " ₴",
         "@@PRICE_ROWS@@": price_rows, "@@REPAIR_CARDS@@": repair_cards, "@@FAQ_JSON@@": faq_json,
         "@@FAQ_HTML@@": faq_html, "@@OTHER@@": other, "@@BOOK_OPTIONS@@": opts, "@@HERO_ART@@": hero_art,
-        "@@NOTE@@": m["note"], "@@LEAD_TITLE@@": lead_title, "@@LEAD_DESC@@": lead_desc,
+        "@@NOTE@@": m["note"], "@@MODEL_UNIQUE@@": model_unique,
+        "@@LEAD_TITLE@@": lead_title, "@@LEAD_DESC@@": lead_desc,
         "@@META_DESC@@": m.get("meta") or f"Ремонт {name} в Одессе: {lead_desc}. Бесплатная диагностика, гарантия 12 мес, оригинальные запчасти.",
         "@@OG_DESC@@": og_desc, "@@LEAD_KW@@": lead_kw, "@@HERO_SUB@@": hero_sub,
     }
@@ -519,6 +557,8 @@ TEMPLATE = r'''<!DOCTYPE html>
       </div>
     </div>
   </section>
+
+@@MODEL_UNIQUE@@
 
   <section class="sec sec-ink" id="process">
     <div class="wrap">
