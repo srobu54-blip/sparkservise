@@ -892,7 +892,7 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
     const next = {}, bad = [];
     document.querySelectorAll("#pxRows .px-num").forEach((i) => i.classList.remove("bad"));
     for (const svc of Object.keys(r.prices)) { const lo = Math.round(+pxBuf[svc][0] || 0), hi = Math.round(+pxBuf[svc][1] || 0);
-      if (!(lo > 0) || !(hi > 0)) bad.push(svc); next[svc] = [lo, hi]; }
+      if (lo < 0 || hi < 0 || (lo > 0) !== (hi > 0)) bad.push(svc); next[svc] = [lo, hi]; }   // 0/0 = «уточняйте при заявке»
     if (bad.length) { bad.forEach((svc) => { const tr = rowEl(svc); if (tr) tr.querySelectorAll(".px-num").forEach((i) => i.classList.add("bad")); });
       setMsg("Цена должна быть больше 0 — проверьте выделенные поля.", "err"); return; }
     for (const svc of Object.keys(next)) { const [lo, hi] = next[svc];

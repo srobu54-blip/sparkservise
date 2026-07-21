@@ -93,6 +93,8 @@ def build_tiers_block(rows) -> str:
     return "\n".join(lines)
 
 
+# [0,0] — легальная цена-сентинел: означает «уточняйте при заявке».
+# Так услуга живёт в общей структуре и остаётся редактируемой в админке.
 def validate(rows) -> bool:
     if not rows or not isinstance(rows, list):
         log("пустой ответ — пропускаю")
@@ -110,7 +112,7 @@ def validate(rows) -> bool:
             return False
         for svc, pair in eff.items():
             if (not isinstance(pair, (list, tuple)) or len(pair) != 2
-                    or not all(isinstance(x, int) and x > 0 for x in pair)):
+                    or not all(isinstance(x, int) and x >= 0 for x in pair)):
                 log(f"кривая цена {r['id']} / {svc}: {pair} — пропускаю")
                 return False
     return True

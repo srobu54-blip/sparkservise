@@ -29,7 +29,8 @@
       var p = prices[cell.getAttribute("data-svc")];
       if (!p || !p.length) return;
       var dash = ((cell.getAttribute("data-price-dash") || host.getAttribute("data-price-dash")) === "en") ? " – " : " — ";
-      cell.textContent = (+p[0] === +p[1]) ? money(p[0]) + " ₴" : money(p[0]) + dash + money(p[1]) + " ₴";
+      cell.textContent = (!+p[0] && !+p[1]) ? "Уточняйте при заявке"
+        : (+p[0] === +p[1]) ? money(p[0]) + " ₴" : money(p[0]) + dash + money(p[1]) + " ₴";
     });
   }
 

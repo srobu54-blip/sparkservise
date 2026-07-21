@@ -70,12 +70,16 @@ def render_strings(src: str):
         r":k\.indexOf\('([^']*)'\)>-1\?'([^']*)':t\.time;",
         src,
     )
+    # подпись для цены-сентинела [0,0] («уточняйте при заявке») — берём из самой страницы,
+    # чтобы UA-версия подхватила свой перевод, а не русскую строку
+    onreq = re.search(r"var pr=\(!p\[0\]&&!p\[1\]\)\?'([^']*)'", src)
     if not diag or not tmap:
         return None
     return {
         "diag": diag.group(1), "free": diag.group(2), "atyou": diag.group(3),
         "water": tmap.group(1), "wtime": tmap.group(2),
         "plat": tmap.group(3), "ptime": tmap.group(4),
+        "on_request": onreq.group(1) if onreq else "Уточняйте при заявке",
     }
 
 
@@ -94,7 +98,10 @@ def build_rows(tier, s) -> str:
             time = s["ptime"]
         else:
             time = tier_time
-        pr = f"{fmt(lo)} ₴" if lo == hi else f"{fmt(lo)} — {fmt(hi)} ₴"
+        if not lo and not hi:
+            pr = s["on_request"]
+        else:
+            pr = f"{fmt(lo)} ₴" if lo == hi else f"{fmt(lo)} — {fmt(hi)} ₴"
         rows.append(
             f'{ind}<tr><td class="svc-name">{svc}</td>'
             f'<td class="pr">{pr}</td>'

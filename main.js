@@ -129,7 +129,7 @@
           lo=r50(base[0]*mm);hi=r50(base[1]*Math.min(mm,1.3));
           if(hi<=lo) hi=lo+ r50(base[0]*0.3);
         }
-        elPrice.innerHTML=(lo===hi)?lo.toLocaleString('ru-RU')+' <small>₴</small>':'от '+lo.toLocaleString('ru-RU')+' <small>до '+hi.toLocaleString('ru-RU')+' ₴</small>';
+        elPrice.innerHTML=(!lo&&!hi)?'<small>Уточняйте при заявке</small>':(lo===hi)?lo.toLocaleString('ru-RU')+' <small>₴</small>':'от '+lo.toLocaleString('ru-RU')+' <small>до '+hi.toLocaleString('ru-RU')+' ₴</small>';
         var t=(curDev==='iphone')?'30-60 минут':'от 1 часа';
         elMeta.innerHTML='<span class="free">Диагностика 0 ₴</span><span>Гарантия 12 мес</span><span>Срок: '+t+'</span>';
       };
