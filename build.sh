@@ -63,6 +63,13 @@ step "mark_current_nav — активное меню";     $PY _build/mark_curre
 #       чтобы цены были в HTML для краулеров. После make_ua (UA-хаб уже собран).
 step "prerender_hub_prices — прайс хаба в HTML"; $PY _build/prerender_hub_prices.py
 
+# 12.6) Рейтинг Google → во все страницы (из _build/google_rating.json).
+#       Значения обновляет fetch_google_rating.py при наличии API-ключа.
+if [ -n "${GOOGLE_PLACES_API_KEY:-}" ]; then
+  step "fetch_google_rating — рейтинг из Places API"; $PY _build/fetch_google_rating.py || true
+fi
+step "apply_rating — рейтинг по страницам";  $PY _build/apply_rating.py
+
 # 13-16) Инъекции в <head> и финальная оптимизация
 step "inject_favicon — фавикон";             $PY _build/inject_favicon.py
 step "inject_analytics — analytics.js";      $PY _build/inject_analytics.py
