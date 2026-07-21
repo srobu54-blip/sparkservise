@@ -553,7 +553,7 @@ def build(slug, device, c):
     page += '        <p class="sub">%s</p>\n'%esc(sub)
     page += '        <div class="hero-cta">\n          <a class="btn btn-spark" href="#book">Записаться</a>\n          <a class="btn btn-line" href="tel:+380960755452">☎ Позвонить</a>\n        </div>\n'
     page += '        <p class="cta-note">⏱ <b>Перезвоним за 15 минут</b> · бесплатная диагностика</p>\n'
-    page += '        <div class="trustbar"><span class="tb-star">★ 4.9</span> <b>Google</b><span class="sep">·</span>127 отзывов<span class="sep">·</span><b>32 000</b> ремонтов<span class="sep">·</span>9 лет</div>\n'
+    page += '        <div class="trustbar"><span class="tb-star">★ 4.8</span> <b>Google</b><span class="sep">·</span>158 отзывов<span class="sep">·</span><b>32 000</b> ремонтов<span class="sep">·</span>9 лет</div>\n'
     page += '        <div class="quick">\n          <span>📍 <b>ул. Академика Королёва, 23</b></span>\n          <span>🕐 <b>Пн-Сб 10:00-19:00</b></span>\n          %s\n        </div>\n'%quick_price_html
     page += '      </div>\n      ' + hero_art(slug, device) + '\n    </div>\n  </section>\n\n'
     # prices

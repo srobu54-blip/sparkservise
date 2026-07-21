@@ -135,7 +135,7 @@ def build(slug, name, c):
     p += '        <span class="eyebrow">%s в Одессе</span>\n        <h1>%s</h1>\n        <p class="sub">%s</p>\n' % (esc(name), esc(h1), rich(sub))
     p += '        <div class="hero-cta">\n          <a class="btn btn-spark" href="#book">Записаться</a>\n          <a class="btn btn-line" href="tel:+380960755452">☎ Позвонить</a>\n        </div>\n'
     p += '        <p class="cta-note">⏱ <b>Перезвоним за 15 минут</b> · бесплатная диагностика</p>\n'
-    p += '        <div class="trustbar"><span class="tb-star">★ 4.9</span> <b>Google</b><span class="sep">·</span>127 отзывов<span class="sep">·</span><b>32 000</b> ремонтов<span class="sep">·</span>9 лет</div>\n'
+    p += '        <div class="trustbar"><span class="tb-star">★ 4.8</span> <b>Google</b><span class="sep">·</span>158 отзывов<span class="sep">·</span><b>32 000</b> ремонтов<span class="sep">·</span>9 лет</div>\n'
     p += '        <div class="quick">\n          <span>📍 <b>ул. Академика Королёва, 23</b></span>\n          <span>🕐 <b>Пн-Сб 10:00-19:00</b></span>\n          %s\n        </div>\n' % quick_html
     p += '      </div>\n      ' + hero_service(name, heroIcon) + '\n    </div>\n  </section>\n\n'
     p += '  <section class="sec" id="cases">\n    <div class="wrap">\n      <div class="sec-head reveal">\n        <span class="sec-tag">Услуга</span>\n        <h2>%s</h2>\n      </div>\n      <div class="repair-types">\n        %s\n      </div>\n    </div>\n  </section>\n\n' % (

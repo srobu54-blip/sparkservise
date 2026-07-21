@@ -510,7 +510,7 @@ def build_article(slug, category, icon_key, iso, disp, a, meta):
     tldr_html = ('<div class="tldr"><b>Коротко</b><ul>%s</ul></div>' %
                  "".join("<li>%s</li>" % esc(t) for t in tldr)) if tldr else ""
     author_html = ('<div class="art-author"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>'
-        '<p>Материал подготовили и проверили мастера <b><a href="../../o-kompanii/">сервисного центра SPARK</a></b> — независимого сервиса по ремонту техники Apple в Одессе с 2017 года: более 32 000 отремонтированных устройств, гарантия до 12 месяцев и рейтинг 4.9★ на Google.<br>Обновлено: <time datetime="%s">%s</time></p></div>') % (miso, mdisp)
+        '<p>Материал подготовили и проверили мастера <b><a href="../../o-kompanii/">сервисного центра SPARK</a></b> — независимого сервиса по ремонту техники Apple в Одессе с 2017 года: более 32 000 отремонтированных устройств, гарантия до 12 месяцев и рейтинг 4.8★ на Google.<br>Обновлено: <time datetime="%s">%s</time></p></div>') % (miso, mdisp)
     faq = a.get("faq") or []
     faq_html = ""
     if faq:
