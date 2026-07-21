@@ -43,7 +43,13 @@
   .page-hero .quick b{color:var(--text);font-weight:600}
   @media(min-width:920px){.page-hero .wrap{grid-template-columns:1.15fr .85fr;gap:48px;padding-top:20px}}
   .repair-types{display:grid;grid-template-columns:1fr;gap:14px;margin-top:24px}
-  .rtype{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:22px;transition:transform .3s,box-shadow .3s,border-color .3s}
+  .rtype{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:22px;transition:transform .3s,box-shadow .3s,border-color .3s}
+  /* карточка услуги, у которой есть своя посадочная: кликабельна целиком */
+  .rtype .rt-link{color:inherit;text-decoration:none}
+  .rtype .rt-link::after{content:"";position:absolute;inset:0;border-radius:inherit}
+  .rtype:has(.rt-link){cursor:pointer}
+  .rtype:has(.rt-link):hover{border-color:var(--spark)}
+  .rtype:has(.rt-link):hover .rt-link{color:var(--spark)}
   .rtype:hover{transform:translateY(-3px);box-shadow:0 18px 40px -20px rgba(16,18,26,.25);border-color:#dbe0e8}
   .rtype h3{font-size:1.08rem;font-weight:650;margin-bottom:6px;display:flex;align-items:center;gap:10px}
   .rtype h3 .ri{width:36px;height:36px;border-radius:9px;background:var(--spark-soft);color:var(--spark);display:grid;place-items:center;flex-shrink:0}
@@ -212,11 +218,11 @@
       </div>
       <div class="repair-types">
         <div class="rtype reveal">
-          <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M8 6l8 12"/></svg></span> Замена стекла</h3>
+          <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M8 6l8 12"/></svg></span> <a class="rt-link" href="zamena-stekla/">Замена стекла</a></h3>
           <p>Меняем разбитое или поцарапанное защитное стекло Apple Watch с сохранением тачскрина и дисплея под ним.</p>
         </div>
         <div class="rtype reveal">
-          <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9z"/><path d="M19 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg></span> Полировка стекла</h3>
+          <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9z"/><path d="M19 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg></span> <a class="rt-link" href="zamena-stekla/">Полировка стекла</a></h3>
           <p>Убираем царапины и потёртости, если стекло целое. Часы не вскрываем, поэтому заводская влагозащита остаётся нетронутой, а стекло — родным. Единая цена для всех моделей.</p>
         </div>
         <div class="rtype reveal">

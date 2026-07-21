@@ -338,7 +338,13 @@ STYLE = '''<style>
   .page-hero .quick b{color:var(--text);font-weight:600}
   @media(min-width:920px){.page-hero .wrap{grid-template-columns:1.15fr .85fr;gap:48px;padding-top:20px}}
   .repair-types{display:grid;grid-template-columns:1fr;gap:14px;margin-top:24px}
-  .rtype{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:22px;transition:transform .3s,box-shadow .3s,border-color .3s}
+  .rtype{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:22px;transition:transform .3s,box-shadow .3s,border-color .3s}
+  /* карточка услуги, у которой есть своя посадочная: кликабельна целиком */
+  .rtype .rt-link{color:inherit;text-decoration:none}
+  .rtype .rt-link::after{content:"";position:absolute;inset:0;border-radius:inherit}
+  .rtype:has(.rt-link){cursor:pointer}
+  .rtype:has(.rt-link):hover{border-color:var(--spark)}
+  .rtype:has(.rt-link):hover .rt-link{color:var(--spark)}
   .rtype:hover{transform:translateY(-3px);box-shadow:0 18px 40px -20px rgba(16,18,26,.25);border-color:#dbe0e8}
   .rtype h3{font-size:1.08rem;font-weight:650;margin-bottom:6px;display:flex;align-items:center;gap:10px}
   .rtype h3 .ri{width:36px;height:36px;border-radius:9px;background:var(--spark-soft);color:var(--spark);display:grid;place-items:center;flex-shrink:0}
@@ -471,11 +477,18 @@ def build(slug, device, c):
             cell, esc(normprice(r.get("price",""))), esc(r.get("time",""))))
     pricerows = "\n            ".join(rows)
 
-    # repair cards
+    # repair cards. Если у услуги есть своя посадочная — карточка кликабельна целиком
+    # (ссылка на заголовке + растянутая ::after перекрывает карточку, см. .rt-link в CSS).
+    CARD_LINKS = {"remont-apple-watch": {"Замена стекла": "zamena-stekla/",
+                                         "Полировка стекла": "zamena-stekla/"}}
+    clinks = CARD_LINKS.get(slug, {})
     cards = []
     for t in rt:
+        ttl = t.get("title", "")
+        href = clinks.get(ttl)
+        ttl_html = ('<a class="rt-link" href="%s">%s</a>' % (href, esc(ttl))) if href else esc(ttl)
         cards.append('<div class="rtype reveal">\n          <h3><span class="ri">%s</span> %s</h3>\n          <p>%s</p>\n        </div>'%(
-            icon(t.get("icon","wrench")), esc(t.get("title","")), esc(t.get("desc",""))))
+            icon(t.get("icon","wrench")), ttl_html, esc(t.get("desc",""))))
     repairtypes = "\n        ".join(cards)
 
     # process
