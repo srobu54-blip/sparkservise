@@ -147,7 +147,7 @@
     ];
     function detect(code){for(var i=0;i<OPS.length;i++){if(OPS[i].c.indexOf(code)>-1)return OPS[i].n;}return null;}
     function rawDigits(v){var d=v.replace(/\D/g,'');if(d.indexOf('38')===0)d=d.slice(2);return d.slice(0,10);}
-    function fmt(d){var o='';if(d.length>0)o='('+d.slice(0,3);if(d.length>=3)o+=') ';if(d.length>3)o+=d.slice(3,6);if(d.length>6)o+='-'+d.slice(6,8);if(d.length>8)o+='-'+d.slice(8,10);return o;}
+    function fmt(d){var o='';if(d.length>0)o='('+d.slice(0,3);if(d.length>=3)o+=') ';if(d.length>3)o+=d.slice(3,6);if(d.length>6)o+='-'+d.slice(6,8);if(d.length>8)o+='-'+d.slice(8,10);return o.replace(/\D+$/,'');}  // без хвостовых разделителей: иначе бэкспейс стирает только ') ' и цифры не удаляются
     // Маска с сохранением курсора. Ведущий «0» подставляем ТОЛЬКО при вводе, не при удалении —
     // иначе он регенерируется и поле не стереть/не отредактировать (баг с несъедаемым кодом оператора).
     function isDel(e){return !!(e&&e.inputType&&e.inputType.indexOf('delete')===0);}
