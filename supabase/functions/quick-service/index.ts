@@ -46,15 +46,12 @@ Deno.serve(async (req) => {
     const text = await resp.text();
     if (!resp.ok) return json({ ok: false, error: "hook_failed", status: resp.status, vercel: text.slice(0, 500) }, 502);
 
-    // 3) Только ПОСЛЕ принятого хука повышаем черновик до опубликованного одним
-    //    атомарным стейтментом (RPC). Сборка стартует через ~десятки секунд —
-    //    к тому моменту published_prices уже = prices, и build их и запечёт.
-    //    Если стамп не удался — честно возвращаем snapshot:false, чтобы админка
-    //    НЕ показывала ложное «Опубликовано» и доверяла состоянию БД.
-    const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    if (!service) return json({ ok: true, snapshot: false, warn: "no_service_key", message: "Пересборка запущена" }, 200);
-    const { error: stampErr } = await createClient(url, service).rpc("promote_prices");
-    if (stampErr) return json({ ok: true, snapshot: false, warn: "stamp_failed", detail: stampErr.message, message: "Пересборка запущена" }, 200);
+    // 3) Только ПОСЛЕ принятого хука повышаем черновик до опубликованного.
+    //    Зовём promote_prices от JWT самого админа (asUser): функция —
+    //    SECURITY DEFINER, право execute выдано роли authenticated. Так не нужен
+    //    service-ключ (который в новых проектах Supabase может не инжектиться в env).
+    const { error: stampErr } = await asUser.rpc("promote_prices");
+    if (stampErr) return json({ ok: true, snapshot: false, detail: stampErr.message, message: "Пересборка запущена" }, 200);
 
     return json({ ok: true, snapshot: true, message: "Пересборка запущена, снимок обновлён" }, 200);
   } catch (e) {
