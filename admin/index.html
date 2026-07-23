@@ -950,13 +950,13 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
     if (pxPublishing) return; pxPublishing = true; $("pxModalGo").disabled = true; refreshPubBar();
     setMsg("Отправляю на публикацию…", "muted");
     let ok = false, snapshot = false;
-    try { const { data, error } = await sb.functions.invoke("publish-site", { body: {} });
+    try { const { data, error } = await sb.functions.invoke("quick-service", { body: {} });
       if (!error && data && data.ok) { ok = true; snapshot = data.snapshot !== false; }
     } catch (_) {}
     $("pxModal").style.display = "none"; $("pxModalGo").disabled = false; pxPublishing = false;
     await refetchPublished();   // баннер/пилюля — по реальному состоянию БД
     if (ok && snapshot) setMsg("Отправлено на публикацию ✓ Цены появятся на сайте через 1–2 минуты.", "ok");
-    else if (ok) setMsg("Пересборка запущена, но снимок публикации не обновился — проверьте настройку publish-site.", "muted");
+    else if (ok) setMsg("Пересборка запущена, но снимок публикации не обновился — проверьте настройку quick-service.", "muted");
     else setMsg("Не удалось запустить публикацию. Черновик сохранён; возможно, автопубликация ещё не подключена — пока публикует разработчик.", "err");
   });
   window.addEventListener("beforeunload", (e) => { if (PX && hasUnsaved()) { e.preventDefault(); e.returnValue = ""; } });
