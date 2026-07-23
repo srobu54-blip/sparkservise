@@ -13,6 +13,9 @@ ARTICLES = [
     ("iphone-ne-zaryazhaetsya", "Зарядка", "charge", "2026-06-28", "28 июня 2026"),
     ("iphone-ne-vklyuchaetsya", "Диагностика", "power", "2026-06-28", "28 июня 2026"),
     ("iphone-greetsya", "Диагностика", "heat", "2026-06-28", "28 июня 2026"),
+    ("zamena-stekla-ili-displeya-iphone", "Дисплеи", "screen", "2026-07-23", "23 июля 2026"),
+    ("ne-rabotaet-face-id-iphone", "Диагностика", "faceid", "2026-07-23", "23 июля 2026"),
+    ("vzdulsya-akkumulyator-iphone", "Аккумулятор", "battery", "2026-07-23", "23 июля 2026"),
 ]
 SLUGS = [a[0] for a in ARTICLES]
 # dateModified = дата последнего РЕАЛЬНОГО изменения статьи. По умолчанию = дата публикации (iso/disp).
@@ -37,6 +40,9 @@ CARD_TEASERS = {
     "iphone-ne-zaryazhaetsya": "Кабель, разъём или уже сервис? Простые проверки дома и момент, когда пора в ремонт.",
     "iphone-ne-vklyuchaetsya": "Чёрный экран, завис на яблоке или после воды — что сделать самому и когда в сервис.",
     "iphone-greetsya": "Игры, зарядка или поломка? Когда нагрев — это норма, а когда сигнал о проблеме.",
+    "zamena-stekla-ili-displeya-iphone": "Треснуло стекло, а картинка цела — можно поменять только стекло? Объясняем без маркетинга.",
+    "ne-rabotaet-face-id-iphone": "Грязь, настройки, замена экрана или поломка датчика? Что чинится дома, а что только в сервисе.",
+    "vzdulsya-akkumulyator-iphone": "Экран приподняло, корпус распирает? Чем это опасно и чего нельзя делать ни в коем случае.",
 }
 
 def word_count(a):
@@ -56,6 +62,7 @@ ICON = {
  "charge": '<path d="M13 3 L6 13 H11 L10 21 L18 10 H13 Z"/>',
  "power": '<path d="M12 4 V12"/><path d="M7.8 6.3 a7 7 0 1 0 8.4 0"/>',
  "heat": '<path d="M14 14.76V5a2 2 0 0 0-4 0v9.76a4 4 0 1 0 4 0z"/>',
+ "faceid": '<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10v1M15 10v1M12 10v3l-1 1M9 15c.8.7 1.9 1 3 1s2.2-.3 3-1"/>',
 }
 
 def esc(s): return html.escape(str(s), quote=False)
@@ -67,6 +74,8 @@ def resolve(target):
     if t == "blog": return "../../blog/"
     if t == "remont-iphone-17-pro-max": return "../../remont-iphone/iphone-17-pro-max/"
     if t == "zamena-akkumulyatora": return "../../remont-iphone/zamena-akkumulyatora/"
+    if t == "zamena-ekrana": return "../../remont-iphone/zamena-ekrana/"
+    if t == "zamena-zadnego-stekla": return "../../remont-iphone/zamena-zadnego-stekla/"
     if t in SLUGS: return "../" + t + "/"
     return "../../" + t + "/"
 
@@ -529,8 +538,9 @@ def build_article(slug, category, icon_key, iso, disp, a, meta):
     if rels:
         links = "".join('<a href="%s">%s</a>' % (resolve(r.get("slug","remont-iphone")), esc(r.get("text",""))) for r in rels)
         rel_html = '<div class="art-rel"><b>Связанные услуги</b><div class="rel-links">%s</div></div>' % links
-    # read next: other 2 articles
-    rn = [x for x in ARTICLES if x[0] != slug]
+    # read next: до 4 статей — сначала та же категория (тематический кластер), потом свежие; новые выше
+    others = [x for x in reversed(ARTICLES) if x[0] != slug]
+    rn = ([x for x in others if x[1] == category] + [x for x in others if x[1] != category])[:4]
     rn_cards = ""
     for (s2, cat2, ic2, iso2, disp2) in rn:
         m2 = meta.get(s2, {})
