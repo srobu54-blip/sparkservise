@@ -897,7 +897,9 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
       setMsg("Цена должна быть больше 0 — проверьте выделенные поля.", "err"); return; }
     for (const svc of Object.keys(next)) { const [lo, hi] = next[svc];
       if (lo > hi) { if (!confirm('«' + svc + '»: «От» больше, чем «До». Поменять местами → ' + pxFmt(hi) + "–" + pxFmt(lo) + " ₴?")) return; next[svc] = [hi, lo]; } }
-    for (const svc of Object.keys(next)) { const base = (r.published_prices && r.published_prices[svc]) || r.prices[svc];
+    for (const svc of Object.keys(next)) {
+      if (next[svc][0] === 0 && next[svc][1] === 0) continue;   // [0,0] = «уточняйте при заявке» — это не «потерянный ноль»
+      const base = (r.published_prices && r.published_prices[svc]) || r.prices[svc];
       const seen = new Set();   // для фикс-цены lo==hi не спрашивать дважды
       const pairs = [[next[svc][0], base ? +base[0] : 0], [next[svc][1], base ? +base[1] : 0]]
         .filter(([v, b]) => { const k = v + "|" + b; if (seen.has(k)) return false; seen.add(k); return true; });
@@ -949,23 +951,25 @@ if (!CFG.url || CFG.url.indexOf("REPLACE_") === 0) {
   $("pxModalGo").addEventListener("click", async () => {
     if (pxPublishing) return; pxPublishing = true; $("pxModalGo").disabled = true; refreshPubBar();
     setMsg("Отправляю на публикацию…", "muted");
-    let ok = false, snapshot = false, why = "";
+    let hookOk = false, snapshot = false, why = "";
     try {
-      // 1) Промоут черновика → опубликованное делаем ЗДЕСЬ, от JWT админа
-      //    (promote_prices = SECURITY DEFINER, execute выдан роли authenticated).
-      //    Так не зависим от service-ключа в окружении edge-функции.
-      const { error: promErr } = await sb.rpc("promote_prices");
-      if (promErr) why = promErr.message; else snapshot = true;
-      // 2) Триггерим пересборку через edge-функцию (она держит секрет Vercel Deploy Hook).
+      // 1) СНАЧАЛА запускаем пересборку (edge-функция с Vercel Deploy Hook).
+      //    Порядок «хук → промоут» важен: если хук не примут, черновик НЕ повышаем —
+      //    баннер остаётся «не на сайте», кнопка активна, можно нажать снова.
+      //    Так не бывает ложного «опубликовано» при неудавшейся пересборке.
       const { data, error } = await sb.functions.invoke("quick-service", { body: {} });
-      if (!error && data && data.ok) ok = true;
-      else if (!why) why = (error && (error.message || error)) || (data && data.error) || "hook_error";
+      if (!error && data && data.ok) hookOk = true;
+      else why = (error && (error.message || error)) || (data && data.error) || "hook_error";
+      // 2) Только после принятого хука повышаем черновик → опубликованное (от JWT админа,
+      //    promote_prices = SECURITY DEFINER). Сборка стартует через ~десятки секунд —
+      //    promote успеет записаться раньше, чем pull_prices прочитает снимок.
+      if (hookOk) { const { error: promErr } = await sb.rpc("promote_prices"); if (promErr) why = promErr.message; else snapshot = true; }
     } catch (e) { why = String(e); }
     $("pxModal").style.display = "none"; $("pxModalGo").disabled = false; pxPublishing = false;
     await refetchPublished();   // баннер/пилюля — по реальному состоянию БД
-    if (ok && snapshot) setMsg("Отправлено на публикацию ✓ Цены появятся на сайте через 1–2 минуты.", "ok");
-    else if (ok) setMsg("Пересборка запущена, но снимок не обновился" + (why ? " · причина: " + why : "") + ".", "muted");
-    else setMsg("Не удалось запустить публикацию" + (why ? " · " + why : "") + ". Черновик сохранён.", "err");
+    if (hookOk && snapshot) setMsg("Отправлено на публикацию ✓ Цены появятся на сайте через 1–2 минуты.", "ok");
+    else if (hookOk) setMsg("Пересборка запущена, но снимок не обновился" + (why ? " · причина: " + why : "") + ". Нажмите «Опубликовать» ещё раз.", "muted");
+    else setMsg("Не удалось запустить пересборку" + (why ? " · " + why : "") + ". Черновик сохранён — попробуйте ещё раз.", "err");
   });
   window.addEventListener("beforeunload", (e) => { if (PX && hasUnsaved()) { e.preventDefault(); e.returnValue = ""; } });
 
