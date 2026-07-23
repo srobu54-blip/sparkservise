@@ -222,6 +222,13 @@
   .mcard .pr b{color:var(--spark);font-weight:700}
   .mcard .hit{position:absolute;top:-8px;left:14px;font-size:.66rem;font-weight:700;letter-spacing:.02em;color:#fff;background:var(--spark);padding:2px 8px;border-radius:999px}
   .mcard.hide{display:none}
+  /* Категорийные карточки device-хабов (без фото): явный CTA-переход на страницу модели */
+  .mcard-cat{padding-bottom:15px}
+  .mcard-cat .nm{justify-content:flex-start}
+  .mcard .mgo{margin-top:7px;display:inline-flex;align-items:center;gap:6px;font-size:.86rem;font-weight:650;color:var(--spark)}
+  .mcard .mgo svg{width:16px;height:16px;flex:none;transition:transform .16s}
+  .mcard-cat:hover{background:#fff}
+  .mcard-cat:hover .mgo svg{transform:translateX(4px)}
   .mcard .mph{height:110px;display:flex;align-items:center;justify-content:center;margin:-1px 0 9px;border-radius:10px;background:#f5f6f8;overflow:hidden}
   .mcard .mph img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block;transition:transform .2s}
   .mcard:hover .mph img{transform:scale(1.04)}
