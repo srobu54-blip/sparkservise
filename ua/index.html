@@ -247,6 +247,15 @@
   .svc:hover a.lk .ar{transform:translateX(5px)}
   .svc a.lk::after{content:"";position:absolute;inset:0;border-radius:inherit}
 
+  /* Карточки «виды ремонта»: явный CTA-переход + вся карточка кликабельна.
+     Scoped через :has(a.lk) — информационные/симптомные .rtype-гриды (без ссылки) не трогаются. */
+  .rtype:has(a.lk){position:relative;cursor:pointer}
+  .rtype:has(a.lk):hover{border-color:var(--spark)}
+  .rtype a.lk{display:inline-block;margin:2px 0 12px;font-size:.92rem;font-weight:650;color:var(--spark);text-decoration:none;line-height:1.4}
+  .rtype a.lk .ar{display:inline-block;margin-left:5px;transition:transform .25s cubic-bezier(.22,.61,.36,1)}
+  .rtype:has(a.lk):hover a.lk .ar{transform:translateX(4px)}
+  .rtype a.lk::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:1}
+
   .why-grid{display:grid;grid-template-columns:1fr;gap:14px}
   .why{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px;transition:transform .34s cubic-bezier(.22,.61,.36,1),box-shadow .34s cubic-bezier(.22,.61,.36,1),border-color .34s ease}
   .why:hover{transform:translateY(-4px);box-shadow:0 22px 46px -24px rgba(16,18,26,.28);border-color:#dbe0e8}
