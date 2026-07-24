@@ -248,6 +248,7 @@ def render(dev, m):
             '<div class="rtype reveal">\n'
             '          <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">%s</svg></span> %s</h3>\n'
             '          <p>%s</p>\n'
+            '          <a class="lk" href="#book">Узнать цену<span class="ar">→</span></a>\n'
             '          <div class="meta"><span>%s</span><span class="green">%s</span></div>\n'
             '        </div>' % (ICONS[icon], label, desc.format(name=name), t, green))
     repair_cards = "\n        ".join(cards)

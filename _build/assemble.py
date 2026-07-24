@@ -486,9 +486,12 @@ def build(slug, device, c):
     for t in rt:
         ttl = t.get("title", "")
         href = clinks.get(ttl)
-        ttl_html = ('<a class="rt-link" href="%s">%s</a>' % (href, esc(ttl))) if href else esc(ttl)
-        cards.append('<div class="rtype reveal">\n          <h3><span class="ri">%s</span> %s</h3>\n          <p>%s</p>\n        </div>'%(
-            icon(t.get("icon","wrench")), ttl_html, esc(t.get("desc",""))))
+        # CTA-кнопка: карточка с посадочной (clinks) → её страница «Цены и сроки»,
+        # без посадочной → форма записи «Узнать цену». Вся карточка кликабельна (a.lk::after).
+        cta = ('<a class="lk" href="%s">Цены и сроки<span class="ar">→</span></a>' % href) if href \
+              else '<a class="lk" href="#book">Узнать цену<span class="ar">→</span></a>'
+        cards.append('<div class="rtype reveal">\n          <h3><span class="ri">%s</span> %s</h3>\n          <p>%s</p>\n          %s\n        </div>'%(
+            icon(t.get("icon","wrench")), esc(ttl), esc(t.get("desc","")), cta))
     repairtypes = "\n        ".join(cards)
 
     # process
