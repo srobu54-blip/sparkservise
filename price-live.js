@@ -16,7 +16,14 @@
       AK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2cXFveXR0dmZtcmp2dWZra3ptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MDQwMDgsImV4cCI6MjA5ODk4MDAwOH0.yaUDu6A4ajFSKx7Xn51BEUgMgkpF47HOhRocCYfjpSU",
       CACHE = "spark_live_prices_v1";
 
-  function money(n) { return Number(n).toLocaleString("ru-RU"); }
+  // Язык страницы: файл ОБЩИЙ для RU и UA, а текст-заглушку и формат числа он пишет
+  // сам — без этого на украинских страницах поверх верного «Уточнюйте при заявці»
+  // появлялось русское «Уточняйте при заявке» (видно только в браузере, не в HTML).
+  var UK = (document.documentElement.getAttribute("lang") || "").toLowerCase().indexOf("uk") === 0,
+      ON_REQUEST = UK ? "Уточнюйте при заявці" : "Уточняйте при заявке",
+      LOCALE = UK ? "uk-UA" : "ru-RU";
+
+  function money(n) { return Number(n).toLocaleString(LOCALE); }
 
   function apply(byId, byLabel) {
     document.querySelectorAll("[data-svc]").forEach(function (cell) {
@@ -29,7 +36,7 @@
       var p = prices[cell.getAttribute("data-svc")];
       if (!p || !p.length) return;
       var dash = ((cell.getAttribute("data-price-dash") || host.getAttribute("data-price-dash")) === "en") ? " – " : " — ";
-      cell.textContent = (!+p[0] && !+p[1]) ? "Уточняйте при заявке"
+      cell.textContent = (!+p[0] && !+p[1]) ? ON_REQUEST
         : (+p[0] === +p[1]) ? money(p[0]) + " ₴" : money(p[0]) + dash + money(p[1]) + " ₴";
     });
   }

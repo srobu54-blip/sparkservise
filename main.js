@@ -76,6 +76,41 @@
           })['catch'](function(){});
       }catch(e){}
     })();
+    /* ---- Язык интерфейса. main.js ОБЩИЙ для RU и UA (i18n_wire отдаёт UA-странице
+       тот же файл), а калькулятор и форма пишут текст сами → на украинской главной
+       подписи услуг и подсказки формы были РУССКИМИ. Видно только в браузере: в HTML
+       этих строк нет, поэтому обычные проверки разметки их не ловили.
+       ВАЖНО: ключи услуг/моделей — канонические (RU), они совпадают с TIERS и CMS.
+       Переводим ТОЛЬКО подпись (option.textContent), а option.value оставляем ключом,
+       иначе calc()/tierMult() перестанут находить цену. ---- */
+    var UK=(document.documentElement.getAttribute('lang')||'').toLowerCase().indexOf('uk')===0,
+        LOC=UK?'uk-UA':'ru-RU',
+        L_UA={
+          'Замена экрана (дисплея)':'Заміна екрана (дисплея)',
+          'Замена стекла (без замены дисплея)':'Заміна скла (без заміни дисплея)',
+          'Замена аккумулятора':'Заміна акумулятора',
+          'Замена заднего стекла':'Заміна заднього скла',
+          'Не заряжается (разъём)':"Не заряджається (роз'єм)",
+          'После воды':'Після води',
+          'Замена камеры':'Заміна камери',
+          'Динамик / микрофон':'Динамік / мікрофон',
+          'Ремонт платы':'Ремонт плати',
+          'Замена матрицы':'Заміна матриці',
+          'Замена клавиатуры':'Заміна клавіатури',
+          'Чистка после воды':'Чищення після води',
+          'Не включается (плата)':'Не вмикається (плата)',
+          'Замена стекла (тачскрина)':'Заміна скла (тачскрина)',
+          'Замена дисплея':'Заміна дисплея',
+          'Замена стекла':'Заміна скла',
+          'Чистка':'Чищення',
+          'Не заряжаются':'Не заряджаються',
+          'Замена амбушюр / сетки':'Заміна амбушюр / сітки',
+          'Диагностика звука':'Діагностика звуку',
+          'MacBook Air (старый)':'MacBook Air (старий)',
+          'Series 3 и старше':'Series 3 і старіші'
+        };
+    function L(s){ return (UK && L_UA[s]) ? L_UA[s] : s; }
+
     var DATA={
       iphone:{label:"iPhone"},
       macbook:{label:"MacBook",
@@ -103,7 +138,7 @@
     if(elDev&&elModel&&elProb){
       var curDev='iphone';
       var IPH_MODELS=Object.keys(IPH_TIERS);
-      var fill=function(sel,arr){sel.innerHTML='';arr.forEach(function(v){var o=document.createElement('option');o.textContent=v;sel.appendChild(o);});};
+      var fill=function(sel,arr){sel.innerHTML='';arr.forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=L(v);sel.appendChild(o);});};
       var loadProblems=function(){
         if(curDev==='iphone'){fill(elProb,Object.keys(IPH_TIERS[elModel.value]||{}));}
         else{fill(elProb,Object.keys(DATA[curDev].problems));}
@@ -129,9 +164,13 @@
           lo=r50(base[0]*mm);hi=r50(base[1]*Math.min(mm,1.3));
           if(hi<=lo) hi=lo+ r50(base[0]*0.3);
         }
-        elPrice.innerHTML=(!lo&&!hi)?'<small>Уточняйте при заявке</small>':(lo===hi)?lo.toLocaleString('ru-RU')+' <small>₴</small>':'от '+lo.toLocaleString('ru-RU')+' <small>до '+hi.toLocaleString('ru-RU')+' ₴</small>';
-        var t=(curDev==='iphone')?'30-60 минут':'от 1 часа';
-        elMeta.innerHTML='<span class="free">Диагностика 0 ₴</span><span>Гарантия 12 мес</span><span>Срок: '+t+'</span>';
+        elPrice.innerHTML=(!lo&&!hi)?'<small>'+(UK?'Уточнюйте при заявці':'Уточняйте при заявке')+'</small>'
+          :(lo===hi)?lo.toLocaleString(LOC)+' <small>₴</small>'
+          :(UK?'від ':'от ')+lo.toLocaleString(LOC)+' <small>до '+hi.toLocaleString(LOC)+' ₴</small>';
+        var t=(curDev==='iphone')?(UK?'30-60 хвилин':'30-60 минут'):(UK?'від 1 години':'от 1 часа');
+        elMeta.innerHTML=UK
+          ? '<span class="free">Діагностика 0 ₴</span><span>Гарантія 12 міс</span><span>Термін: '+t+'</span>'
+          : '<span class="free">Диагностика 0 ₴</span><span>Гарантия 12 мес</span><span>Срок: '+t+'</span>';
       };
       elModel.addEventListener('change',function(){if(curDev==='iphone')loadProblems();calc();});
       elProb.addEventListener('change',calc);
@@ -161,11 +200,11 @@
       function checkPhone(){
         var d=rawDigits(o.phone.value);
         var box=o.phone.closest('.mf-input'); phoneValid=false;
-        if(d.length===0){o.hint.textContent='Введите номер мобильного оператора Украины';o.hint.className='mf-hint js-hint';box.classList.remove('valid','invalid');}
-        else if(d.length<10){o.hint.textContent='Введите номер полностью';o.hint.className='mf-hint js-hint';box.classList.remove('valid','invalid');}
+        if(d.length===0){o.hint.textContent=(UK?'Введіть номер мобільного оператора України':'Введите номер мобильного оператора Украины');o.hint.className='mf-hint js-hint';box.classList.remove('valid','invalid');}
+        else if(d.length<10){o.hint.textContent=(UK?'Введіть номер повністю':'Введите номер полностью');o.hint.className='mf-hint js-hint';box.classList.remove('valid','invalid');}
         else{var op=detect(d.slice(1,3));
-          if(op){phoneValid=true;o.hint.innerHTML='<span class="mf-op">✓ '+op+'</span> номер распознан';o.hint.className='mf-hint js-hint ok';box.classList.add('valid');box.classList.remove('invalid');}
-          else{o.hint.textContent='Проверьте код оператора - такого в Украине нет';o.hint.className='mf-hint js-hint err';box.classList.add('invalid');box.classList.remove('valid');}
+          if(op){phoneValid=true;o.hint.innerHTML='<span class="mf-op">✓ '+op+(UK?'</span> номер розпізнано':'</span> номер распознан');o.hint.className='mf-hint js-hint ok';box.classList.add('valid');box.classList.remove('invalid');}
+          else{o.hint.textContent=(UK?'Перевірте код оператора — такого в Україні немає':'Проверьте код оператора - такого в Украине нет');o.hint.className='mf-hint js-hint err';box.classList.add('invalid');box.classList.remove('valid');}
         }
         for(var i=0;i<dots.length;i++){ if(i<d.length) dots[i].classList.add('on'); else dots[i].classList.remove('on'); }
         if(o.dotsWrap){o.dotsWrap.classList.remove('valid','invalid'); if(d.length===10) o.dotsWrap.classList.add(phoneValid?'valid':'invalid');}
@@ -183,9 +222,9 @@
       o.submit.addEventListener('click',function(){
         if(o.submit.disabled)return;
         if(o.summary)o.summary.innerHTML=
-          '<div><span>Имя</span><b>'+esc(o.name.value.trim())+'</b></div>'+
+          (UK?'<div><span>Ім’я</span><b>':'<div><span>Имя</span><b>')+esc(o.name.value.trim())+'</b></div>'+
           '<div><span>Телефон</span><b>+38 '+esc(o.phone.value)+'</b></div>'+
-          '<div><span>Запрос</span><b>'+esc(o.dev?o.dev.value:'')+'</b></div>';
+          (UK?'<div><span>Запит</span><b>':'<div><span>Запрос</span><b>')+esc(o.dev?o.dev.value:'')+'</b></div>';
         if(o.bar)o.bar.style.width='100%';
         o.root.classList.add('done');
       });
