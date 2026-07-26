@@ -15,13 +15,86 @@ CAT = json.load(open(os.path.join(REPO, '_build', 'i18n_ua.json'), encoding='utf
 TEXT, ATTR, JSONLD, JS = CAT['text'], CAT['attr'], CAT['jsonld'], CAT['js']
 untranslated = []   # (sitepath, kind, segment)
 
-def tr_jsonld(obj):
+# ── Fallback: перевод по ЧИСЛОВОМУ ШАБЛОНУ ────────────────────────────────────
+# Зачем: ключи каталога содержат литеральные цены («Замена аккумулятора — 1 300 ₴»).
+# Правка цены в админке делает RU-строку НОВЫМ ключом → точного совпадения нет →
+# fail-open отдавал РУССКИЙ текст на украинской странице (тихая деградация).
+# Решение: если строка отличается от известной ТОЛЬКО числами — берём её UA и
+# подставляем фактические числа. Строгие гарантии (иначе отказ и обычный fail-open):
+#   1) скелет (текст без чисел) совпадает буква-в-букву;
+#   2) количество чисел в RU-ключе == в целевой строке;
+#   3) числа в UA-значении идентичны числам RU-ключа и в том же порядке
+#      (значит цены копируются в перевод как есть, и подстановка позиционно верна);
+#   4) все кандидаты семейства дают один результат — иначе неоднозначность, отказ.
+# Подстановка позиционная через re.sub (не str.replace) — не ломает числа-подстроки
+# вроде «2 000» внутри «12 000». Ветка js НЕ участвует (там код, а не проза).
+_NUM_RE = re.compile(r'\d+(?:[\s  ]\d{3})*')
+_NUM_MASK = '\x00'
+_tmpl_idx = {}          # id(dict) -> {masked_ru: [(ru, ua), ...]}
+tmpl_hits = []          # (sitepath, kind, segment) — что вытянули по шаблону
+
+def _nums(s):
+    return _NUM_RE.findall(s)
+
+def _mask(s):
+    return _NUM_RE.sub(_NUM_MASK, s)
+
+def _templates(d):
+    # кэш держит ССЫЛКУ на сам словарь: иначе id() освобождённого dict мог бы
+    # переиспользоваться и отдать чужой индекс (важно для ad-hoc словарей в тестах).
+    key = id(d)
+    hit = _tmpl_idx.get(key)
+    if hit is not None and hit[0] is d:
+        return hit[1]
+    idx = {}
+    for ru, ua in d.items():
+        if _NUM_RE.search(ru):
+            idx.setdefault(_mask(ru), []).append((ru, ua))
+    _tmpl_idx[key] = (d, idx)
+    return idx
+
+def tr_by_template(d, s):
+    """UA для строки, отличающейся от известной только числами. None, если нельзя надёжно."""
+    if not _NUM_RE.search(s):
+        return None
+    fam = _templates(d).get(_mask(s))
+    if not fam:
+        return None
+    tgt = _nums(s)
+    results = set()
+    for ru, ua in fam:
+        src = _nums(ru)
+        if len(src) != len(tgt):
+            continue
+        if _nums(ua) != src:        # в UA числа не те же / не в том же порядке — не подставляем
+            continue
+        it = iter(tgt)
+        results.add(_NUM_RE.sub(lambda _m: next(it), ua))
+    if len(results) == 1:           # ровно один вариант → безопасно
+        return results.pop()
+    return None
+
+def lookup(d, s, sp=None, kind=None):
+    """Точное совпадение → шаблон по числам → None (вызывающий делает fail-open)."""
+    v = d.get(s)
+    if v is not None:
+        return v
+    v = tr_by_template(d, s)
+    # В отчёт — только РЕАЛЬНЫЕ спасения: если шаблон вернул строку, равную исходной
+    # (напр. «1 500 ₴» одинаково в двух языках), перевода не было и хвастаться нечем.
+    if v is not None and v != s and sp is not None:
+        tmpl_hits.append((sp, kind, s))
+    return v
+# ─────────────────────────────────────────────────────────────────────────────
+
+def tr_jsonld(obj, sp=None):
     if isinstance(obj, dict):
-        return {k: tr_jsonld(v) for k, v in obj.items()}
+        return {k: tr_jsonld(v, sp) for k, v in obj.items()}
     if isinstance(obj, list):
-        return [tr_jsonld(x) for x in obj]
+        return [tr_jsonld(x, sp) for x in obj]
     if isinstance(obj, str):
-        return JSONLD.get(obj, obj)
+        v = lookup(JSONLD, obj, sp, 'jsonld')
+        return v if v is not None else obj
     return obj
 
 def translate_page(sp, ru_html, existing_ua_tokens):
@@ -32,8 +105,9 @@ def translate_page(sp, ru_html, existing_ua_tokens):
             lead, core, trail = T.split_ws(tok)
             if not core:
                 continue
-            if core in TEXT:
-                toks[i] = lead + TEXT[core] + trail
+            _t = lookup(TEXT, core, sp, 'text')
+            if _t is not None:
+                toks[i] = lead + _t + trail
             elif T.has_cyr(core):
                 untranslated.append((sp, 'text', core))
             continue
@@ -51,7 +125,7 @@ def translate_page(sp, ru_html, existing_ua_tokens):
                         toks[i] = existing_ua_tokens[i]
                     untranslated.append((sp, 'jsonld-unparsed', body[:60]))
                     continue
-                obj = tr_jsonld(obj)
+                obj = tr_jsonld(obj, sp)
                 if isinstance(obj, dict) and '@graph' not in obj and 'inLanguage' not in obj and isinstance(obj.get('@type'), str):
                     obj['inLanguage'] = 'uk'
                 toks[i] = pre + json.dumps(obj, ensure_ascii=False) + suf
@@ -71,8 +145,9 @@ def translate_page(sp, ru_html, existing_ua_tokens):
             if tok[:6].lower().startswith('<meta') and 'og:locale' in tok:
                 tok = tok.replace('content="ru_RU"', 'content="uk_UA"')
             def attr_tr(v):
-                if v in ATTR:
-                    return ATTR[v]
+                _a = lookup(ATTR, v, sp, 'attr')
+                if _a is not None:
+                    return _a
                 if T.has_cyr(v):
                     untranslated.append((sp, 'attr', v))
                 return None
@@ -115,6 +190,14 @@ def main():
     uniq = {}
     for sp, kind, seg in untranslated:
         uniq.setdefault((kind, seg), set()).add(sp)
+    if tmpl_hits:
+        _tu = {}
+        for sp, kind, seg in tmpl_hits:
+            _tu.setdefault((kind, seg), set()).add(sp)
+        print("Переведено по числовому шаблону: %d уникальных (вхождений: %d) — цены изменились, скелет знаком"
+              % (len(_tu), len(tmpl_hits)))
+        for (kind, seg), pages in list(_tu.items())[:10]:
+            print("  [%s→шаблон] %r  (стр.: %d)" % (kind, seg[:70], len(pages)))
     print("Непереведённых уникальных сегментов: %d (вхождений: %d)" % (len(uniq), len(untranslated)))
     for (kind, seg), pages in list(uniq.items())[:30]:
         print("  [%s] %r  (стр.: %d)" % (kind, seg[:70], len(pages)))

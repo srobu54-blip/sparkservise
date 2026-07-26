@@ -185,6 +185,13 @@ def render(tid):
     pr = PRICES_ALL[tid]
     canon = f"{BASE}/remont-iphone/{slug}/"
     batt_low = pr["Замена аккумулятора"][0]
+    # «от X ₴» в герое и price в Offer брались из цены АКБ напрямую: если в CMS поставить
+    # сентинел [0,0] («уточняйте»), вышло бы видимое «от 0 ₴» и price:"0" в schema.
+    # Подстраховка: берём минимальную НЕнулевую цену по услугам модели.
+    _lows = [v[0] for v in pr.values() if isinstance(v, (list, tuple)) and v and v[0]]
+    _from_price = batt_low or (min(_lows) if _lows else 0)
+    _offer_desc = (f"Замена аккумулятора {name} от {money(batt_low)} ₴" if batt_low
+                   else f"Ремонт {name}")
     has_back = "Замена заднего стекла" in pr
     bio_label = "Face ID" if bio == "faceid" else "Кнопка Home / Touch ID"
     bio_human = "Face ID" if bio == "faceid" else "кнопку Home и сканер Touch ID"
@@ -281,9 +288,25 @@ def render(tid):
         da = f"Оригинальные или качественные совместимые {disp_human.lower()} на ваш выбор. Разницу в цене и качестве мастер показывает до начала ремонта."
     _ekr = pr['Замена экрана (дисплея)']
     _ekr_disp = (f"{money(_ekr[0])} ₴" if _ekr[0] == _ekr[1] else f"от {money(_ekr[0])} до {money(_ekr[1])} ₴")
+    # Аккумуляторный кластер: «[модель] замена аккумулятора цена/стоимость/оригинал» — крупнейший
+    # коммерческий лонг-тейл сайта. Цена [0,0] (сентинел CMS «уточняйте») → ответ без цифр.
+    _akb = pr.get('Замена аккумулятора') or [0, 0]
+    if _akb[0] or _akb[1]:
+        _akb_disp = (f"{money(_akb[0])} ₴" if _akb[0] == _akb[1] else f"от {money(_akb[0])} до {money(_akb[1])} ₴")
+        _akb_ans = (f"Замена аккумулятора {name} — {_akb_disp}. В стоимость входит новая батарея и работа мастера, "
+                    f"меняем примерно за 30-40 минут при вас. Точную цену подтвердим после бесплатной диагностики — "
+                    f"она зависит от типа аккумулятора (оригинал или качественный совместимый).")
+    else:
+        _akb_ans = (f"Стоимость замены аккумулятора {name} уточняйте при заявке — назовём цену сразу после бесплатной "
+                    f"диагностики. Замена занимает примерно 30-40 минут при вас, гарантия 12 месяцев.")
     faq = [
         (f"Сколько стоит замена экрана {name}?",
          f"Замена экрана {name} — {_ekr_disp}, в зависимости от типа запчасти (оригинал или качественный совместимый дисплей). Точную цену мастер назовёт после бесплатной диагностики."),
+        (f"Сколько стоит замена аккумулятора {name}?", _akb_ans),
+        (f"Какие аккумуляторы вы ставите на {name} — оригинал или совместимый?",
+         f"На выбор: оригинальный аккумулятор или качественный совместимый — разницу в цене, ёмкости и ресурсе мастер "
+         f"объясняет до начала ремонта. Ставим новую батарею с ёмкостью 100%, а не восстановленную, и даём гарантию "
+         f"12 месяцев на запчасть и работу."),
         ("Сколько времени занимает ремонт?",
          f"Замена экрана и аккумулятора {name} — 30-60 минут при вас. Ремонт после воды и микропайка платы — от нескольких часов до 1-3 дней."),
         (dq, da),
@@ -381,7 +404,10 @@ def render(tid):
 
     repl = {
         "@@NAME@@": name, "@@TRANSLIT@@": translit(name), "@@CANON@@": canon, "@@OG_IMAGE@@": OG_IMAGE,
-        "@@OFFER_PRICE@@": str(batt_low), "@@OFFER_BATT@@": money(batt_low), "@@FROM_PRICE@@": money(batt_low),
+        "@@OFFER_PRICE@@": str(_from_price), "@@OFFER_BATT@@": money(_from_price), "@@FROM_PRICE@@": money(_from_price),
+        "@@OFFER_DESC@@": _offer_desc,
+        # ценовой хвост АКБ для description; пустой, если цена [0,0] («уточняйте») — иначе вышло бы «от 0 ₴»
+        "@@BATT_FROM@@": (f" от {money(batt_low)} ₴" if batt_low else ""),
         "@@PORT@@": port, "@@BIO_HUMAN@@": bio_human, "@@BIO_SHORT@@": bio_short, "@@BIO_SEO@@": bio_seo, "@@BACK_SEO@@": back_seo,
         "@@SCREEN_FEAT@@": screen_feat, "@@SAVE_LINE@@": save_line, "@@DISP_HUMAN@@": disp_human,
         "@@BACK_HERO@@": ("задней крышки и " if has_back else ""),
@@ -402,8 +428,8 @@ TEMPLATE = r'''<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ремонт @@NAME@@ в Одессе: экран, батарея | SPARK</title>
-<meta name="description" content="Ремонт @@NAME@@ в Одессе: экран, аккумулятор, @@BIO_SHORT@@, @@PORT@@-разъём. Бесплатная диагностика, гарантия 12 мес, ремонт за 30-60 минут.">
-<meta name="keywords" content="ремонт @@NAME@@, ремонт @@TRANSLIT@@ Одесса, замена экрана @@NAME@@, замена дисплея @@NAME@@, замена батареи @@NAME@@, замена аккумулятора @@NAME@@, @@NAME@@ Одесса, замена стекла @@NAME@@, сервисный центр Apple Одесса">
+<meta name="description" content="Ремонт @@NAME@@ в Одессе: экран, аккумулятор@@BATT_FROM@@, @@BIO_SHORT@@, @@PORT@@-разъём. Диагностика бесплатно, гарантия 12 мес, ремонт 30-60 мин.">
+<meta name="keywords" content="ремонт @@NAME@@, ремонт @@TRANSLIT@@ Одесса, замена экрана @@NAME@@, замена дисплея @@NAME@@, замена батареи @@NAME@@, замена аккумулятора @@NAME@@, замена аккумулятора @@NAME@@ цена, сколько стоит замена аккумулятора @@NAME@@, @@NAME@@ Одесса, замена стекла @@NAME@@, сервисный центр Apple Одесса">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="@@CANON@@">
 <meta name="theme-color" content="#ffffff">
@@ -421,7 +447,7 @@ TEMPLATE = r'''<!DOCTYPE html>
   "provider":{"@type":"Organization","name":"SPARK","url":"https://sparkservice.od.ua/","telephone":"+380960755452","address":{"@type":"PostalAddress","streetAddress":"ул. Академика Королёва, 23","addressLocality":"Одесса","addressCountry":"UA"}},
   "areaServed":{"@type":"City","name":"Одесса"},
   "serviceType":"Ремонт @@NAME@@",
-  "offers":{"@type":"Offer","priceCurrency":"UAH","price":"@@OFFER_PRICE@@","description":"Замена аккумулятора @@NAME@@ от @@OFFER_BATT@@ ₴"}
+  "offers":{"@type":"Offer","priceCurrency":"UAH","price":"@@OFFER_PRICE@@","description":"@@OFFER_DESC@@"}
 }
 </script>
 <script type="application/ld+json">
