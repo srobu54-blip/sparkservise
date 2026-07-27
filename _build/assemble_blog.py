@@ -610,9 +610,12 @@ def build_index(meta):
     for (slug, category, icon_key, iso, disp) in reversed(ARTICLES):
         a = meta.get(slug, {})
         h1 = a.get("h1") or a.get("title") or slug
+        # h2, а не h3: на листинге блога заголовки карточек идут сразу после h1
+        # страницы, и h3 давал пропуск уровня. На главной те же карточки лежат
+        # внутри секции с h2, поэтому там они остаются h3 (см. build_home_cards).
         cards += ('<a class="blogc reveal" href="%s/">\n'
                   '          <span class="ph"><img src="%s/%s" alt="%s" loading="lazy" decoding="async"><span class="cat">%s</span></span>\n'
-                  '          <span class="bd"><h3>%s</h3><p>%s</p><span class="more">Читать <span class="ar">→</span></span></span>\n'
+                  '          <span class="bd"><h2>%s</h2><p>%s</p><span class="more">Читать <span class="ar">→</span></span></span>\n'
                   '        </a>\n        ') % (slug, slug, cover_file(slug), escA(a.get("coverAlt") or h1), esc(category), esc(h1), esc(excerpt(a)))
     crumb = {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
         {"@type":"ListItem","position":1,"name":"Главная","item":"https://sparkservice.od.ua/"},

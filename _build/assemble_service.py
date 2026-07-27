@@ -70,8 +70,14 @@ def build(slug, name, c):
     related = c.get("relatedSlugs") or []
     articles = c.get("relatedArticles") or []   # контекстные статьи блога (только релевантные)
 
+    # serviceName — необязательное переопределение имени услуги в разметке.
+    # Нужно, когда «<name> в Одессе» совпадает с какой-то видимой строкой страницы
+    # (например мелким eyebrow): каталог переводов ключуется по русской строке, и
+    # одинаковый RU у двух разных ролей заставляет их делить один UA-перевод.
+    # У /diagnostika/ так и было — см. BRANCH_DIFF_OK в make_ua.py.
+    service_name = g("serviceName", "%s в Одессе" % name)
     service = {"@context":"https://schema.org","@type":"Service","@id":"https://sparkservice.od.ua/%s/#service"%slug,
-        "name":"%s в Одессе"%name,"description":ogd or sub,
+        "name":service_name,"description":ogd or sub,
         "provider":{"@type":"Organization","name":"SPARK","url":"https://sparkservice.od.ua/","telephone":"+380960755452",
             "address":{"@type":"PostalAddress","streetAddress":"ул. Академика Королёва, 23","addressLocality":"Одесса","addressCountry":"UA"}},
         "areaServed":{"@type":"City","name":"Одесса"},"serviceType":name}
