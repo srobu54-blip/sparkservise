@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Детерминированная сборка страниц ремонта устройств из _build/<slug>.json.
 Каркас (шапка/футер/форма/модалка/пути) фиксирован -> дизайн идентичен на всех страницах."""
-import json, html, os, sys
+import json, html, os, sys, re
 
 REPO = "/Users/koristuvac/Downloads/sparkservise-git"
 BUILD = os.path.join(REPO, "_build")
@@ -442,6 +442,14 @@ def build(slug, device, c):
     sub = g("sub")
     quickPrice = g("quickPrice", "")
     diagTime = g("diagTime", "при вас")
+    # {price} в title подставляется из quickPrice — той же строки, что стоит в hero
+    # страницы. Так цена в выдаче не разъезжается с ценой на странице: правится
+    # одно поле в <slug>.json. Если quickPrice пуст — плейсхолдер и хвост «: …»
+    # убираются, чтобы в <title> не осталось «цены от  ₴».
+    if "{price}" in title:
+        title = re.sub(r"\s*[:—-]?\s*[^:—-]*\{price\}[^|]*", " ", title).strip() if not quickPrice \
+                else title.replace("{price}", quickPrice)
+        title = re.sub(r"\s{2,}", " ", title).replace(" |", " |")
     rt = c.get("repairTypes") or []
     pr = c.get("priceRows") or []
     proc = c.get("process") or []
