@@ -515,12 +515,12 @@
     },
     {
       "source": "/remont-ekrana-iphone",
-      "destination": "/remont-iphone/",
+      "destination": "/remont-iphone/zamena-ekrana/",
       "permanent": true
     },
     {
       "source": "/remont-ekrana-iphone/",
-      "destination": "/remont-iphone/",
+      "destination": "/remont-iphone/zamena-ekrana/",
       "permanent": true
     },
     {
@@ -935,22 +935,22 @@
     },
     {
       "source": "/zamena-ekrana",
-      "destination": "/remont-iphone/",
+      "destination": "/remont-iphone/zamena-ekrana/",
       "permanent": true
     },
     {
       "source": "/zamena-ekrana/",
-      "destination": "/remont-iphone/",
+      "destination": "/remont-iphone/zamena-ekrana/",
       "permanent": true
     },
     {
       "source": "/zamena-ekrana-iphone",
-      "destination": "/remont-iphone/",
+      "destination": "/remont-iphone/zamena-ekrana/",
       "permanent": true
     },
     {
       "source": "/zamena-ekrana-iphone/",
-      "destination": "/remont-iphone/",
+      "destination": "/remont-iphone/zamena-ekrana/",
       "permanent": true
     },
     {
@@ -1016,6 +1016,36 @@
     {
       "source": "/sitemap-store.xml",
       "destination": "/sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/zamena_akkumulyatora_iphone",
+      "destination": "/remont-iphone/zamena-akkumulyatora/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena_akkumulyatora_iphone/",
+      "destination": "/remont-iphone/zamena-akkumulyatora/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena_ekrana_iphone",
+      "destination": "/remont-iphone/zamena-ekrana/",
+      "permanent": true
+    },
+    {
+      "source": "/zamena_ekrana_iphone/",
+      "destination": "/remont-iphone/zamena-ekrana/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_airpods",
+      "destination": "/remont-airpods/",
+      "permanent": true
+    },
+    {
+      "source": "/remont_airpods/",
+      "destination": "/remont-airpods/",
       "permanent": true
     }
   ],
