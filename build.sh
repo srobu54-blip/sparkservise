@@ -46,6 +46,9 @@ step "assemble_device_model — устройства";   $PY _build/assemble_dev
 step "apply_model_photos — фото моделей";    $PY _build/apply_model_photos.py
 # 9) Калькулятор на главной (main.js) ← TIERS
 step "sync_calc — калькулятор главной";      $PY _build/sync_calc.py
+# 9.1) Цифры хаба iPhone (hero + FAQ про экран) ← TIERS. Только RU: UA соберётся
+#      из него в make_ua, числа в перевод подставит числовой fallback.
+step "sync_hub_facts — цены хаба iPhone";    $PY _build/sync_hub_facts.py
 
 # 10) UA-страницы из RU по каталогу переводов.
 #     make_ua внутри сам зовёт i18n_wire. Он ВОЗВРАЩАЕТ 1 как ПРЕДУПРЕЖДЕНИЕ
