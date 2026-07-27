@@ -94,7 +94,32 @@ def tr_jsonld(obj, sp=None):
         return [tr_jsonld(x, sp) for x in obj]
     if isinstance(obj, str):
         v = lookup(JSONLD, obj, sp, 'jsonld')
-        return v if v is not None else obj
+        if v is None:
+            # JSON-LD молчал при fail-open (в отличие от text/attr/js) — русский
+            # текст годами жил в разметке незамеченным. Теперь логируем так же.
+            if T.has_cyr(obj):
+                untranslated.append((sp, 'jsonld', obj))
+            return obj
+        return v
+    return obj
+
+def fix_inlanguage(obj):
+    """RU-исходник может ЯВНО задавать inLanguage ('ru-RU' в блоге, 'ru' в
+    o-kompanii). UA-страница — перевод того же контента, значит на ней такое
+    значение неверно. Переписываем ru* → 'uk' на любой глубине, включая @graph
+    (прежняя проверка ставила язык только когда поля НЕТ, поэтому явное 'ru-RU'
+    переживало сборку). Значения других языков не трогаем — они не про перевод.
+    'uk' без региона: так же, как <html lang="uk"> и остальные узлы разметки;
+    регион живёт в hreflang (uk-UA/ru-UA), где он действительно значим."""
+    if isinstance(obj, dict):
+        v = obj.get('inLanguage')
+        if isinstance(v, str) and (v.lower() == 'ru' or v.lower().startswith('ru-')):
+            obj['inLanguage'] = 'uk'
+        for x in obj.values():
+            fix_inlanguage(x)
+    elif isinstance(obj, list):
+        for x in obj:
+            fix_inlanguage(x)
     return obj
 
 def translate_page(sp, ru_html, existing_ua_tokens):
@@ -128,6 +153,7 @@ def translate_page(sp, ru_html, existing_ua_tokens):
                 obj = tr_jsonld(obj, sp)
                 if isinstance(obj, dict) and '@graph' not in obj and 'inLanguage' not in obj and isinstance(obj.get('@type'), str):
                     obj['inLanguage'] = 'uk'
+                fix_inlanguage(obj)   # явные ru/ru-RU из RU-исходника → uk
                 toks[i] = pre + json.dumps(obj, ensure_ascii=False) + suf
             elif kind == 'js':
                 new = tok
