@@ -160,6 +160,40 @@ ON_REQUEST = "Уточняйте при заявке"   # цена [0,0] = ут�
 def rng(p):
     if not p[0] and not p[1]: return ON_REQUEST
     return f"{money(p[0])} ₴" if p[0] == p[1] else f"{money(p[0])} — {money(p[1])} ₴"
+# ── Цены внутри авторских текстов моделей ────────────────────────────────────
+# В model_content.json цены записаны токеном {{P:услуга|ед|форма}}, а не числом.
+# Причина: цены едут из Supabase, а проза правится руками — синхронизировать их
+# вручную не выходило, и текст расходился с прайсом (доходило до двукратной
+# разницы на iPhone 17 Pro Max). Теперь число берётся из того же PRICES_ALL,
+# что и прайс-таблица, поэтому правка в админке меняет и прозу.
+# «форма» сохраняет исходную формулировку автора: one / dash / ot-do.
+_P_TOKEN = re.compile(r"\{\{P:([^|}]+)\|([^|}]+)\|([^}]+)\}\}")
+
+def expand_prices(text, pr, lang="ru"):
+    def _sub(m):
+        svc, unit, form = m.group(1), m.group(2), m.group(3)
+        p = pr.get(svc)
+        if not p or (not p[0] and not p[1]):
+            # услуги нет в прайсе или цена «уточняйте» — оставляем нейтральную фразу
+            return "уточняйте" if lang == "ru" else "уточнюйте"
+        lo, hi = p
+        if lo == hi:
+            return f"{money(lo)} {unit}"
+        if form == "ot-do":
+            ot, do = ("от", "до") if lang == "ru" else ("від", "до")
+            return f"{ot} {money(lo)} {do} {money(hi)} {unit}"
+        return f"{money(lo)}–{money(hi)} {unit}"
+    return _P_TOKEN.sub(_sub, text)
+
+def expand_mc(mc, pr, lang):
+    """Копия блока контента с раскрытыми ценами (исходник не мутируем)."""
+    suffix = "_" + lang
+    out = {}
+    for sec, items in mc.items():
+        out[sec] = [{k: (expand_prices(v, pr, lang) if isinstance(v, str) and k.endswith(suffix) else v)
+                     for k, v in item.items()} for item in items]
+    return out
+
 def esc_attr(s): return s.replace('"', "&quot;")
 def jstr(s): return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
@@ -319,7 +353,10 @@ def render(tid):
     ]
 
     # ── Обогащение модели: уникальные блоки + модельные FAQ (в HTML и в schema) ──
-    mc = MODEL_CONTENT.get(slug, {})
+    # Цены в этих текстах — не литералы, а токены {{P:услуга|ед|форма}}; раскрываем
+    # их из того же прайса, что питает таблицу, поэтому правка цены в админке
+    # меняет и прозу (см. expand_prices).
+    mc = expand_mc(MODEL_CONTENT.get(slug, {}), pr, "ru")
     for _it in mc.get("faq", []):
         faq.append((_it["q_ru"], _it["a_ru"]))
 
@@ -977,6 +1014,48 @@ TEMPLATE = r'''<!DOCTYPE html>
 '''
 
 
+def sync_price_i18n():
+    """Положить в каталог переводов пары «RU с раскрытой ценой» → «UA с той же ценой».
+
+    Без этого правка цены ломала бы украинскую версию: RU-строка меняется, точного
+    ключа в каталоге нет, числовой fallback спасает только пока не изменилась ФОРМА
+    цены (одна сумма против диапазона) — на этом уже дважды выпадал русский текст
+    на ua/remont-iphone/iphone-15-pro-max и iphone-17-pro-max. Здесь пара строится
+    заново на каждой сборке из одного источника, поэтому разъехаться не может.
+    """
+    cat_path = os.path.join(REPO, "_build", "i18n_ua.json")
+    try:
+        cat = json.load(open(cat_path, encoding="utf-8"))
+    except Exception as e:
+        print(f"[assemble_model] каталог переводов не прочитан ({e}) — i18n-пары не обновлены")
+        return 0
+    added = 0
+    for tid in SPEC:
+        slug = SPEC[tid][1]
+        mc = MODEL_CONTENT.get(slug)
+        if not mc or tid not in PRICES_ALL:
+            continue
+        pr = PRICES_ALL[tid]
+        ru, ua = expand_mc(mc, pr, "ru"), expand_mc(mc, pr, "ua")
+        for sec in ru:
+            for i_ru, i_ua in zip(ru[sec], ua[sec]):
+                for k, v in i_ru.items():
+                    if not (k.endswith("_ru") and isinstance(v, str)):
+                        continue
+                    tgt = i_ua.get(k[:-3] + "_ua")
+                    if not isinstance(tgt, str) or not tgt:
+                        continue
+                    for br in ("text", "jsonld"):
+                        if cat[br].get(v) != tgt:
+                            cat[br][v] = tgt
+                            added += 1
+    if added:
+        json.dump(cat, open(cat_path, "w", encoding="utf-8"),
+                  ensure_ascii=False, indent=1, sort_keys=False)
+    print(f"[assemble_model] i18n-пар для текстов с ценами обновлено: {added}")
+    return added
+
+
 def main():
     written = []
     for tid in SPEC:
@@ -985,6 +1064,7 @@ def main():
         with open(os.path.join(out_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(html)
         written.append((SPEC[tid][1], len(html)))
+    sync_price_i18n()
     print("=== WRITTEN ===")
     for slug, n in written:
         print("  ✓ remont-iphone/%s (%d симв.)" % (slug, n))
