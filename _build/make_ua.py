@@ -228,7 +228,68 @@ def main():
     for (kind, seg), pages in list(uniq.items())[:30]:
         print("  [%s] %r  (стр.: %d)" % (kind, seg[:70], len(pages)))
     check_branch_consistency()
+    if not dry:
+        check_jsonld_language()
     return 1 if untranslated else 0
+
+# Строки, которые в украинском пишутся ТАК ЖЕ, как в русском, — совпадение с
+# RU-версией для них нормально и утечкой не является.
+SAME_IN_UK = {'Блог', 'Блог SPARK', 'SPARK', 'Спарк', 'Зарядка'}
+
+def check_jsonld_language():
+    """Ни одно поле JSON-LD на UA-странице не должно дословно повторять RU-версию.
+
+    Это прямое измерение вместо эвристик. Словарные детекторы («ищем ыъэё»)
+    пропускают русский без этих букв — так «Замена стекла Apple Watch в Одессе»
+    полгода жила на украинской странице незамеченной. Сравнение с источником
+    ловит любой непереведённый сегмент независимо от того, какие в нём буквы.
+    Отчёт make_ua тут не помощник: он печатает лишь первые 30 из ~200 сегментов,
+    и новая утечка в этот срез может просто не попасть.
+    """
+    import glob as _glob
+    scr = re.compile(r'<script[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>', re.S | re.I)
+    cyr = re.compile(r'[Ѐ-ӿ]')
+
+    def fields(path):
+        out = {}
+        try:
+            html = open(path, encoding='utf-8').read()
+        except OSError:
+            return out
+        for si, m in enumerate(scr.finditer(html)):
+            try:
+                data = json.loads(m.group(1))
+            except Exception:
+                continue
+            def walk(n, p):
+                if isinstance(n, dict):
+                    for k, v in n.items():
+                        walk(v, p + [str(k)])
+                elif isinstance(n, list):
+                    for i, v in enumerate(n):
+                        walk(v, p + ['[%d]' % i])
+                elif isinstance(n, str):
+                    out['%d:%s' % (si, '.'.join(p))] = n
+            walk(data, [])
+        return out
+
+    leaks = []
+    for f in _glob.glob(os.path.join(REPO, 'ua', '**', 'index.html'), recursive=True):
+        rel = os.path.relpath(f, os.path.join(REPO, 'ua'))
+        ru_file = os.path.join(REPO, rel)
+        if not os.path.isfile(ru_file):
+            continue
+        fu, fr = fields(f), fields(ru_file)
+        for k, v in fu.items():
+            if (cyr.search(v) and fr.get(k) == v
+                    and v not in SAME_IN_UK and not v.startswith('Ремонт ')):
+                leaks.append((rel, k, v))
+    if not leaks:
+        print('Язык JSON-LD на UA: OK (ни одно поле не повторяет RU дословно)')
+        return
+    print('⚠ РУССКИЙ ТЕКСТ В JSON-LD НА UA-СТРАНИЦАХ: %d полей' % len(leaks))
+    for rel, k, v in leaks:          # без обрезки: утечка не должна теряться в хвосте
+        print('   ua/%s  [%s]\n      %r' % (rel, k, v[:100]))
 
 # Один RU-ключ обязан иметь ОДИН украинский перевод во всех ветках каталога.
 # Иначе видимый текст и разметка расходятся: так на /ua/o-kompanii/ вопрос в
