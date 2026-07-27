@@ -487,16 +487,22 @@ def build(slug, device, c):
 
     # repair cards. Если у услуги есть своя посадочная — карточка кликабельна целиком
     # (ссылка на заголовке + растянутая ::after перекрывает карточку, см. .rt-link в CSS).
-    CARD_LINKS = {"remont-apple-watch": {"Замена стекла": "zamena-stekla/",
-                                         "Полировка стекла": "zamena-stekla/"}}
+    # Значение: (href, текст CTA). Текст РАЗНЫЙ для каждой карточки: раньше обе вели
+    # на одну страницу безликим «Цены и сроки», то есть один анкор на один URL дважды
+    # и ни одного упоминания устройства. Для страницы, которую Google до сих пор не
+    # переставил со старого тильдовского URL, анкор — единственный смысловой сигнал.
+    CARD_LINKS = {"remont-apple-watch": {
+        "Замена стекла":    ("zamena-stekla/", "Цены на замену стекла Apple Watch"),
+        "Полировка стекла": ("zamena-stekla/", "Сколько стоит полировка стекла"),
+    }}
     clinks = CARD_LINKS.get(slug, {})
     cards = []
     for t in rt:
         ttl = t.get("title", "")
-        href = clinks.get(ttl)
-        # CTA-кнопка: карточка с посадочной (clinks) → её страница «Цены и сроки»,
+        link = clinks.get(ttl)
+        # CTA-кнопка: карточка с посадочной (clinks) → её страница со своим анкором,
         # без посадочной → форма записи «Узнать цену». Вся карточка кликабельна (a.lk::after).
-        cta = ('<a class="lk" href="%s">Цены и сроки<span class="ar">→</span></a>' % href) if href \
+        cta = ('<a class="lk" href="%s">%s<span class="ar">→</span></a>' % link) if link \
               else '<a class="lk" href="#book">Узнать цену<span class="ar">→</span></a>'
         cards.append('<div class="rtype reveal">\n          <h3><span class="ri">%s</span> %s</h3>\n          <p>%s</p>\n          %s\n        </div>'%(
             icon(t.get("icon","wrench")), esc(ttl), esc(t.get("desc","")), cta))

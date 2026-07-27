@@ -232,11 +232,21 @@ def render(dev, m):
     # цена для JSON offer — самая дешёвая услуга
     cheap_key = min(pr, key=lambda k: pr[k][0])
 
+    # Услуги, у которых есть отдельная посадочная: строка прайса и CTA карточки ведут
+    # на неё, а не в форму. До этого модельные страницы не ссылались на споки вовсе —
+    # именно так /remont-apple-watch/zamena-stekla/ и осталась с 4 ссылками с одной
+    # страницы, тогда как АКБ-лендинг iPhone собирает 45 доноров ровно этим способом.
+    SPOKE_LINKS = {
+        ("apple-watch", "glass"): ("../zamena-stekla/", "Замена стекла {name}"),
+    }
+
     # Прайс
     rows = ['<tr><td class="svc-name free">Диагностика</td><td class="pr free">Бесплатно</td><td class="time">при вас</td></tr>']
     for k in order:
         _, label, t, _, _ = cat[k]
-        rows.append(f'<tr><td class="svc-name">{label}</td><td class="pr">{rng(pr[k])}</td><td class="time">{t}</td></tr>')
+        _sp = SPOKE_LINKS.get((dev, k))
+        _cell = f'<a href="{_sp[0]}">{label}</a>' if _sp else label
+        rows.append(f'<tr><td class="svc-name">{_cell}</td><td class="pr">{rng(pr[k])}</td><td class="time">{t}</td></tr>')
     price_rows = "\n            ".join(rows)
 
     # Карточки
@@ -244,13 +254,17 @@ def render(dev, m):
     for k in order:
         _, label, t, icon, desc = cat[k]
         green = "Диагностика 0 ₴" if k in ("water", "board", "sound") else "Гарантия 12 мес"
+        _sp = SPOKE_LINKS.get((dev, k))
+        _cta = ('<a class="lk" href="%s">%s<span class="ar">→</span></a>'
+                % (_sp[0], _sp[1].format(name=name))) if _sp else \
+               '<a class="lk" href="#book">Узнать цену<span class="ar">→</span></a>'
         cards.append(
             '<div class="rtype reveal">\n'
             '          <h3><span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">%s</svg></span> %s</h3>\n'
             '          <p>%s</p>\n'
-            '          <a class="lk" href="#book">Узнать цену<span class="ar">→</span></a>\n'
+            '          %s\n'
             '          <div class="meta"><span>%s</span><span class="green">%s</span></div>\n'
-            '        </div>' % (ICONS[icon], label, desc.format(name=name), t, green))
+            '        </div>' % (ICONS[icon], label, desc.format(name=name), _cta, t, green))
     repair_cards = "\n        ".join(cards)
 
     # FAQ
