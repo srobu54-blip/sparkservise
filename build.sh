@@ -36,6 +36,9 @@ step "assemble_watch_glass — стекло Watch";  $PY _build/assemble_watch_g
 step "assemble_screen — экран iPhone";       $PY _build/assemble_screen.py
 # 4.3) Посадочная «Замена заднего стекла iPhone»
 step "assemble_backglass — заднее стекло";   $PY _build/assemble_backglass.py
+# 4.4) Посадочная «Замена аккумулятора MacBook» — крупнейший сервисный кластер
+#      MacBook по спросу (~1900 запросов/мес против 30 у клавиатуры).
+step "assemble_macbook_battery — АКБ MacBook"; $PY _build/assemble_macbook_battery.py
 # 5) Страницы услуг (разблокировка, диагностика, восстановление)
 step "assemble_service — услуги";            $PY _build/assemble_service.py
 # 6) Блог

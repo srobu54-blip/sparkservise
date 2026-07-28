@@ -472,15 +472,27 @@ def build(slug, device, c):
 
     # price rows
     rows = ['<tr><td class="svc-name free">Диагностика</td><td class="pr free">Бесплатно</td><td class="time">%s</td></tr>'%esc(diagTime)]
-    # Услуги, у которых есть своя посадочная — строка прайса ведёт на неё (внутренняя перелинковка)
-    SPOKE_LINKS = {"Замена защитного стекла": "zamena-stekla/",
-                   "Полировка стекла (царапины)": "zamena-stekla/"}
+    # Услуги, у которых есть своя посадочная — строка прайса ведёт на неё.
+    # Словарь ПО ХАБАМ, а не общий: «Замена аккумулятора» есть в прайсе и у Watch,
+    # и у MacBook, но посадочная — только у MacBook. Общий словарь давал битую
+    # ссылку /remont-apple-watch/zamena-akkumulyatora/ и раздваивал анкор между
+    # тремя URL (у iPhone своя страница АКБ).
+    SPOKE_LINKS = {
+        "remont-apple-watch": {"Замена защитного стекла": "zamena-stekla/",
+                               "Полировка стекла (царапины)": "zamena-stekla/"},
+        # значение: href или (href, анкор). Анкор задаём там, где название услуги
+        # совпадает с услугой другого устройства: «Замена аккумулятора» есть и у
+        # iPhone, и у MacBook, а один анкор на два URL размывает сигнал.
+        "remont-macbook":     {"Замена аккумулятора": ("zamena-akkumulyatora/", "Замена аккумулятора MacBook")},
+    }
+    slinks = SPOKE_LINKS.get(slug, {})
     for r in pr:
         svc = r.get("service","")
         cell = esc(svc)
-        href = SPOKE_LINKS.get(svc)
-        if href and slug == "remont-apple-watch":
-            cell = '<a href="%s">%s</a>' % (href, esc(svc))
+        link = slinks.get(svc)
+        if link:
+            href, anchor = link if isinstance(link, tuple) else (link, svc)
+            cell = '<a href="%s">%s</a>' % (href, esc(anchor))
         rows.append('<tr><td class="svc-name">%s</td><td class="pr">%s</td><td class="time">%s</td></tr>'%(
             cell, esc(normprice(r.get("price",""))), esc(r.get("time",""))))
     pricerows = "\n            ".join(rows)
@@ -494,6 +506,8 @@ def build(slug, device, c):
     CARD_LINKS = {"remont-apple-watch": {
         "Замена стекла":    ("zamena-stekla/", "Цены на замену стекла Apple Watch"),
         "Полировка стекла": ("zamena-stekla/", "Сколько стоит полировка стекла"),
+    }, "remont-macbook": {
+        "Замена аккумулятора": ("zamena-akkumulyatora/", "Замена батареи MacBook — цены и сроки"),
     }}
     clinks = CARD_LINKS.get(slug, {})
     cards = []
