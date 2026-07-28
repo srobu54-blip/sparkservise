@@ -39,6 +39,8 @@ step "assemble_backglass — заднее стекло";   $PY _build/assemble_b
 # 4.4) Посадочная «Замена аккумулятора MacBook» — крупнейший сервисный кластер
 #      MacBook по спросу (~1900 запросов/мес против 30 у клавиатуры).
 step "assemble_macbook_battery — АКБ MacBook"; $PY _build/assemble_macbook_battery.py
+# 4.5) Посадочная «Замена/ремонт тачпада MacBook» (~240 запросов/мес, страницы не было)
+step "assemble_macbook_trackpad — тачпад";     $PY _build/assemble_macbook_trackpad.py
 # 5) Страницы услуг (разблокировка, диагностика, восстановление)
 step "assemble_service — услуги";            $PY _build/assemble_service.py
 # 6) Блог

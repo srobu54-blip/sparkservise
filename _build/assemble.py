@@ -508,6 +508,7 @@ def build(slug, device, c):
         "Полировка стекла": ("zamena-stekla/", "Сколько стоит полировка стекла"),
     }, "remont-macbook": {
         "Замена аккумулятора": ("zamena-akkumulyatora/", "Замена батареи MacBook — цены и сроки"),
+        "Замена тачпада":      ("zamena-tachpada/", "Ремонт тачпада MacBook — подробнее"),
     }}
     clinks = CARD_LINKS.get(slug, {})
     cards = []
