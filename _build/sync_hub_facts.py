@@ -112,6 +112,78 @@ def fix_faq(src, rng):
     return src, n
 
 
+# ── Главная ──────────────────────────────────────────────────────────────────
+# Главная страница РУЧНАЯ, поэтому цены в ней вписывались руками и разошлись со
+# своими же хабами: 5 карточек устройств из 6 (MacBook 900 против 700, iMac 1100
+# против 600, Apple Watch 700 против 800 — то есть обещали дешевле, чем есть),
+# карточка АКБ 850 против 700 и срок «20-30 минут» против 30-40 на лендинге.
+# Здесь всё это берётся из тех же источников, что и сами хабы.
+HOME = os.path.join(ROOT, "index.html")
+DEVICE_HUBS = ["remont-iphone", "remont-macbook", "remont-imac",
+               "remont-apple-watch", "remont-ipad", "remont-airpods"]
+
+
+def hub_quick_price(slug):
+    """Цена из блока .quick самого хаба — то, что видит посетитель на его странице."""
+    path = os.path.join(ROOT, slug, "index.html")
+    if not os.path.isfile(path):
+        return None
+    src = open(path, encoding="utf-8").read()
+    m = re.search(r'class="quick"(.{0,600}?)(от\s[\d\s\xa0]+\s*₴)', src, re.S)
+    return re.sub(r"\s+", " ", m.group(2)).strip() if m else None
+
+
+def battery_facts():
+    """Минимальная цена АКБ по прайсу и срок — со страницы лендинга АКБ."""
+    src = open(HUB, encoding="utf-8").read()
+    rng_ = price_range(src).get("Замена аккумулятора")
+    land = os.path.join(ROOT, "remont-iphone", "zamena-akkumulyatora", "index.html")
+    dur = None
+    if os.path.isfile(land):
+        found = re.findall(r"(\d{2}-\d{2}) минут", open(land, encoding="utf-8").read())
+        if found:
+            dur = max(set(found), key=found.count)      # самая частая формулировка
+    return (rng_[0] if rng_ else None), dur
+
+
+def fix_home():
+    if not os.path.isfile(HOME):
+        log("главная не найдена — пропуск")
+        return 0
+    src = open(HOME, encoding="utf-8").read()
+    orig, n = src, 0
+
+    # карточки устройств: <a class="dev …" href="./slug/"> … <span class="price">от X ₴</span>
+    for slug in DEVICE_HUBS:
+        want = hub_quick_price(slug)
+        if not want:
+            log(f"у хаба {slug} не нашёл цену в .quick — карточка пропущена")
+            continue
+        pat = re.compile(r'(href="\./%s/"(?:(?!</a>).)*?<span class="price">)([^<]*)(</span>)'
+                         % re.escape(slug), re.S)
+        src, c = pat.subn(lambda m: m.group(1) + want + m.group(3), src)
+        n += c
+        if not c:
+            log(f"карточка {slug} на главной не найдена")
+
+    # карточка «Замена аккумулятора iPhone»: цена и срок
+    lo, dur = battery_facts()
+    if lo:
+        src, c = re.subn(r"(Меняем аккумулятор на любом iPhone за )\d{2}-\d{2}( минут\. Цена от )[\d\s\xa0]+( ₴)",
+                         lambda m: m.group(1) + (dur or "30-40") + m.group(2) + fmt(lo) + m.group(3),
+                         src)
+        n += c
+        if not c:
+            log("карточка АКБ на главной не найдена")
+
+    if src != orig:
+        open(HOME, "w", encoding="utf-8").write(src)
+        log(f"главная: обновлено блоков {n}")
+    else:
+        log(f"главная: цифры уже совпадают ({n} блоков проверено)")
+    return n
+
+
 def main():
     if not os.path.isfile(HUB):
         log("хаб не найден — пропуск")
@@ -133,6 +205,7 @@ def main():
         log(f"цифры уже совпадают с прайсом (hero {n_hero}, FAQ {n_faq}) — правок нет")
     lo, hi = rng.get(HERO_MAP["Замена экрана"], (0, 0))
     log(f"замена экрана по прайсу: {lo}–{hi} ₴")
+    fix_home()
     return 0
 
 
