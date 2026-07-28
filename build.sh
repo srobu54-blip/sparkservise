@@ -94,5 +94,10 @@ if [ -d .git ]; then
   step "sync_sitemap_dates — даты sitemap";  $PY _build/sync_sitemap_dates.py || true
 fi
 
+# 18) Гейт: инлайн-скрипты должны парситься. Ловит оборванные строки от апострофа
+#     в UA-переводах — единственный класс багов, который HTML-проверки не видят
+#     (страница валидна и отдаёт 200, но весь скрипт мёртв и контент не проявляется).
+step "check_js_syntax — синтаксис инлайн-JS";  $PY _build/check_js_syntax.py
+
 echo ""
 echo "✅ build.sh завершён"

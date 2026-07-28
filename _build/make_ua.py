@@ -15,6 +15,28 @@ CAT = json.load(open(os.path.join(REPO, '_build', 'i18n_ua.json'), encoding='utf
 TEXT, ATTR, JSONLD, JS = CAT['text'], CAT['attr'], CAT['jsonld'], CAT['js']
 untranslated = []   # (sitepath, kind, segment)
 
+# ── Экранирование кавычки при подстановке в JS ────────────────────────────────
+# Зачем: ключи ветки js хранят литерал ВМЕСТЕ с кавычками-ограничителями
+# ('<div><span>Имя</span><b>'), а подстановка была голым str.replace. В украинском
+# апостроф — рабочая буква («Ім'я», «роз'єм»), в русском его нет. Апостроф внутри
+# литерала в одинарных кавычках обрывал строку → SyntaxError → весь инлайн-скрипт
+# мёртв → блоки с reveal-анимацией навсегда оставались opacity:0. Легло 76 из 77
+# UA-страниц при полностью живых RU — баг был строго односторонним.
+# Ограничитель известен точно (первый символ ключа), поэтому JS не парсим:
+# экранируем ТОЛЬКО свою кавычку. Двойные кавычки внутри одинарного литерала
+# ('<tr><td class="pr">…') легальны и остаются нетронутыми.
+def js_sub(ru_lit, ua_lit):
+    if len(ru_lit) < 2 or ru_lit[0] not in '\'"`' or ru_lit[-1] != ru_lit[0]:
+        return ua_lit                      # ключ — не целый литерал, не рискуем
+    q = ru_lit[0]
+    if len(ua_lit) < 2 or ua_lit[0] != q or ua_lit[-1] != q:
+        return ua_lit                      # перевод не в тех же кавычках, не рискуем
+    body = ua_lit[1:-1]
+    if '\\' in body:
+        # уже есть экранирование — доэкранировать вслепую опасно (сломает \n и т.п.)
+        return ua_lit
+    return q + body.replace(q, '\\' + q) + q
+
 # ── Fallback: перевод по ЧИСЛОВОМУ ШАБЛОНУ ────────────────────────────────────
 # Зачем: ключи каталога содержат литеральные цены («Замена аккумулятора — 1 300 ₴»).
 # Правка цены в админке делает RU-строку НОВЫМ ключом → точного совпадения нет →
@@ -159,7 +181,7 @@ def translate_page(sp, ru_html, existing_ua_tokens):
                 new = tok
                 for ru_lit in sorted(JS, key=len, reverse=True):  # длинные первыми
                     if ru_lit in new:
-                        new = new.replace(ru_lit, JS[ru_lit])
+                        new = new.replace(ru_lit, js_sub(ru_lit, JS[ru_lit]))
                 for m in T.JS_CYR.finditer(tok):
                     if m.group(0) not in JS:
                         untranslated.append((sp, 'js', m.group(0)))

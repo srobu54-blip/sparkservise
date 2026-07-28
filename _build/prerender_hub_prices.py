@@ -42,19 +42,33 @@ def fmt(n: int) -> str:
     return f"{int(n):,}".replace(",", " ")
 
 
+# JS-строка в одинарных кавычках С УЧЁТОМ экранирования. Наивный '([^']+)'
+# останавливался на первой же кавычке: украинский апостроф в «роз'єм» разрывал
+# совпадение, и в пред-рендеренный прайс попадал обрубок «єм)». Дефект видимый
+# и жил на главной UA-странице — заметен только глазами, ни одна проверка HTML
+# его не ловит, потому что разметка при этом валидна.
+_JSSTR = r"'((?:\\.|[^'\\])*)'"
+
+
+def _unesc(s: str) -> str:
+    """Снять JS-экранирование: \\' → ', \\\\ → \\."""
+    return re.sub(r'\\(.)', r'\1', s)
+
+
 def first_tier(src: str):
     """Первый объект TIERS → (label, [(svc, lo, hi), ...], time) либо None."""
     m = re.search(
-        r"var TIERS=\[\s*\{id:'[^']+',label:'([^']*)',prices:\{([^}]*)\},time:'([^']*)'\}",
+        r"var TIERS=\[\s*\{id:'[^']+',label:" + _JSSTR +
+        r",prices:\{([^}]*)\},time:" + _JSSTR + r"\}",
         src,
     )
     if not m:
         return None
-    label, prices_inner, tier_time = m.group(1), m.group(2), m.group(3)
-    svcs = re.findall(r"'([^']+)':\[(\d+),(\d+)\]", prices_inner)
+    label, prices_inner, tier_time = _unesc(m.group(1)), m.group(2), _unesc(m.group(3))
+    svcs = re.findall(_JSSTR + r":\[(\d+),(\d+)\]", prices_inner)
     if not svcs:
         return None
-    return label, [(s, int(lo), int(hi)) for s, lo, hi in svcs], tier_time
+    return label, [(_unesc(s), int(lo), int(hi)) for s, lo, hi in svcs], tier_time
 
 
 def render_strings(src: str):
@@ -66,20 +80,21 @@ def render_strings(src: str):
         src,
     )
     tmap = re.search(
-        r"var time=k\.indexOf\('([^']*)'\)>-1\?'([^']*)'"
-        r":k\.indexOf\('([^']*)'\)>-1\?'([^']*)':t\.time;",
+        r"var time=k\.indexOf\(" + _JSSTR + r"\)>-1\?" + _JSSTR +
+        r":k\.indexOf\(" + _JSSTR + r"\)>-1\?" + _JSSTR + r":t\.time;",
         src,
     )
     # подпись для цены-сентинела [0,0] («уточняйте при заявке») — берём из самой страницы,
     # чтобы UA-версия подхватила свой перевод, а не русскую строку
-    onreq = re.search(r"var pr=\(!p\[0\]&&!p\[1\]\)\?'([^']*)'", src)
+    onreq = re.search(r"var pr=\(!p\[0\]&&!p\[1\]\)\?" + _JSSTR, src)
     if not diag or not tmap:
         return None
     return {
-        "diag": diag.group(1), "free": diag.group(2), "atyou": diag.group(3),
-        "water": tmap.group(1), "wtime": tmap.group(2),
-        "plat": tmap.group(3), "ptime": tmap.group(4),
-        "on_request": onreq.group(1) if onreq else "Уточняйте при заявке",
+        "diag": _unesc(diag.group(1)), "free": _unesc(diag.group(2)),
+        "atyou": _unesc(diag.group(3)),
+        "water": _unesc(tmap.group(1)), "wtime": _unesc(tmap.group(2)),
+        "plat": _unesc(tmap.group(3)), "ptime": _unesc(tmap.group(4)),
+        "on_request": _unesc(onreq.group(1)) if onreq else "Уточняйте при заявке",
     }
 
 
