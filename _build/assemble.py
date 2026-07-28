@@ -483,7 +483,8 @@ def build(slug, device, c):
         # значение: href или (href, анкор). Анкор задаём там, где название услуги
         # совпадает с услугой другого устройства: «Замена аккумулятора» есть и у
         # iPhone, и у MacBook, а один анкор на два URL размывает сигнал.
-        "remont-macbook":     {"Замена аккумулятора": ("zamena-akkumulyatora/", "Замена аккумулятора MacBook")},
+        "remont-macbook":     {"Замена аккумулятора": ("zamena-akkumulyatora/", "Замена аккумулятора MacBook"),
+                               "Замена разъёма / платы зарядки MagSafe": ("ne-zaryazhaetsya/", "Замена разъёма зарядки MacBook")},
     }
     slinks = SPOKE_LINKS.get(slug, {})
     for r in pr:
@@ -509,6 +510,7 @@ def build(slug, device, c):
     }, "remont-macbook": {
         "Замена аккумулятора": ("zamena-akkumulyatora/", "Замена батареи MacBook — цены и сроки"),
         "Замена тачпада":      ("zamena-tachpada/", "Ремонт тачпада MacBook — подробнее"),
+        "Ремонт платы и цепей питания": ("ne-zaryazhaetsya/", "MacBook не заряжается — причины"),
     }}
     clinks = CARD_LINKS.get(slug, {})
     cards = []

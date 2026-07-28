@@ -41,6 +41,10 @@ step "assemble_backglass — заднее стекло";   $PY _build/assemble_b
 step "assemble_macbook_battery — АКБ MacBook"; $PY _build/assemble_macbook_battery.py
 # 4.5) Посадочная «Замена/ремонт тачпада MacBook» (~240 запросов/мес, страницы не было)
 step "assemble_macbook_trackpad — тачпад";     $PY _build/assemble_macbook_trackpad.py
+# 4.6) Посадочная «MacBook не заряжается» (~260 запросов/мес, KD 0). Взят ремонтный
+#      кластер, а не торговый: «зарядка для macbook» — интент покупки (CPC 15-20 ₴),
+#      там магазины, сервису его не выиграть. Цены тянутся из прайса хаба.
+step "assemble_macbook_charging — зарядка";    $PY _build/assemble_macbook_charging.py
 # 5) Страницы услуг (разблокировка, диагностика, восстановление)
 step "assemble_service — услуги";            $PY _build/assemble_service.py
 # 6) Блог
