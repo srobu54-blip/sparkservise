@@ -15,19 +15,32 @@
 только Google, AI-краулеры и посетители без JS — то есть ровно те, кто
 формирует выдачу. Поэтому нужна проверка HTML, а не проверка глазами.
 
-Сверяются все ячейки с data-svc на всех страницах, RU и UA. Живой inline-fetch
-к Supabase на хабе iPhone здесь ни при чём: он правит рантайм, а мы проверяем
-исходник — он обязан совпадать с var TIERS, который в этот же прогон обновил
-pull_prices.
+⚠ УРОК ПРО САМ ЭТОТ ГЕЙТ. Первая версия требовала, чтобы в ячейке рядом стоял
+data-price-label, и молча покрывала 6 страниц из 83, печатая при этом бодрое
+«все цены совпадают». Модельные страницы размечают ячейки ОДНИМ data-svc —
+модель подразумевается самой страницей. Проверка, которая уверенно зелёная на
+одной десятой материала, хуже отсутствующей. Отсюда счётчик покрытия ниже:
+если число страниц вдруг упало — гейт ослеп, а не сайт починился.
+
+Разбираются два вида разметки:
+  лендинги      <td class="pr" data-price-label="iPhone 13" data-svc="…">
+  модели        <td class="pr" data-svc="…">          ← модель из пути страницы
+Ключи data-svc КАНОНИЧЕСКИЕ (русские) и на украинских страницах тоже — так
+задумано, они совпадают с прайсом и CMS; переводится только видимая подпись.
 """
 import os, re, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import assemble_model as MOD          # SPEC — авторитетная карта модель→slug
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKIP_DIRS = {'_build', 'node_modules', '.git', 'admin'}
-HUB = os.path.join(REPO, 'remont-iphone', 'index.html')
 
-CELL = re.compile(
-    r'data-price-label="([^"]+)"[^>]*data-svc="([^"]+)"[^>]*>([^<]*)</td>')
+CELL = re.compile(r'<td class="pr"([^>]*)>([^<]*)</td>')
+ATTR = re.compile(r'data-(price-label|svc)="([^"]*)"')
+BADGE = re.compile(r'🛠 <b>(?:от|від) ([^<]+?) ₴</b>')
+
+SLUG2LABEL = {v[1]: v[0] for v in MOD.SPEC.values()}
 
 
 def money(n):
@@ -35,42 +48,28 @@ def money(n):
 
 
 def norm(s):
-    """\u0421\u0440\u0430\u0432\u043d\u0438\u0432\u0430\u0435\u043c \u043f\u043e \u0441\u0443\u0442\u0438, \u0430 \u043d\u0435 \u043f\u043e \u0442\u0438\u043f\u043e\u0433\u0440\u0430\u0444\u0438\u043a\u0435.
+    """Сравниваем по сути, а не по типографике.
 
-    \u0420\u0430\u0437\u043d\u044b\u0435 \u0433\u0435\u043d\u0435\u0440\u0430\u0442\u043e\u0440\u044b \u0440\u0430\u0437\u0434\u0435\u043b\u044f\u044e\u0442 \u0440\u0430\u0437\u0440\u044f\u0434\u044b \u0442\u043e \u043e\u0431\u044b\u0447\u043d\u044b\u043c \u043f\u0440\u043e\u0431\u0435\u043b\u043e\u043c, \u0442\u043e \u043d\u0435\u0440\u0430\u0437\u0440\u044b\u0432\u043d\u044b\u043c,
-    \u0442\u043e \u0443\u0437\u043a\u0438\u043c, \u0438 \u0441\u0442\u0430\u0432\u044f\u0442 \u0440\u0430\u0437\u043d\u044b\u0435 \u0442\u0438\u0440\u0435 (\u2013, \u2014, -). \u042d\u0442\u043e \u043e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u0435, \u0430 \u043d\u0435 \u0446\u0435\u043d\u0430, \u0438
-    \u0441\u0440\u0430\u0432\u043d\u0438\u0432\u0430\u0442\u044c \u043f\u043e \u043d\u0438\u043c \u0437\u043d\u0430\u0447\u0438\u0442 \u043b\u043e\u0432\u0438\u0442\u044c \u043b\u043e\u0436\u043d\u044b\u0435 \u0440\u0430\u0441\u0445\u043e\u0436\u0434\u0435\u043d\u0438\u044f \u2014 \u043d\u0430 \u044d\u0442\u043e\u043c \u043c\u043e\u044f \u043f\u0435\u0440\u0432\u0430\u044f
-    \u0432\u0435\u0440\u0441\u0438\u044f \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0438 \u0434\u0430\u043b\u0430 182 \u00ab\u043e\u0448\u0438\u0431\u043a\u0438\u00bb \u043d\u0430 \u0441\u043e\u0432\u043f\u0430\u0434\u0430\u044e\u0449\u0438\u0445 \u0447\u0438\u0441\u043b\u0430\u0445.
+    Разряды разделяются то обычным пробелом, то неразрывным, то узким; тире
+    бывает –, — или -. Это оформление, а не цена. На этом первая версия дала
+    182 «ошибки» на совпадающих числах.
     """
-    s = re.sub(r'[\s\u00a0\u202f\u2009]', '', s)
-    return re.sub(r'[\u2013\u2014\u2212-]', '-', s)
+    s = re.sub(r'[\s   ]', '', s)
+    return re.sub(r'[–—−-]', '-', s)
 
 
 def tiers():
-    """{label: {услуга: [lo, hi]}} из единственного источника — var TIERS."""
-    s = open(HUB, encoding='utf-8').read()
-    body = re.search(r'var TIERS=\[(.*?)\];', s, re.S)
-    if not body:
-        print('  ⚠ var TIERS не найден в хабе — проверка цен пропущена.')
-        sys.exit(0)
+    """{label: {услуга: (lo, hi)}} — единственный источник, var TIERS."""
     out = {}
-    for _tid, label, pr, _t in re.findall(
-            r"\{id:'([^']+)',label:'([^']+)',prices:\{([^}]*)\},time:'([^']+)'\}", body.group(1)):
-        d = {}
-        for k, lo, hi in re.findall(r"'((?:\\.|[^'\\])*)':\[(\d+),(\d+)\]", pr):
-            d[re.sub(r'\\(.)', r'\1', k)] = (int(lo), int(hi))
-        out[label] = d
+    for tid, prices in MOD.PRICES_ALL.items():
+        out[MOD.SPEC[tid][0]] = {k: tuple(v) for k, v in prices.items()}
     return out
 
 
 def expected(lo, hi):
-    """Варианты написания, которые считаем верными (тире у страниц разные)."""
     if not lo and not hi:
-        return None                     # сентинел «уточняйте» — не сверяем
-    if lo == hi:
-        return {norm(money(lo))}
-    a, b = money(lo), money(hi)
-    return {norm(f'{a}-{b}')}
+        return None                       # сентинел «уточняйте при заявке»
+    return norm(money(lo)) if lo == hi else norm(f'{money(lo)}-{money(hi)}')
 
 
 def pages():
@@ -81,39 +80,88 @@ def pages():
                 yield os.path.join(root, f)
 
 
+def page_model(rel):
+    """Модель страницы по её пути: remont-iphone/<slug>/ → «iPhone 13»."""
+    parts = rel.replace(os.sep, '/').split('/')
+    if 'remont-iphone' in parts:
+        i = parts.index('remont-iphone')
+        if i + 1 < len(parts):
+            return SLUG2LABEL.get(parts[i + 1])
+    return None
+
+
 T = tiers()
-bad, checked, n_pages = [], 0, 0
+bad, badge_bad = [], []
+checked = badge_checked = n_pages = 0
 
 for path in sorted(pages()):
     html = open(path, encoding='utf-8', errors='replace').read()
     hits = CELL.findall(html)
     if not hits:
         continue
-    n_pages += 1
     rel = os.path.relpath(path, REPO)
-    for label, svc, shown in hits:
-        prices = T.get(label)
-        if not prices or svc not in prices:
-            continue                    # услуги нет у модели — не наша забота
-        exp = expected(*prices[svc])
-        if exp is None:
-            continue
-        checked += 1
-        got = norm(shown.replace('₴', ''))
-        if got not in exp:
-            bad.append((rel, label, svc, got, ' / '.join(sorted(exp))))
+    default_label = page_model(rel)
+    seen_here = False
+    mins = []
 
-print(f'  страниц с ценами: {n_pages}, сверено ячеек: {checked}')
+    for attrs, shown in hits:
+        a = dict((k, v) for k, v in ATTR.findall(attrs))
+        svc = a.get('svc')
+        if not svc:
+            continue                      # «Диагностика — Бесплатно» и т.п.
+        label = a.get('price-label') or default_label
+        prices = T.get(label or '')
+        if not prices or svc not in prices:
+            continue
+        exp = expected(*prices[svc])
+        got = norm(shown.replace('₴', ''))
+        if exp is None:
+            continue                      # цена не назначена — сверять нечего
+        seen_here = True
+        checked += 1
+        if got != exp:
+            bad.append((rel, label, svc, got, exp))
+        lo = prices[svc][0]
+        if lo:
+            mins.append(lo)
+
+    if seen_here:
+        n_pages += 1
+
+    # ── бейдж «🛠 от X ₴» в первом экране: обязан быть минимумом ПО СТРАНИЦЕ ──
+    # Раньше сюда шла цена АККУМУЛЯТОРА, и вход завышался в 1,2-4 раза:
+    # iPhone 16 Pro обещал «от 4 200 ₴» при реальном минимуме 1 200 ₴. Это первое,
+    # что видит человек из поиска, поэтому проверяется отдельно от ячеек.
+    m = BADGE.search(html)
+    if m and mins:
+        badge_checked += 1
+        if norm(m.group(1)) != norm(money(min(mins))):
+            badge_bad.append((rel, norm(m.group(1)), norm(money(min(mins)))))
+
+print(f'  страниц с ценами: {n_pages}, сверено ячеек: {checked}, '
+      f'бейджей: {badge_checked}')
 
 if bad:
     print(f'\n  ❌ ЦЕНА НА СТРАНИЦЕ НЕ СОВПАДАЕТ С ПРАЙСОМ — {len(bad)} шт.:')
     for rel, label, svc, got, exp in bad[:20]:
-        print(f'     {rel}')
-        print(f'       {label} · {svc}: на странице «{got}», в прайсе «{exp}»')
+        print(f'     {rel}\n       {label} · {svc}: страница «{got}», прайс «{exp}»')
     if len(bad) > 20:
         print(f'     … и ещё {len(bad) - 20}')
-    print('\n  Цены на странице обязаны выводиться из прайса, а не вписываться руками.')
-    print('  Образец, как правильно: assemble_model.models_for() в _build/assemble_model.py.')
+
+if badge_bad:
+    print(f'\n  ❌ БЕЙДЖ «от X ₴» ≠ МИНИМУМУ ПО СТРАНИЦЕ — {len(badge_bad)} шт.:')
+    for rel, got, exp in badge_bad[:12]:
+        print(f'     {rel}: бейдж «{got}», минимум «{exp}»')
+    if len(badge_bad) > 12:
+        print(f'     … и ещё {len(badge_bad) - 12}')
+
+if bad or badge_bad:
+    print('\n  Цифры на странице обязаны выводиться из прайса, а не вписываться руками.')
+    print('  Образцы: assemble_model.models_for() и _min_price в _build/assemble_model.py.')
     sys.exit(1)
 
-print('  ✅ все цены на страницах совпадают с прайсом')
+if n_pages < 80:
+    print(f'  ⚠ покрытие подозрительно мало ({n_pages} стр.) — проверь, не сменилась ли')
+    print('    разметка ячеек: гейт мог ослепнуть и молча пропускать расхождения.')
+
+print('  ✅ цены и бейджи на страницах совпадают с прайсом')

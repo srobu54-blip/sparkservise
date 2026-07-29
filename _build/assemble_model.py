@@ -250,11 +250,24 @@ def render(tid):
     pr = PRICES_ALL[tid]
     canon = f"{BASE}/remont-iphone/{slug}/"
     batt_low = pr["Замена аккумулятора"][0]
-    # «от X ₴» в герое и price в Offer брались из цены АКБ напрямую: если в CMS поставить
-    # сентинел [0,0] («уточняйте»), вышло бы видимое «от 0 ₴» и price:"0" в schema.
-    # Подстраховка: берём минимальную НЕнулевую цену по услугам модели.
+    # Две РАЗНЫЕ величины, которые раньше были одной и той же — отсюда и баг.
+    #
+    # _min_price — минимум по ВСЕЙ странице, для видимого бейджа «🛠 от X ₴».
+    # Раньше туда шла цена АККУМУЛЯТОРА, и первый экран завышал вход в 1,2-4 раза:
+    # iPhone 16 обещал «ремонт от 4 200 ₴» при реальном минимуме 1 100 ₴ (динамик,
+    # разъём). Человек с недорогой поломкой уходил, не долистав до прайса. Аудит
+    # 29.07 нашёл это на всех 38 моделях, то есть на 76 страницах с украинскими.
+    #
+    # _batt_price — цена аккумулятора, для Offer в разметке и meta description.
+    # Там она КОРРЕКТНА: описание Offer прямо говорит «Замена аккумулятора …»,
+    # а meta — «аккумулятор от X ₴». Менять её на минимум нельзя, иначе цена
+    # разъедется с тем, что она подписывает.
+    #
+    # Сентинел [0,0] в CMS означает «уточняйте»: такие услуги в минимум не берём,
+    # иначе на странице появилось бы «от 0 ₴», а в schema price:"0".
     _lows = [v[0] for v in pr.values() if isinstance(v, (list, tuple)) and v and v[0]]
-    _from_price = batt_low or (min(_lows) if _lows else 0)
+    _min_price = min(_lows) if _lows else 0
+    _batt_price = batt_low or _min_price
     _offer_desc = (f"Замена аккумулятора {name} от {money(batt_low)} ₴" if batt_low
                    else f"Ремонт {name}")
     has_back = "Замена заднего стекла" in pr
@@ -472,7 +485,7 @@ def render(tid):
 
     repl = {
         "@@NAME@@": name, "@@TRANSLIT@@": translit(name), "@@CANON@@": canon, "@@OG_IMAGE@@": OG_IMAGE,
-        "@@OFFER_PRICE@@": str(_from_price), "@@OFFER_BATT@@": money(_from_price), "@@FROM_PRICE@@": money(_from_price),
+        "@@OFFER_PRICE@@": str(_batt_price), "@@OFFER_BATT@@": money(_batt_price), "@@FROM_PRICE@@": money(_min_price),
         "@@OFFER_DESC@@": _offer_desc,
         # ценовой хвост АКБ для description; пустой, если цена [0,0] («уточняйте») — иначе вышло бы «от 0 ₴»
         "@@BATT_FROM@@": (f" от {money(batt_low)} ₴" if batt_low else ""),
