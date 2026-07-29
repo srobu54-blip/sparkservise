@@ -21,27 +21,22 @@ def d2(s): return s.replace('href="../', 'href="../../').replace('src="../', 'sr
 NAV2, FOOTER2 = d2(D.NAV), d2(D.FOOTER)
 
 # ── данные: цена аккумулятора по моделям (из калькулятора хаба), ссылка на модель ──
-MODELS = [
-    ("iPhone 17 Pro Max","iphone-17-pro-max",2000,2600),("iPhone 17 Pro","iphone-17-pro",1800,2400),
-    ("iPhone 17 Air","iphone-17-air",1700,2300),("iPhone 17","iphone-17",1600,2200),
-    ("iPhone 16 Pro Max","iphone-16-pro-max",4500,4500),("iPhone 16 Pro","iphone-16-pro",4200,4200),
-    ("iPhone 16 Plus","iphone-16-plus",4200,4200),("iPhone 16","iphone-16",4200,4200),
-    ("iPhone 15 Pro Max","iphone-15-pro-max",2900,2900),("iPhone 15 Pro","iphone-15-pro",2900,2900),
-    ("iPhone 15 Plus","iphone-15-plus",2900,2900),("iPhone 15","iphone-15",1200,1700),
-    ("iPhone 14 Pro Max","iphone-14-pro-max",1300,1900),("iPhone 14 Pro","iphone-14-pro",2600,2600),
-    ("iPhone 14 Plus","iphone-14-plus",2600,2600),("iPhone 14","iphone-14",2000,2000),
-    ("iPhone 13 Pro Max","iphone-13-pro-max",2000,2000),("iPhone 13 Pro","iphone-13-pro",1900,1900),
-    ("iPhone 13","iphone-13",1700,1700),("iPhone 13 mini","iphone-13-mini",1850,1850),
-    ("iPhone 12 Pro Max","iphone-12-pro-max",1900,1900),("iPhone 12 Pro","iphone-12-pro",1900,1900),
-    ("iPhone 12","iphone-12",1800,1800),("iPhone 12 mini","iphone-12-mini",1800,1800),
-    ("iPhone 11 Pro Max","iphone-11-pro-max",1500,1500),("iPhone 11 Pro","iphone-11-pro",1300,1300),
-    ("iPhone 11","iphone-11",1200,1200),("iPhone XS Max","iphone-xs-max",1200,1200),
-    ("iPhone XS","iphone-xs",1100,1100),("iPhone XR","iphone-xr",1000,1000),
-    ("iPhone X","iphone-x",950,950),("iPhone 8 Plus","iphone-8-plus",900,900),
-    ("iPhone 8","iphone-8",800,800),("iPhone 7 Plus","iphone-7-plus",800,800),
-    ("iPhone 7","iphone-7",700,700),("iPhone SE 3 (2022)","iphone-se-2022",1400,1400),
-    ("iPhone SE 2 (2020)","iphone-se-2020",900,900),("iPhone SE (2016)","iphone-se-2016",800,800),
-]
+# ── цены по моделям: ЕДИНСТВЕННЫЙ источник — прайс (var TIERS через assemble_model) ──
+# См. пояснение в assemble_screen.py: список литералов расходился с прайсом.
+import assemble_model as MOD
+SERVICE = "Замена аккумулятора"
+MODELS = MOD.models_for(SERVICE)
+
+_P = {n: (lo, hi) for n, sl, lo, hi in MODELS}
+def _mm(names):
+    v = [x for n in names if n in _P for x in _P[n]]
+    return (min(v), max(v)) if v else (0, 0)
+LO_MIN = min(m[2] for m in MODELS)
+_OLD  = _mm(["iPhone 7", "iPhone 7 Plus", "iPhone 8", "iPhone 8 Plus",
+             "iPhone SE (2016)", "iPhone SE 2 (2020)", "iPhone SE 3 (2022)"])[0]
+_MID  = _mm([f"iPhone {n}{sf}" for n in (11, 12, 13)
+             for sf in ("", " Pro", " Pro Max", " mini")])
+_FLAG = _mm(["iPhone 16 Pro Max"])[1]
 def grn(n): return format(n, ",d").replace(",", " ")   # 1200 -> "1 200"
 
 # ── признаки, что пора менять (карточки) ──
@@ -64,7 +59,7 @@ STEPS = [
 
 # ── FAQ ──
 FAQ = [
-    ("Сколько стоит замена аккумулятора на iPhone?","Цена зависит от модели: от 700 ₴ для iPhone 7-8 и SE, 1200-1500 ₴ для iPhone 11-13, до 4500 ₴ для флагманов iPhone 16 Pro Max. Точную стоимость по вашей модели смотрите в таблице выше — диагностика бесплатная, итоговую цену называем до начала работ."),
+    ("Сколько стоит замена аккумулятора на iPhone?",f"Цена зависит от модели: от {_OLD} ₴ для iPhone 7-8 и SE, {_MID[0]}-{_MID[1]} ₴ для iPhone 11-13, до {_FLAG} ₴ для флагманов iPhone 16 Pro Max. Точную стоимость по вашей модели смотрите в таблице выше — диагностика бесплатная, итоговую цену называем до начала работ."),
     ("Сколько времени занимает замена батареи?","В среднем 30-40 минут — меняем при вас в мастерской. Если параллельно нужна диагностика платы или чистка разъёма, скажем об этом сразу после проверки."),
     ("Какая гарантия на новый аккумулятор?","12 месяцев — и на сам аккумулятор, и на работу мастера. Если в течение гарантии появятся вопросы к автономности, бесплатно проверим и решим."),
     ("Вы ставите оригинальный аккумулятор или копию?","Используем качественные сервисные аккумуляторы с проверенной ёмкостью. Разницу между оригиналом, сервисным и дешёвым «no-name» АКБ честно объясняем до замены — вы сами выбираете вариант под бюджет."),
@@ -112,14 +107,14 @@ def hero_svg():
       '</svg>\n      </div>')
 
 def build():
-    title = "Замена аккумулятора iPhone в Одессе — цена от 700 ₴ | SPARK"
-    desc = "Замена аккумулятора iPhone в Одессе за 30-40 минут: цена от 700 ₴, гарантия 12 месяцев, бесплатная диагностика. Все модели — от iPhone 7 до 17 Pro Max."
+    title = f"Замена аккумулятора iPhone в Одессе — цена от {LO_MIN} ₴ | SPARK"
+    desc = f"Замена аккумулятора iPhone в Одессе за 30-40 минут: цена от {LO_MIN} ₴, гарантия 12 месяцев, бесплатная диагностика. Все модели — от iPhone 7 до 17 Pro Max."
     kw = "замена аккумулятора iphone, замена аккумулятора айфон, замена батареи iphone, замена аккумулятора iphone одесса, поменять аккумулятор айфон одесса"
     h1 = "Замена аккумулятора iPhone в Одессе"
     sub = "Меняем аккумулятор на любом iPhone за 30-40 минут при вас. Бесплатная диагностика, качественные аккумуляторы, гарантия 12 месяцев и оплата по факту — без предоплаты."
 
     # ── JSON-LD ──
-    lo_min = min(m[2] for m in MODELS)
+    lo_min = LO_MIN
     service = {"@context":"https://schema.org","@type":"Service","@id":CANON+"#service",
         "name":"Замена аккумулятора iPhone в Одессе","serviceType":"Замена аккумулятора iPhone",
         "description":desc,"areaServed":{"@type":"City","name":"Одесса"},
@@ -154,7 +149,7 @@ def build():
     p += '        <div class="hero-cta">\n          <a class="btn btn-spark" href="#book">Записаться</a>\n          <a class="btn btn-line" href="tel:+380960755452">☎ Позвонить</a>\n        </div>\n'
     p += '        <p class="cta-note">⏱ <b>Перезвоним за 15 минут</b> · бесплатная диагностика</p>\n'
     p += '        <div class="trustbar"><span class="tb-star">★ 4.8</span> <b>Google</b><span class="sep">·</span>158 отзывов<span class="sep">·</span><b>32 000</b> ремонтов<span class="sep">·</span>9 лет</div>\n'
-    p += '        <div class="quick">\n          <span>📍 <b>ул. Академика Королёва, 23</b></span>\n          <span>🕐 <b>Пн-Сб 10:00-19:00</b></span>\n          <span>🔋 <b>от 700 ₴ · 30-40 минут</b></span>\n        </div>\n'
+    p += '        <div class="quick">\n          <span>📍 <b>ул. Академика Королёва, 23</b></span>\n          <span>🕐 <b>Пн-Сб 10:00-19:00</b></span>\n          <span>🔋 <b>от ' + str(LO_MIN) + ' ₴ · 30-40 минут</b></span>\n        </div>\n'
     p += '      </div>\n      ' + hero_svg() + '\n    </div>\n  </section>\n\n'
 
     # ── признаки ──

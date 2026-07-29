@@ -209,10 +209,41 @@ def parse_tiers():
     rows = re.findall(r"\{id:'([^']+)',label:'([^']+)',prices:\{([^}]*)\},time:'([^']+)'\}", body)
     out = {}
     for tid, label, pr, time in rows:
-        out[tid] = json.loads('{' + pr.replace("'", '"') + '}')
+        # Разбор литералов С УЧЁТОМ экранирования: наивный '([^']+)' обрывается на
+        # первой кавычке, а украинский апостроф (роз'єм) экранируется как \'. Сейчас
+        # читается только RU-исходник, где апострофов нет, — но ровно этот класс
+        # разбора уже клал в прайс обрубок «єм)», поэтому не повторяем.
+        d = {}
+        for k, lo, hi in re.findall(r"'((?:\\.|[^'\\])*)':\[(\d+),(\d+)\]", pr):
+            d[re.sub(r'\\(.)', r'\1', k)] = [int(lo), int(hi)]
+        out[tid] = d
     return out
 
 PRICES_ALL = parse_tiers()
+
+
+def models_for(service):
+    """[(название, slug, lo, hi), …] по одной услуге, в порядке прайса.
+
+    ЕДИНСТВЕННЫЙ источник ценовых таблиц на посадочных страницах. Раньше
+    assemble_screen.py и assemble_battery.py держали такой список ЛИТЕРАЛАМИ —
+    с комментарием «(из TIERS)», которого код не делал. Цена в админке уезжала,
+    лендинги оставались со старыми числами. Аудит 29.07 нашёл 4 расхождения до
+    2,3×: страница обещала за экран iPhone 17 Pro Max 11 000 ₴ при прайсе
+    20 000 — 25 000 ₴. Коварство в том, что price-live.js правит ячейку уже в
+    браузере, поэтому заниженную цену видели только Google, AI-краулеры и
+    посетители без JS — глазами дефект не заметен.
+    """
+    out = []
+    for tid, pr in PRICES_ALL.items():
+        v = pr.get(service)
+        if not isinstance(v, (list, tuple)) or len(v) != 2:
+            continue
+        lo, hi = int(v[0]), int(v[1])
+        if not lo and not hi:
+            continue          # сентинел [0,0] = «уточняйте при заявке», строку не печатаем
+        out.append((SPEC[tid][0], SPEC[tid][1], lo, hi))
+    return out
 
 def render(tid):
     name, slug, port, promo, disp, bio, truetone, water = SPEC[tid]
