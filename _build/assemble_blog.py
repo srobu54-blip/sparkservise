@@ -16,6 +16,7 @@ ARTICLES = [
     ("zamena-stekla-ili-displeya-iphone", "Дисплеи", "screen", "2026-07-23", "23 июля 2026"),
     ("ne-rabotaet-face-id-iphone", "Диагностика", "faceid", "2026-07-23", "23 июля 2026"),
     ("vzdulsya-akkumulyator-iphone", "Аккумулятор", "battery", "2026-07-23", "23 июля 2026"),
+    ("iphone-nedostupen-zabyl-parol", "Диагностика", "lock", "2026-07-30", "30 июля 2026"),
 ]
 SLUGS = [a[0] for a in ARTICLES]
 # dateModified = дата последнего РЕАЛЬНОГО изменения статьи. По умолчанию = дата публикации (iso/disp).
@@ -43,6 +44,7 @@ CARD_TEASERS = {
     "zamena-stekla-ili-displeya-iphone": "Треснуло стекло, а картинка цела — можно поменять только стекло? Объясняем без маркетинга.",
     "ne-rabotaet-face-id-iphone": "Грязь, настройки, замена экрана или поломка датчика? Что чинится дома, а что только в сервисе.",
     "vzdulsya-akkumulyator-iphone": "Экран приподняло, корпус распирает? Чем это опасно и чего нельзя делать ни в коем случае.",
+    "iphone-nedostupen-zabyl-parol": "Забыли код-пароль? Почему экстренный вызов не помогает и что реально можно сделать.",
 }
 
 def word_count(a):
@@ -63,6 +65,7 @@ ICON = {
  "power": '<path d="M12 4 V12"/><path d="M7.8 6.3 a7 7 0 1 0 8.4 0"/>',
  "heat": '<path d="M14 14.76V5a2 2 0 0 0-4 0v9.76a4 4 0 1 0 4 0z"/>',
  "faceid": '<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10v1M15 10v1M12 10v3l-1 1M9 15c.8.7 1.9 1 3 1s2.2-.3 3-1"/>',
+ "lock": '<rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/><path d="M12 14.5v2.5"/>',
 }
 
 def esc(s): return html.escape(str(s), quote=False)
@@ -104,6 +107,7 @@ INLINE_ALT = {
     "pochemu-bystro-saditsya-batareya": "Замена аккумулятора iPhone на рабочем столе мастера SPARK",
     "original-ili-kopiya-displeya-iphone": "Мастер SPARK снимает дисплейный модуль iPhone для замены",
     "iphone-ne-vklyuchaetsya": "Диагностика iPhone с чёрным экраном в сервисном центре SPARK",
+    "iphone-nedostupen-zabyl-parol": "Заблокированный iPhone со значком замка на экране в мастерской SPARK",
 }
 
 def cover(slug, icon_key, alt):

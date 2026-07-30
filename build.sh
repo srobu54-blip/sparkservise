@@ -47,6 +47,11 @@ step "assemble_macbook_trackpad — тачпад";     $PY _build/assemble_macbo
 step "assemble_macbook_charging — зарядка";    $PY _build/assemble_macbook_charging.py
 # 5) Страницы услуг (разблокировка, диагностика, восстановление)
 step "assemble_service — услуги";            $PY _build/assemble_service.py
+# 5.1) Посадочная «Разлочка iPhone от оператора» — спойк /razblokirovka-iphone/.
+#      Кластер разблокировки — единственный коммерческий кластер сайта без
+#      локального пака (DR 0 сидят в топ-5), а разлочка — самый дорогой чек
+#      внутри него. Цены тянутся из прайса родителя, ПОСЛЕ assemble_service.
+step "assemble_sim_unlock — разлочка";       $PY _build/assemble_sim_unlock.py
 # 6) Блог
 step "assemble_blog — блог";                 $PY _build/assemble_blog.py
 # 7) Под-модели не-iPhone устройств

@@ -13,6 +13,7 @@ esc, escA, icon = D.esc, D.escA, D.icon
 SERVICES = [("razblokirovka-iphone", "Разблокировка iPhone"), ("diagnostika", "Диагностика"), ("vosstanovlenie-dannyh", "Восстановление данных")]
 SLUG_NAMES = {
  "razblokirovka-icloud":"Разблокировка iCloud","razblokirovka-iphone":"Разблокировка iPhone",
+ "razblokirovka-iphone/sim-unlock":"Разлочка iPhone от оператора",
  "remont-iphone":"Ремонт iPhone","diagnostika":"Диагностика","kontakty":"Контакты",
  "remont-macbook":"Ремонт MacBook","remont-imac":"Ремонт iMac","remont-ipad":"Ремонт iPad",
  "remont-apple-watch":"Ремонт Apple Watch","remont-airpods":"Ремонт AirPods",
