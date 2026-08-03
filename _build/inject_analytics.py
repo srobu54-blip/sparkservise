@@ -9,6 +9,7 @@ SCRIPTS = [
     ('<!--spark-analytics-->', '<!--/spark-analytics-->', 'analytics.js'),
     ('<!--spark-exit-->', '<!--/spark-exit-->', 'exit-popup.js'),
     ('<!--spark-lead-->', '<!--/spark-lead-->', 'lead-submit.js'),
+    ('<!--spark-hours-->', '<!--/spark-hours-->', 'hours.js'),
 ]
 
 def process(f):

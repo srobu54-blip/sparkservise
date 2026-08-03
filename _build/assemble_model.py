@@ -589,7 +589,7 @@ TEMPLATE = r'''<!DOCTYPE html>
 
 <div class="topbar">
   <div class="wrap">
-    <span class="tb-item tb-hide"><span class="dot"></span> Сегодня работаем · 10:00-19:00</span>
+    <span class="tb-item tb-hide" data-hours><span class="dot"></span> <span class="tb-hours">Пн-Сб 10:00-19:00 · Вс — выходной</span></span>
     <span class="right">
       <span class="lang"><a href="https://sparkservice.od.ua/">UA</a><span>/</span><a class="on" href="#">RU</a></span>
     </span>
