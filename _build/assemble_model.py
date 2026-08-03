@@ -901,6 +901,7 @@ TEMPLATE = r'''<!DOCTYPE html>
 </footer>
 
 <div class="callbar">
+  <div class="cb-note" data-hours-bar><span class="dot"></span><span class="cb-text"></span></div>
   <a class="btn btn-line" href="tel:+380960755452">☎ Позвонить</a>
   <a class="btn btn-spark" href="#book">Записаться</a>
 </div>
