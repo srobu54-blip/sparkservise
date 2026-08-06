@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sitemap-old.xml — ВРЕМЕННАЯ карта старых Tilda-адресов.
+
+  Зачем. После переезда 09.07.2026 Google держит в индексе И старый адрес,
+  И новый: /zamena-batarei-iphone висит на поз. 27 (548 показов/мес), а
+  /remont-iphone/zamena-akkumulyatora/ стоит на поз. 5,6. Два URL одной
+  страницы делят между собой доверие. Редиректы 308 стоят и работают —
+  Google просто ещё не обошёл старые адреса: домену месяц, краулинговый
+  бюджет маленький.
+
+  Этот файл ставит все 105 старых адресов в очередь на сканирование разом.
+  Краулер приходит, видит 308, переносит сигнал на новый URL и выкидывает
+  старый из индекса. Приём документирован Google для переезда URL.
+
+  Все 105 проверены 06.08.2026: на входе 308, после переходов 200.
+
+  ⚠ В отчёте GSC по этой карте будут висеть «Страница с переадресацией» —
+    это ожидаемо, файл ровно для этого и нужен.
+  ⚠ Отправляется в GSC ОТДЕЛЬНОЙ строкой, в robots.txt намеренно НЕ указан:
+    файл временный. Основной sitemap.xml не трогаем.
+  ⚠ УДАЛИТЬ, когда показы старых адресов в GSC упадут до нуля
+    (ориентир — середина сентября 2026). Проверять: Эффективность → Страницы.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://sparkservice.od.ua/contacts</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/copy_spark_service</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/i_fon</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/imac_2009-2012</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/imac_2012-2019</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/imac_pro</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/ipad_2</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/ipad_3</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/ipad_4</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/ipad_air</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/ipad_air_2</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/ipad_mini</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/ipad_mini_2</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/ipad_mini_3</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/ipad_mini_4</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone13</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone13mini</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone13pro</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone13promax</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_11</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_11_pro</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_11_pro_max</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_14</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_14_plus</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_14_pro</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_14_pro_max</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_15</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_15_plus</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_15_pro</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_15_pro_max</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_5</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_5_c</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_5_s</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_6</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_6_plus</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_6_s</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_6_s_plus</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_7</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_7_plus</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_8</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_8_plus</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_se</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_x</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_xr</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_xs</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/iphone_xs_max</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/lgjlvakjesr</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/macbook_air</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/macbook_pro_retina</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/macbookpro</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/of_copy_11</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/of_copy_11_pro</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/pgstart</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-ekrana-iphone</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-iphone-16-odessa</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-iphone-16-plus-odessa</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-iphone-16-pro-max-odessa</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-iphone-16-pro-odessa</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-iphone-16e-odessa</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-iphone-17-air-odessa</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-iphone-17-odessa</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-iphone-17-pro-max-odessa</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-iphone-17-pro-odessa</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont-iphone-17e-odessa</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_airpods</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_android</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_1_38_mm</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_1_42_mm</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_2_38_mm</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_2_42_mm</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_3_38_mm</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_3_42_mm</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_4_40_mm</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_4_44_mm</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_5</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_6</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_apple_watch_se</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_imac</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_ipad</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_iphone</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_iphone_12</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_iphone_12_pro</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_iphone_12_pro_max</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_macbook</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/remont_telefonov</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/repair-iphone</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/service-iphone</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/sitemap-store.xml</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/spark-service</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/spark-service-1-1</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/spark-service-11</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/spark-service-11-1</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/thank_you_ekr</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zamena-batarei-iphone</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zamena-battery</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zamena-display</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zamena-displeya-iphone</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zamena-ekrana</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zamena-ekrana-iphone</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zamena-stekla-iphone</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zamena_akkumulyatora_iphone</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zamena_ekrana_iphone</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zamena_stekla_apple_watch</loc><lastmod>2026-08-06</lastmod></url>
+  <url><loc>https://sparkservice.od.ua/zayavka_ekr</loc><lastmod>2026-08-06</lastmod></url>
+</urlset>
