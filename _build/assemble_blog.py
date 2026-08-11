@@ -489,7 +489,7 @@ def schema_blocks(slug, a, iso, miso, category):
         "headline": a.get("title") or a.get("h1"), "description": a.get("metaDescription",""),
         "image": img, "datePublished": iso, "dateModified": miso, "wordCount": word_count(a), "inLanguage":"ru-RU",
         "articleSection": category, "keywords": a.get("keywords",""),
-        "author":{"@type":"Organization","name":"SPARK","url":"https://sparkservice.od.ua/","description":"Сервисный центр по ремонту техники Apple в Одессе, 9 лет опыта, 32 000+ ремонтов"},
+        "author":{"@type":"Organization","name":"SPARK","url":"https://sparkservice.od.ua/","description":"Сервисный центр по ремонту техники Apple в Одессе, 8 лет опыта, 32 000+ ремонтов"},
         "publisher":{"@type":"Organization","name":"SPARK","logo":{"@type":"ImageObject","url":"https://sparkservice.od.ua/og/logo.png"}}}
     crumb = {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
         {"@type":"ListItem","position":1,"name":"Главная","item":"https://sparkservice.od.ua/"},
@@ -524,7 +524,7 @@ def build_article(slug, category, icon_key, iso, disp, a, meta):
     tldr_html = ('<div class="tldr"><b>Коротко</b><ul>%s</ul></div>' %
                  "".join("<li>%s</li>" % esc(t) for t in tldr)) if tldr else ""
     author_html = ('<div class="art-author"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>'
-        '<p>Материал подготовили и проверили мастера <b><a href="../../o-kompanii/">сервисного центра SPARK</a></b> — независимого сервиса по ремонту техники Apple в Одессе с 2017 года: более 32 000 отремонтированных устройств, гарантия до 12 месяцев и рейтинг 4.8★ на Google.<br>Обновлено: <time datetime="%s">%s</time></p></div>') % (miso, mdisp)
+        '<p>Материал подготовили и проверили мастера <b><a href="../../o-kompanii/">сервисного центра SPARK</a></b> — независимого сервиса по ремонту техники Apple в Одессе с 2018 года: более 32 000 отремонтированных устройств, гарантия до 12 месяцев и рейтинг 4.8★ на Google.<br>Обновлено: <time datetime="%s">%s</time></p></div>') % (miso, mdisp)
     faq = a.get("faq") or []
     faq_html = ""
     if faq:

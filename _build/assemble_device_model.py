@@ -526,7 +526,7 @@ TEMPLATE = r'''<!DOCTYPE html>
           <a class="btn btn-line" href="tel:+380960755452">☎ Позвонить</a>
         </div>
         <p class="cta-note">⏱ <b>Перезвоним за 15 минут</b> · без предоплаты</p>
-        <div class="trustbar"><span class="tb-star">★ 4.8</span> <b>Google</b><span class="sep">·</span>158 отзывов<span class="sep">·</span><b>32 000</b> ремонтов<span class="sep">·</span>9 лет</div>
+        <div class="trustbar"><span class="tb-star">★ 4.8</span> <b>Google</b><span class="sep">·</span>158 отзывов<span class="sep">·</span><b>32 000</b> ремонтов<span class="sep">·</span>8 лет</div>
         <div class="quick">
           <span>📍 <b>ул. Академика Королёва, 23</b></span>
           <span>🕐 <b>Ежедневно 10:00-19:00</b></span>
