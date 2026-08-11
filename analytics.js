@@ -121,4 +121,84 @@
     // 5) TikTok — событие заявки
     if (T.tt && window.ttq) { try { ttq.track("SubmitForm", { content_type: "lead", content_name: service || "" }); } catch (_) {} }
   }, true);
+
+  /* ── ВОРОНКА ФОРМЫ: form_view → form_start → form_ready → generate_lead ──
+     Зачем. До сих пор было видно только «пришёл» и «обратился»: за 30 дней
+     611 пользователей и 63 ключевых события, а на каком шаге теряются
+     остальные — вслепую. Эти три события закрывают разрыв:
+       form_view   — доскроллили до формы
+       form_start  — коснулись первого поля
+       form_ready  — заполнили так, что кнопка отправки разблокировалась
+     Провал между form_ready и generate_lead — самый обидный и сегодня
+     невидимый: человек всё ввёл и передумал на кнопке.
+
+     Как. Логику валидации не дублируем — она живёт в wireForm() (main.js и
+     exit-popup.js). Мы только СМОТРИМ на её результат: состояние кнопки
+     проверяется после каждого ввода. Поэтому работает и для exit-попапа,
+     который вставляется в DOM позже (см. exit-popup.js — modal.id задаётся
+     в рантайме), и MutationObserver не нужен.
+
+     Персональных данных в этих событиях НЕТ — телефон и имя уходят только
+     в generate_lead, как и раньше. */
+  function formIdOf(el) {
+    if (!el || !el.closest) return "";
+    if (el.closest("#spkExitModal")) return "exit_popup";
+    if (el.closest("#bookFormInline")) return "inline_form";
+    if (el.closest(".modal-card")) return "modal_callback";
+    return "";
+  }
+  function step(name, form_id) {
+    window.dataLayer.push({ event: name, form_id: form_id, language: lang, test_mode: TEST });
+  }
+
+  // form_view — только для встроенной формы: модалка и exit-попап открываются
+  // по действию, там «показ» гарантирован, а попап и так шлёт exit_popup_show.
+  try {
+    var inlineForm = document.getElementById("bookFormInline");
+    if (inlineForm && window.IntersectionObserver) {
+      // Одна доля тут не годится: форма ~790px, и на невысоком экране доля
+      // 0.4 недостижима физически — событие не выстрелит никогда. Меряем
+      // видимую ВЫСОТУ в пикселях: 150px — это заголовок с первым полем,
+      // то есть форму человек действительно увидел (для низких форм берём
+      // 60% высоты, иначе порог был бы недостижим и для них).
+      // ⚠ Порогов нужно НЕСКОЛЬКО. С одним threshold:0 колбэк вызывается
+      // только в момент пересечения границы — когда видно пару пикселей;
+      // проверка высоты не пройдёт, а пока форма остаётся в кадре, повторных
+      // вызовов не будет, и событие потеряется навсегда.
+      var io = new IntersectionObserver(function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          var en = entries[i], h = en.boundingClientRect.height;
+          if (en.isIntersecting && en.intersectionRect.height >= Math.min(150, h * 0.6)) {
+            step("form_view", "inline_form"); io.disconnect(); return;
+          }
+        }
+      }, { threshold: [0, 0.1, 0.2, 0.35, 0.5, 0.75, 1] });
+      io.observe(inlineForm);
+    }
+  } catch (_) {}
+
+  document.addEventListener("input", function (e) {
+    var f = e.target;
+    if (!f || !f.closest) return;
+    if (!f.closest(".js-name, .js-phone, .js-device, #mName, #mPhone, #mDevice")) return;
+    var box = f.closest("#spkExitModal, #bookFormInline, .modal-card");
+    if (!box) return;                       // без контейнера метки ставить некуда
+    var id = formIdOf(f);
+    if (!id) return;
+
+    if (!box.hasAttribute("data-spk-start")) {
+      box.setAttribute("data-spk-start", "1");
+      step("form_start", id);
+    }
+    // состояние кнопки wireForm() обновляет в своём обработчике ввода —
+    // читаем после него, поэтому откладываем на следующий тик
+    setTimeout(function () {
+      if (box.hasAttribute("data-spk-ready")) return;
+      var btn = box.querySelector(".js-submit, #mSubmit");
+      if (btn && !btn.disabled) {
+        box.setAttribute("data-spk-ready", "1");
+        step("form_ready", id);
+      }
+    }, 0);
+  }, true);
 })();
