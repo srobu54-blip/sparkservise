@@ -148,7 +148,7 @@ def render_blocks(blocks):
 
 NAV = '''<div class="topbar">
   <div class="wrap">
-    <span class="tb-item tb-hide" data-hours><span class="dot"></span> <span class="tb-hours">Пн-Сб 10:00-19:00 · Вс — выходной</span></span>
+    <span class="tb-item tb-hide" data-hours><span class="dot"></span> <span class="tb-hours">Ежедневно 10:00-19:00</span></span>
     <span class="right"><span class="lang"><a href="https://sparkservice.od.ua/">UA</a><span>/</span><a class="on" href="#">RU</a></span></span>
   </div>
 </div>
@@ -181,7 +181,7 @@ NAV = '''<div class="topbar">
       <a href="{{P}}kontakty/">Контакты</a>
     </nav>
     <div class="nav-right">
-      <span class="hphone"><a href="tel:+380960755452">+38 (096) 075-54-52</a><small>Пн-Сб 10:00-19:00</small></span>
+      <span class="hphone"><a href="tel:+380960755452">+38 (096) 075-54-52</a><small>Ежедневно 10:00-19:00</small></span>
       <a class="btn btn-spark hcta" href="#book">Записаться</a>
       <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
     </div>
@@ -238,7 +238,7 @@ FOOTER = '''<footer class="site" id="footer">
         <li><a href="{{P}}kontakty/">Контакты</a></li>
       </ul></div>
       <div class="foot reveal"><h3>Контакты</h3>
-        <p>ул. Академика Королёва, 23, Одесса<br>Пн-Сб: 10:00-19:00 · Вс: выходной</p>
+        <p>ул. Академика Королёва, 23, Одесса<br>Ежедневно: 10:00-19:00</p>
         <p><a href="{{P}}kontakty/">Как нас найти →</a></p>
       </div>
     </div>
