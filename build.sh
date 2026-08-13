@@ -45,6 +45,12 @@ step "assemble_macbook_trackpad — тачпад";     $PY _build/assemble_macbo
 #      кластер, а не торговый: «зарядка для macbook» — интент покупки (CPC 15-20 ₴),
 #      там магазины, сервису его не выиграть. Цены тянутся из прайса хаба.
 step "assemble_macbook_charging — зарядка";    $PY _build/assemble_macbook_charging.py
+# 4.7) Посадочная «Чистка MacBook от пыли + термопаста». Кластер MacBook по GSC —
+#      1859 показов и ОДИН клик при позиции 21, крупнейший неотработанный на сайте.
+#      У чистки страницы не было вовсе, поэтому в GSC 17 показов: ранжироваться нечему.
+#      Две головы: «чистка макбука» 150 и «чистка клавиатуры macbook» 150 — под вторую
+#      отдельный H2-блок. Цена тянется из строки прайса хаба через hub_price().
+step "assemble_macbook_cleaning — чистка";     $PY _build/assemble_macbook_cleaning.py
 # 5) Страницы услуг (разблокировка, диагностика, восстановление)
 step "assemble_service — услуги";            $PY _build/assemble_service.py
 # 5.1) Посадочная «Разлочка iPhone от оператора» — спойк /razblokirovka-iphone/.

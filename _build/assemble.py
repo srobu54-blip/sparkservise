@@ -486,7 +486,8 @@ def build(slug, device, c):
         # совпадает с услугой другого устройства: «Замена аккумулятора» есть и у
         # iPhone, и у MacBook, а один анкор на два URL размывает сигнал.
         "remont-macbook":     {"Замена аккумулятора": ("zamena-akkumulyatora/", "Замена аккумулятора MacBook"),
-                               "Замена разъёма / платы зарядки MagSafe": ("ne-zaryazhaetsya/", "Замена разъёма зарядки MacBook")},
+                               "Замена разъёма / платы зарядки MagSafe": ("ne-zaryazhaetsya/", "Замена разъёма зарядки MacBook"),
+                               "Чистка от пыли + термопаста": ("chistka/", "Чистка MacBook от пыли")},
     }
     slinks = SPOKE_LINKS.get(slug, {})
     for r in pr:
@@ -512,6 +513,7 @@ def build(slug, device, c):
     }, "remont-macbook": {
         "Замена аккумулятора": ("zamena-akkumulyatora/", "Замена батареи MacBook — цены и сроки"),
         "Замена тачпада":      ("zamena-tachpada/", "Ремонт тачпада MacBook — подробнее"),
+        "Чистка и замена термопасты": ("chistka/", "Чистка MacBook и замена термопасты — цены"),
         "Ремонт платы и цепей питания": ("ne-zaryazhaetsya/", "MacBook не заряжается — причины"),
     }}
     clinks = CARD_LINKS.get(slug, {})
