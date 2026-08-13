@@ -8,6 +8,7 @@
 import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import assemble as D
+import assemble_model as MOD          # models_for — единственный источник ценовых таблиц
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 esc, escA, icon = D.esc, D.escA, D.icon
@@ -18,26 +19,17 @@ CANON = "https://sparkservice.od.ua/" + SLUG + "/"
 def d2(s): return s.replace('href="../', 'href="../../').replace('src="../', 'src="../../')
 NAV2, FOOTER2 = d2(D.NAV), d2(D.FOOTER)
 
-# ── цены «Замена заднего стекла» по моделям (из TIERS); только со стеклянной крышкой ──
-MODELS = [
-    ("iPhone 17 Pro Max","iphone-17-pro-max",8200,8200),("iPhone 17 Pro","iphone-17-pro",8200,8200),
-    ("iPhone 17 Air","iphone-17-air",8200,8200),("iPhone 17","iphone-17",8200,8200),
-    ("iPhone 16 Pro Max","iphone-16-pro-max",4750,4750),("iPhone 16 Pro","iphone-16-pro",4750,4750),
-    ("iPhone 16 Plus","iphone-16-plus",4600,4600),("iPhone 16","iphone-16",4200,4200),
-    ("iPhone 15 Pro Max","iphone-15-pro-max",4200,4200),("iPhone 15 Pro","iphone-15-pro",4200,4200),
-    ("iPhone 15 Plus","iphone-15-plus",3500,3500),("iPhone 15","iphone-15",3500,3500),
-    ("iPhone 14 Pro Max","iphone-14-pro-max",3100,3100),("iPhone 14 Pro","iphone-14-pro",2800,2800),
-    ("iPhone 14 Plus","iphone-14-plus",2900,2900),("iPhone 14","iphone-14",2900,2900),
-    ("iPhone 13 Pro Max","iphone-13-pro-max",2400,2400),("iPhone 13 Pro","iphone-13-pro",2400,2400),
-    ("iPhone 13","iphone-13",2000,2000),("iPhone 13 mini","iphone-13-mini",1900,1900),
-    ("iPhone 12 Pro Max","iphone-12-pro-max",2200,2200),("iPhone 12 Pro","iphone-12-pro",2200,2200),
-    ("iPhone 12","iphone-12",2000,2000),("iPhone 12 mini","iphone-12-mini",1700,1700),
-    ("iPhone 11 Pro Max","iphone-11-pro-max",1600,1600),("iPhone 11 Pro","iphone-11-pro",1450,1450),
-    ("iPhone 11","iphone-11",1300,1300),("iPhone XS Max","iphone-xs-max",950,950),
-    ("iPhone XS","iphone-xs",950,950),("iPhone XR","iphone-xr",950,950),
-    ("iPhone X","iphone-x",950,950),("iPhone 8 Plus","iphone-8-plus",850,850),
-    ("iPhone 8","iphone-8",850,850),
-]
+# ── цены «Замена заднего стекла» по моделям — ИЗ TIERS, а не литералами ──
+# Здесь лежал захардкоженный список ровно с этим же комментарием «(из TIERS)», которого
+# код не делал. Цену правили в админке, страница оставалась со старой: 13.08.2026 гейт
+# check_prices поймал 3 расхождения, худшее — iPhone 17 обещал 8 200 ₴ при прайсе
+# 3 000 — 5 000 ₴, то есть завышал вдвое. Коварство в том, что price-live.js правит
+# ячейку уже в браузере, поэтому старое число видели только Google, AI-краулеры и
+# посетители без JS — глазами дефект не заметен. Тот же класс бага уже чинили в
+# assemble_screen.py и assemble_battery.py, этот файл пропустили.
+# models_for() сам отбрасывает модели с сентинелом [0,0] — это как раз iPhone 7 и SE
+# с алюминиевой крышкой, поэтому набор и порядок прежние: 33 модели из 38.
+MODELS = MOD.models_for("Замена заднего стекла")
 def grn(n): return format(n, ",d").replace(",", " ")
 
 # ── признаки: что с задним стеклом ──
