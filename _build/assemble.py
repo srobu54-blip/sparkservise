@@ -487,7 +487,8 @@ def build(slug, device, c):
         # iPhone, и у MacBook, а один анкор на два URL размывает сигнал.
         "remont-macbook":     {"Замена аккумулятора": ("zamena-akkumulyatora/", "Замена аккумулятора MacBook"),
                                "Замена разъёма / платы зарядки MagSafe": ("ne-zaryazhaetsya/", "Замена разъёма зарядки MacBook"),
-                               "Чистка от пыли + термопаста": ("chistka/", "Чистка MacBook от пыли")},
+                               "Чистка от пыли + термопаста": ("chistka/", "Чистка MacBook от пыли"),
+                               "Замена тачпада (трекпада)": ("zamena-tachpada/", "Замена тачпада MacBook — цены")},
     }
     slinks = SPOKE_LINKS.get(slug, {})
     for r in pr:
