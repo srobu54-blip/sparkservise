@@ -83,7 +83,7 @@ SVC_META = [
  ("После воды", "После воды", "от 2 часов"),
  ("Замена камеры", "Замена камеры", "40-60 мин"),
  ("Динамик / микрофон", "Динамик / микрофон", "30-50 мин"),
- ("Face ID", "Face ID", "1-3 часа"),
+ ("Face ID", "Face ID", "от 30 мин"),
  ("Кнопка Home / Touch ID", "Кнопка Home / Touch ID", "40-60 мин"),
  ("Ремонт платы", "Ремонт платы", "1-3 дня"),
 ]
@@ -291,9 +291,17 @@ def render(tid):
     for key, label_t, t in SVC_META:
         if key not in pr: continue
         label = label_t.replace("__PORT__", port)
+        # Строка прайса модели → посадочная страница услуги. Словарь отставал от
+        # набора лендингов: 18.08 аудит показал, что у трёх новых страниц 5-7
+        # входящих ссылок против 87-92 у старых, и вся разница — ровно эти 38
+        # модельных страниц. На домене возрастом месяц внутренний вес почти
+        # единственный доступный сигнал, поэтому забывать здесь дорого.
         _svc_page = {"Замена аккумулятора": "../zamena-akkumulyatora/",
                      "Замена экрана (дисплея)": "../zamena-ekrana/",
-                     "Замена заднего стекла": "../zamena-zadnego-stekla/"}.get(key)
+                     "Замена заднего стекла": "../zamena-zadnego-stekla/",
+                     "Face ID": "../face-id/",
+                     "После воды": "../posle-vody/",
+                     "Не заряжается (разъём)": "../ne-zaryazhaetsya/"}.get(key)
         cell = f'<a href="{_svc_page}">{label}</a>' if _svc_page else label
         rows.append(f'<tr><td class="svc-name">{cell}</td><td class="pr" data-svc="{key}">{rng(pr[key])}</td><td class="time">{t}</td></tr>')
     price_rows = "\n            ".join(rows)

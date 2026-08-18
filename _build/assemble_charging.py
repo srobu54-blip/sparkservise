@@ -105,13 +105,17 @@ def hero_svg():
 
 def build():
     lo_min = min(m[2] for m in MODELS)
-    title = "iPhone не заряжается — ремонт разъёма в Одессе | SPARK"
+    # Заголовок ведём от коммерческой формулировки, а не от «iPhone не заряжается»:
+    # этой фразой открывается статья blog/iphone-ne-zaryazhaetsya/, у неё больше
+    # входящих ссылок и истории, и в лобовом столкновении Google выберет её.
+    # Статье остаётся информационный интент, лендингу — транзакционный.
+    title = "Ремонт разъёма зарядки iPhone в Одессе от %s ₴ | SPARK" % grn(lo_min)
     desc = ("iPhone не заряжается или заряжается под углом? SPARK в Одессе: проверим кабель "
             "и порт бесплатно, заменим разъём за 30-50 минут. Гарантия 12 месяцев.")
     kw = ("iphone не заряжается, замена разъёма зарядки iphone, не заряжается айфон одесса, "
           "ремонт разъёма зарядки iphone, айфон не видит зарядку, аксессуар не поддерживается, "
           "замена нижнего шлейфа iphone, чистка разъёма зарядки iphone")
-    h1 = "iPhone не заряжается — ремонт разъёма в Одессе"
+    h1 = "Ремонт разъёма зарядки iPhone в Одессе — если не заряжается"
     sub = ("Меняем изношенный разъём зарядки нижним шлейфом в сборе за 30-50 минут при вас. "
            "Но сначала бесплатно исключаем кабель и загрязнение порта: очень часто телефон исправен, "
            "и менять в нём нечего.")
@@ -134,7 +138,7 @@ def build():
     p += '<title>%s</title>\n<meta name="description" content="%s">\n<meta name="keywords" content="%s">\n' % (escA(title), escA(desc), escA(kw))
     p += '<meta name="robots" content="index, follow">\n<link rel="canonical" href="%s">\n' % CANON
     p += '<meta name="theme-color" content="#ffffff">\n<meta property="og:type" content="website">\n'
-    p += '<meta property="og:title" content="%s">\n<meta property="og:description" content="%s">\n' % (escA("iPhone не заряжается — ремонт разъёма в Одессе | SPARK"), escA(desc))
+    p += '<meta property="og:title" content="%s">\n<meta property="og:description" content="%s">\n' % (escA("Ремонт разъёма зарядки iPhone в Одессе | SPARK"), escA(desc))
     p += '<meta property="og:url" content="%s">\n<meta property="og:locale" content="ru_RU">\n' % CANON
     p += '<meta property="og:image" content="https://sparkservice.od.ua/og/spark.jpg">\n\n'
     p += schema_html + '\n\n<link rel="stylesheet" href="../../styles.css">\n' + D.STYLE + '\n<script defer src="/price-live.js"></script>\n</head>\n<body>\n'

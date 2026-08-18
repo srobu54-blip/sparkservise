@@ -126,7 +126,7 @@ def build():
     crumb = {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
         {"@type":"ListItem","position":1,"name":"Главная","item":"https://sparkservice.od.ua/"},
         {"@type":"ListItem","position":2,"name":"Ремонт iPhone","item":"https://sparkservice.od.ua/remont-iphone/"},
-        {"@type":"ListItem","position":3,"name":"Ремонт после воды","item":CANON}]}
+        {"@type":"ListItem","position":3,"name":"После воды","item":CANON}]}
     faqpage = {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
         {"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in FAQ]}
     schema_html = "\n".join('<script type="application/ld+json">\n'+json.dumps(x, ensure_ascii=False)+'\n</script>' for x in (service, crumb, faqpage))

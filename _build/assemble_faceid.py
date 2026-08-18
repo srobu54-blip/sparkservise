@@ -173,7 +173,7 @@ def build():
           '</ul></div>\n    </div>\n  </section>\n\n')
 
     rows = "\n            ".join(
-        '<tr><td class="svc-name"><a href="../../remont-iphone/%s/">Face ID %s</a></td><td class="pr" data-price-label="%s" data-price-dash="en" data-svc="Face ID">%s ₴</td><td class="time">30-60 мин</td></tr>' % (
+        '<tr><td class="svc-name"><a href="../../remont-iphone/%s/">Face ID %s</a></td><td class="pr" data-price-label="%s" data-price-dash="en" data-svc="Face ID">%s ₴</td><td class="time">от 30 мин</td></tr>' % (
             slug, esc(label), esc(label), (grn(lo) if lo==hi else grn(lo)+" – "+grn(hi))) for label,slug,lo,hi in MODELS)
     p += ('  <section class="sec" id="prices">\n    <div class="wrap">\n      <div class="sec-head reveal">\n'
           '        <span class="sec-tag">Цены</span>\n        <h2>Стоимость ремонта Face ID по моделям</h2>\n'
