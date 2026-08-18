@@ -142,6 +142,7 @@ SEO = [
 
 RELATED = [
     ("../zamena-tachpada/", "Ремонт тачпада MacBook"),
+    ("../zamena-ekrana/", "Замена экрана MacBook"),
     ("../ne-zaryazhaetsya/", "MacBook не заряжается"),
     ("../../remont-macbook/", "Ремонт MacBook — все услуги"),
     ("../../remont-macbook/macbook-pro/", "Ремонт MacBook Pro"),

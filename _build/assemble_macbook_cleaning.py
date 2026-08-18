@@ -128,6 +128,7 @@ RELATED = [
     ("../../remont-macbook/zamena-akkumulyatora/", "Замена аккумулятора MacBook"),
     ("../../remont-macbook/ne-zaryazhaetsya/", "MacBook не заряжается"),
     ("../../remont-macbook/zamena-tachpada/", "Замена тачпада MacBook"),
+    ("../../remont-macbook/zamena-ekrana/", "Замена экрана MacBook"),
     ("../../remont-macbook/macbook-pro/", "Ремонт MacBook Pro"),
     ("../../remont-macbook/macbook-air/", "Ремонт MacBook Air"),
     ("../../remont-macbook/", "Ремонт MacBook — все услуги"),

@@ -488,7 +488,8 @@ def build(slug, device, c):
         "remont-macbook":     {"Замена аккумулятора": ("zamena-akkumulyatora/", "Замена аккумулятора MacBook"),
                                "Замена разъёма / платы зарядки MagSafe": ("ne-zaryazhaetsya/", "Замена разъёма зарядки MacBook"),
                                "Чистка от пыли + термопаста": ("chistka/", "Чистка MacBook от пыли"),
-                               "Замена тачпада (трекпада)": ("zamena-tachpada/", "Замена тачпада MacBook — цены")},
+                               "Замена тачпада (трекпада)": ("zamena-tachpada/", "Замена тачпада MacBook — цены"),
+                               "Замена матрицы / экрана": ("zamena-ekrana/", "Замена экрана MacBook — цены по моделям")},
     }
     slinks = SPOKE_LINKS.get(slug, {})
     for r in pr:
@@ -514,6 +515,7 @@ def build(slug, device, c):
     }, "remont-macbook": {
         "Замена аккумулятора": ("zamena-akkumulyatora/", "Замена батареи MacBook — цены и сроки"),
         "Замена тачпада":      ("zamena-tachpada/", "Ремонт тачпада MacBook — подробнее"),
+        "Замена матрицы / экрана": ("zamena-ekrana/", "Замена экрана MacBook — цены и сроки"),
         "Чистка и замена термопасты": ("chistka/", "Чистка MacBook и замена термопасты — цены"),
         "Ремонт платы и цепей питания": ("ne-zaryazhaetsya/", "MacBook не заряжается — причины"),
     }}

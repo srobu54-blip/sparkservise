@@ -60,6 +60,11 @@ step "assemble_macbook_charging — зарядка";    $PY _build/assemble_macb
 #      Две головы: «чистка макбука» 150 и «чистка клавиатуры macbook» 150 — под вторую
 #      отдельный H2-блок. Цена тянется из строки прайса хаба через hub_price().
 step "assemble_macbook_cleaning — чистка";     $PY _build/assemble_macbook_cleaning.py
+# 4.8) Посадочная «Замена экрана и матрицы MacBook» — самый дорогой чек прайса
+#      (3 500 — 9 000 ₴, дороже любого ремонта iPhone), страницы не было.
+#      Смысл страницы в двух развилках: матрица внутри крышки против модуля
+#      в сборе (отсюда и вилка), и «нет подсветки» — это чаще плата, а не экран.
+step "assemble_macbook_screen — экран MacBook"; $PY _build/assemble_macbook_screen.py
 # 5) Страницы услуг (разблокировка, диагностика, восстановление)
 step "assemble_service — услуги";            $PY _build/assemble_service.py
 # 5.1) Посадочная «Разлочка iPhone от оператора» — спойк /razblokirovka-iphone/.

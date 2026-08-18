@@ -115,6 +115,7 @@ SEO = [
 RELATED = [
     ("../../remont-macbook/zamena-akkumulyatora/", "Замена аккумулятора MacBook"),
     ("../../remont-macbook/ne-zaryazhaetsya/", "Ремонт зарядки MacBook"),
+    ("../../remont-macbook/zamena-ekrana/", "Замена экрана MacBook"),
     ("../../remont-macbook/", "Ремонт MacBook — все услуги"),
     ("../../remont-macbook/macbook-pro/", "Ремонт MacBook Pro"),
     ("../../remont-macbook/macbook-air/", "Ремонт MacBook Air"),
@@ -140,7 +141,7 @@ def hero_svg():
       '<circle cx="200" cy="173" r="7" fill="#E11D2A"/>'
       + D._check(300, 178, 18) +
       '<text x="200" y="266" text-anchor="middle" fill="#fff" font-family="-apple-system,Arial" font-size="17" font-weight="700">Трекпад работает</text>'
-      '<text x="200" y="286" text-anchor="middle" fill="#878d99" font-family="-apple-system,Arial" font-size="12">SPARK · Одеса · гарантия 12 мес</text>'
+      '<text x="200" y="286" text-anchor="middle" fill="#878d99" font-family="-apple-system,Arial" font-size="12">SPARK · Одесса · гарантия 12 мес</text>'
       '</svg>\n      </div>')
 
 
