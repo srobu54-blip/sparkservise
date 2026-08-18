@@ -120,6 +120,7 @@ INLINE_ALT = {
     "original-ili-kopiya-displeya-iphone": "Мастер SPARK снимает дисплейный модуль iPhone для замены",
     "iphone-ne-vklyuchaetsya": "Диагностика iPhone с чёрным экраном в сервисном центре SPARK",
     "iphone-nedostupen-zabyl-parol": "Заблокированный iPhone со значком замка на экране в мастерской SPARK",
+    "kak-uskorit-stary-macbook": "Материнская плата ноутбука: чипы памяти распаяны вплотную к процессору",
 }
 
 def cover(slug, icon_key, alt):
