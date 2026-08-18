@@ -36,6 +36,14 @@ step "assemble_watch_glass — стекло Watch";  $PY _build/assemble_watch_g
 step "assemble_screen — экран iPhone";       $PY _build/assemble_screen.py
 # 4.3) Посадочная «Замена заднего стекла iPhone»
 step "assemble_backglass — заднее стекло";   $PY _build/assemble_backglass.py
+# 4.3.1) Посадочная «Ремонт Face ID» и 4.3.2) «Ремонт после воды». Обе закрывают
+#      разрыв, найденный 18.08: статьи блога «Не работает Face ID» и «iPhone упал
+#      в воду» собирают показы по теме, но вели человека в общий хаб — коммерческой
+#      страницы под них не существовало. Для сравнения: единственная статья с парной
+#      посадочной («греется» → аккумулятор) ссылается на неё 4 раза, и это лучшая
+#      сервисная страница сайта — 948 показов при CTR 4,9%.
+step "assemble_faceid — Face ID";            $PY _build/assemble_faceid.py
+step "assemble_water — после воды";          $PY _build/assemble_water.py
 # 4.4) Посадочная «Замена аккумулятора MacBook» — крупнейший сервисный кластер
 #      MacBook по спросу (~1900 запросов/мес против 30 у клавиатуры).
 step "assemble_macbook_battery — АКБ MacBook"; $PY _build/assemble_macbook_battery.py
