@@ -10,18 +10,22 @@ REPO = "/Users/koristuvac/Downloads/sparkservise-git"
 BUILD = os.path.join(REPO, "_build", "service")
 esc, escA, icon = D.esc, D.escA, D.icon
 
-SERVICES = [("razblokirovka-iphone", "Разблокировка iPhone"), ("diagnostika", "Диагностика"), ("vosstanovlenie-dannyh", "Восстановление данных")]
+SERVICES = [("razblokirovka-iphone", "Разблокировка iPhone"), ("diagnostika", "Диагностика"),
+            ("vosstanovlenie-dannyh", "Восстановление данных"), ("vykup-iphone", "Выкуп iPhone")]
 SLUG_NAMES = {
  "razblokirovka-icloud":"Разблокировка iCloud","razblokirovka-iphone":"Разблокировка iPhone",
  "razblokirovka-iphone/sim-unlock":"Разлочка iPhone от оператора",
  "remont-iphone":"Ремонт iPhone","diagnostika":"Диагностика","kontakty":"Контакты",
  "remont-macbook":"Ремонт MacBook","remont-imac":"Ремонт iMac","remont-ipad":"Ремонт iPad",
  "remont-apple-watch":"Ремонт Apple Watch","remont-airpods":"Ремонт AirPods",
+ "vykup-iphone":"Выкуп iPhone",
 }
 ICON_INNER = {
  "lock":'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
  "search":'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>',
  "data":'<ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+ # выкуп: купюра со знаком — страница /vykup-iphone/
+ "money":'<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>',
 }
 
 def resolve(t):
@@ -108,9 +112,16 @@ def build(slug, name, c):
     elif pr:
         rows = "\n            ".join('<tr><td class="svc-name">%s</td><td class="pr">%s</td><td class="time">%s</td></tr>' % (
             esc(r.get("service","")), esc(D.normprice(r.get("price",""))), esc(r.get("time",""))) for r in pr)
+        # Заголовок, подводку и шапку таблицы можно переопределить из JSON: у выкупа
+        # это не «стоимость услуги», а наоборот — сколько МЫ платим за аппарат.
         price_section = ('  <section class="sec sec-bg" id="prices">\n    <div class="wrap">\n      <div class="sec-head reveal">\n'
-            '        <span class="sec-tag">Цены</span>\n        <h2>Стоимость услуги</h2>\n        <p class="lead-p">Цены ориентировочные. Точную стоимость назовём после бесплатной проверки по IMEI.</p>\n      </div>\n'
-            '      <div class="ptable-wrap reveal"><table class="price-table"><thead><tr><th>Услуга</th><th>Цена</th><th>Срок</th></tr></thead><tbody>\n            %s\n          </tbody></table></div>\n    </div>\n  </section>\n\n' % rows)
+            '        <span class="sec-tag">%s</span>\n        <h2>%s</h2>\n        <p class="lead-p">%s</p>\n      </div>\n'
+            '      <div class="ptable-wrap reveal"><table class="price-table"><thead><tr><th>%s</th><th>%s</th><th>%s</th></tr></thead><tbody>\n            %%s\n          </tbody></table></div>\n    </div>\n  </section>\n\n' % (
+                esc(c.get("priceTag") or "Цены"),
+                esc(c.get("priceTitle") or "Стоимость услуги"),
+                esc(c.get("priceLead") or "Цены ориентировочные. Точную стоимость назовём после бесплатной проверки по IMEI."),
+                esc(c.get("priceHead1") or "Услуга"), esc(c.get("priceHead2") or "Цена"),
+                esc(c.get("priceHead3") or "Срок")) % rows)
     else:
         price_section = ""
 
@@ -126,7 +137,8 @@ def build(slug, name, c):
     fqs = "\n        ".join('<details%s><summary>%s</summary><div class="a">%s</div></details>' % (
         (" open" if i==0 else ""), esc(f.get("q","")), rich(f.get("a",""))) for i,f in enumerate(faq))
     opts = "".join('<option>%s</option>' % esc(o) for o in formOptions)
-    quick_html = ('<span>🔒 <b>%s</b></span>' % esc(quickPrice)) if quickPrice else ""
+    # иконка бейджа в hero переопределяется из JSON: 🔒 подходит разблокировке, но не выкупу
+    quick_html = ('<span>%s <b>%s</b></span>' % (g("quickIcon", "🔒"), esc(quickPrice))) if quickPrice else ""
 
     p = '<!DOCTYPE html>\n<html lang="ru">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
     p += '<title>%s</title>\n<meta name="description" content="%s">\n<meta name="keywords" content="%s">\n' % (escA(title), escA(desc), escA(kw))
@@ -146,7 +158,7 @@ def build(slug, name, c):
     p += '        <div class="quick">\n          <span>📍 <b>ул. Академика Королёва, 23</b></span>\n          <span>🕐 <b>Ежедневно 10:00-19:00</b></span>\n          %s\n        </div>\n' % quick_html
     p += '      </div>\n      ' + hero_service(name, heroIcon) + '\n    </div>\n  </section>\n\n'
     p += '  <section class="sec" id="cases">\n    <div class="wrap">\n      <div class="sec-head reveal">\n        <span class="sec-tag">Услуга</span>\n        <h2>%s</h2>\n      </div>\n      <div class="repair-types">\n        %s\n      </div>\n    </div>\n  </section>\n\n' % (
-        esc("Что разблокируем" if not diagFree else "Что диагностируем"), cards)
+        esc(c.get("casesTitle") or ("Что разблокируем" if not diagFree else "Что диагностируем")), cards)
     p += infobox
     p += price_section
     p += '  <section class="sec sec-ink" id="process">\n    <div class="wrap">\n      <div class="sec-head reveal">\n        <span class="sec-tag">Как мы работаем</span>\n        <h2 style="color:#fff">%s за 4 шага</h2>\n      </div>\n      <div class="steps">\n        %s\n      </div>\n    </div>\n  </section>\n\n' % (esc(name), steps)
