@@ -130,6 +130,8 @@ RELATED = [
     ("../../remont-macbook/zamena-tachpada/", "Замена тачпада MacBook"),
     ("../../remont-macbook/zamena-ekrana/", "Замена экрана MacBook"),
     ("../../remont-macbook/zamena-klaviatury/", "Замена клавиатуры MacBook"),
+    ("../../remont-macbook/apgrejd-ssd/", "Апгрейд SSD в MacBook"),
+    ("../../blog/kak-uskorit-stary-macbook/", "Статья: как ускорить старый MacBook"),
     ("../../remont-macbook/macbook-pro/", "Ремонт MacBook Pro"),
     ("../../remont-macbook/macbook-air/", "Ремонт MacBook Air"),
     ("../../remont-macbook/", "Ремонт MacBook — все услуги"),

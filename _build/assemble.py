@@ -491,7 +491,8 @@ def build(slug, device, c):
                                "Замена тачпада (трекпада)": ("zamena-tachpada/", "Замена тачпада MacBook — цены"),
                                "Замена матрицы / экрана": ("zamena-ekrana/", "Замена экрана MacBook — цены по моделям"),
                                "Замена клавиатуры / топкейса": ("zamena-klaviatury/", "Замена клавиатуры MacBook — цены"),
-                               "Восстановление после залития": ("zalitie/", "MacBook после залития — что делать")},
+                               "Восстановление после залития": ("zalitie/", "MacBook после залития — что делать"),
+                               "Замена / апгрейд SSD": ("apgrejd-ssd/", "Апгрейд SSD в MacBook — цены")},
     }
     slinks = SPOKE_LINKS.get(slug, {})
     for r in pr:
@@ -520,6 +521,7 @@ def build(slug, device, c):
         "Замена матрицы / экрана": ("zamena-ekrana/", "Замена экрана MacBook — цены и сроки"),
         "Замена клавиатуры":   ("zamena-klaviatury/", "Ремонт клавиатуры MacBook — подробнее"),
         "После залития жидкостью": ("zalitie/", "Залил MacBook — первая помощь и цены"),
+        "Замена / апгрейд SSD":  ("apgrejd-ssd/", "Апгрейд SSD MacBook — на каких моделях можно"),
         "Чистка и замена термопасты": ("chistka/", "Чистка MacBook и замена термопасты — цены"),
         "Ремонт платы и цепей питания": ("ne-zaryazhaetsya/", "MacBook не заряжается — причины"),
     }}
@@ -630,7 +632,15 @@ def build(slug, device, c):
     </div>
   </section>\n\n'''%esc(device)
     # seo text
-    page += '  <section class="sec sec-bg" id="seo-text">\n    <div class="wrap">\n      <div class="reveal" style="max-width:80ch">\n        <h2 style="font-size:1.3rem;margin-bottom:14px">Ремонт %s в Одессе — сервисный центр SPARK</h2>\n        %s\n        <p style="margin-top:18px;font-weight:600;color:var(--ink)">Ремонт другой техники Apple:</p>\n        <div class="other-models">\n          %s\n        </div>\n      </div>\n    </div>\n  </section>\n\n'%(esc(device), seops, otherlinks)
+    # Ссылка на парную статью блога. Блог до 18.08 был на 100% про iPhone и с
+    # хабами не связан вовсе — а статья про апгрейд отвечает ровно на вопрос,
+    # с которым приходят на хаб MacBook.
+    HUB_ARTICLE = {"remont-macbook": ("../blog/kak-uskorit-stary-macbook/",
+                                      "Как ускорить старый MacBook: что можно поменять, а что уже нет")}
+    _art = HUB_ARTICLE.get(slug)
+    artblock = ('        <p style="margin-top:18px;font-weight:600;color:var(--ink)">Читайте в блоге:</p>\n'
+                '        <div class="other-models">\n          <a href="%s">%s</a>\n        </div>\n' % (_art[0], esc(_art[1]))) if _art else ''
+    page += '  <section class="sec sec-bg" id="seo-text">\n    <div class="wrap">\n      <div class="reveal" style="max-width:80ch">\n        <h2 style="font-size:1.3rem;margin-bottom:14px">Ремонт %s в Одессе — сервисный центр SPARK</h2>\n        %s\n%s        <p style="margin-top:18px;font-weight:600;color:var(--ink)">Ремонт другой техники Apple:</p>\n        <div class="other-models">\n          %s\n        </div>\n      </div>\n    </div>\n  </section>\n\n'%(esc(device), seops, artblock, otherlinks)
     # faq
     page += '  <section class="sec" id="faq">\n    <div class="wrap">\n      <div class="sec-head reveal">\n        <span class="sec-tag">Частые вопросы</span>\n        <h2>Вопросы о ремонте %s</h2>\n      </div>\n      <div class="faq reveal">\n        %s\n      </div>\n    </div>\n  </section>\n\n'%(esc(device), faqhtml)
     # book

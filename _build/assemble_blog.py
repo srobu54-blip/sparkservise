@@ -17,6 +17,9 @@ ARTICLES = [
     ("ne-rabotaet-face-id-iphone", "Диагностика", "faceid", "2026-07-23", "23 июля 2026"),
     ("vzdulsya-akkumulyator-iphone", "Аккумулятор", "battery", "2026-07-23", "23 июля 2026"),
     ("iphone-nedostupen-zabyl-parol", "Диагностика", "lock", "2026-07-30", "30 июля 2026"),
+    # Первая статья блога не про iPhone. До неё все 10 были телефонными, при том
+    # что самые дорогие чеки прайса — у MacBook.
+    ("kak-uskorit-stary-macbook", "Апгрейд", "speed", "2026-08-18", "18 августа 2026"),
 ]
 SLUGS = [a[0] for a in ARTICLES]
 # dateModified = дата последнего РЕАЛЬНОГО изменения статьи. По умолчанию = дата публикации (iso/disp).
@@ -66,6 +69,7 @@ ICON = {
  "heat": '<path d="M14 14.76V5a2 2 0 0 0-4 0v9.76a4 4 0 1 0 4 0z"/>',
  "faceid": '<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10v1M15 10v1M12 10v3l-1 1M9 15c.8.7 1.9 1 3 1s2.2-.3 3-1"/>',
  "lock": '<rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/><path d="M12 14.5v2.5"/>',
+ "speed": '<path d="M4.9 19a9 9 0 1 1 14.2 0"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M13.5 10.5 18 6"/>',
 }
 
 def esc(s): return html.escape(str(s), quote=False)
@@ -82,6 +86,11 @@ def resolve(target):
     if t == "face-id": return "../../remont-iphone/face-id/"
     if t == "posle-vody": return "../../remont-iphone/posle-vody/"
     if t == "ne-zaryazhaetsya": return "../../remont-iphone/ne-zaryazhaetsya/"
+    if t == "mb-ssd": return "../../remont-macbook/apgrejd-ssd/"
+    if t == "mb-chistka": return "../../remont-macbook/chistka/"
+    if t == "mb-akb": return "../../remont-macbook/zamena-akkumulyatora/"
+    if t == "mb-ekran": return "../../remont-macbook/zamena-ekrana/"
+    if t == "mb-klaviatura": return "../../remont-macbook/zamena-klaviatury/"
     if t in SLUGS: return "../" + t + "/"
     return "../../" + t + "/"
 
@@ -486,7 +495,11 @@ POLL_HTML = '''<div class="poll" id="spark-poll">
 
 def schema_blocks(slug, a, iso, miso, category):
     url = "https://sparkservice.od.ua/blog/%s/" % slug
-    img = url + cover_file(slug)
+    # То же, что с og:image: без своей обложки ссылка вела на несуществующий файл,
+    # а BlogPosting.image, указывающий в 404, — это невалидная разметка.
+    _c = cover_file(slug)
+    img = (url + _c) if os.path.exists(os.path.join(REPO, "blog", slug, _c)) \
+          else "https://sparkservice.od.ua/og/spark.jpg"
     post = {"@context":"https://schema.org","@type":"BlogPosting","@id":url+"#article",
         "mainEntityOfPage":{"@type":"WebPage","@id":url},
         "headline": a.get("title") or a.get("h1"), "description": a.get("metaDescription",""),
@@ -569,7 +582,13 @@ def build_article(slug, category, icon_key, iso, disp, a, meta):
     p += '<meta property="og:description" content="%s">\n' % escA(a.get("ogDescription") or desc)
     p += '<meta property="og:url" content="https://sparkservice.od.ua/blog/%s/">\n' % slug
     p += '<meta property="og:locale" content="ru_RU">\n'
-    p += '<meta property="og:image" content="https://sparkservice.od.ua/blog/%s/%s">\n\n' % (slug, cover_file(slug))
+    # Без своей обложки ссылка вела на несуществующий cover.webp — соцсети и
+    # предпросмотр в мессенджерах получали 404. Отдаём общий og-баннер сайта.
+    _cov = cover_file(slug)
+    _og = ('https://sparkservice.od.ua/blog/%s/%s' % (slug, _cov)) \
+          if os.path.exists(os.path.join(REPO, "blog", slug, _cov)) \
+          else 'https://sparkservice.od.ua/og/spark.jpg'
+    p += '<meta property="og:image" content="%s">\n\n' % _og
     p += schema_blocks(slug, a, iso, miso, category) + "\n\n"
     p += '<link rel="stylesheet" href="../../styles.css">\n' + ART_CSS + '\n</head>\n<body>\n'
     p += '<a class="skip" href="#main">Перейти к содержимому</a>\n\n'

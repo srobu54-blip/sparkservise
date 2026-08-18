@@ -144,6 +144,8 @@ RELATED = [
     ("../zamena-tachpada/", "Ремонт тачпада MacBook"),
     ("../zamena-ekrana/", "Замена экрана MacBook"),
     ("../zalitie/", "MacBook после залития"),
+    ("../apgrejd-ssd/", "Апгрейд SSD в MacBook"),
+    ("../../blog/kak-uskorit-stary-macbook/", "Статья: как ускорить старый MacBook"),
     ("../ne-zaryazhaetsya/", "MacBook не заряжается"),
     ("../../remont-macbook/", "Ремонт MacBook — все услуги"),
     ("../../remont-macbook/macbook-pro/", "Ремонт MacBook Pro"),

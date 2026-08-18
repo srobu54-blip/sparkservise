@@ -70,6 +70,11 @@ step "assemble_macbook_screen — экран MacBook"; $PY _build/assemble_macbo
 #      залитие — срочным интентом: ищут в тот же час, когда пролили.
 step "assemble_macbook_keyboard — клавиатура"; $PY _build/assemble_macbook_keyboard.py
 step "assemble_macbook_water — залитие";       $PY _build/assemble_macbook_water.py
+# 4.11) «Замена и апгрейд SSD в MacBook». Парная к статье блога «Как ускорить
+#      старый MacBook»: статья забирает информационный интент («почему нельзя
+#      добавить память»), страница — коммерческий. Разводим намеренно, чтобы не
+#      повторить столкновение лендинга зарядки со своей же статьёй.
+step "assemble_macbook_ssd — апгрейд SSD";     $PY _build/assemble_macbook_ssd.py
 # 5) Страницы услуг (разблокировка, диагностика, восстановление)
 step "assemble_service — услуги";            $PY _build/assemble_service.py
 # 5.1) Посадочная «Разлочка iPhone от оператора» — спойк /razblokirovka-iphone/.
