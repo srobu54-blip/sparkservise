@@ -44,6 +44,7 @@ step "assemble_backglass — заднее стекло";   $PY _build/assemble_b
 #      сервисная страница сайта — 948 показов при CTR 4,9%.
 step "assemble_faceid — Face ID";            $PY _build/assemble_faceid.py
 step "assemble_water — после воды";          $PY _build/assemble_water.py
+step "assemble_charging — не заряжается";    $PY _build/assemble_charging.py
 # 4.4) Посадочная «Замена аккумулятора MacBook» — крупнейший сервисный кластер
 #      MacBook по спросу (~1900 запросов/мес против 30 у клавиатуры).
 step "assemble_macbook_battery — АКБ MacBook"; $PY _build/assemble_macbook_battery.py

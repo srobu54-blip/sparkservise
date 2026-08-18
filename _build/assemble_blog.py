@@ -81,6 +81,7 @@ def resolve(target):
     if t == "zamena-zadnego-stekla": return "../../remont-iphone/zamena-zadnego-stekla/"
     if t == "face-id": return "../../remont-iphone/face-id/"
     if t == "posle-vody": return "../../remont-iphone/posle-vody/"
+    if t == "ne-zaryazhaetsya": return "../../remont-iphone/ne-zaryazhaetsya/"
     if t in SLUGS: return "../" + t + "/"
     return "../../" + t + "/"
 
