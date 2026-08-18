@@ -116,6 +116,7 @@ RELATED = [
     ("../../remont-macbook/zamena-akkumulyatora/", "Замена аккумулятора MacBook"),
     ("../../remont-macbook/ne-zaryazhaetsya/", "Ремонт зарядки MacBook"),
     ("../../remont-macbook/zamena-ekrana/", "Замена экрана MacBook"),
+    ("../../remont-macbook/zalitie/", "MacBook после залития"),
     ("../../remont-macbook/", "Ремонт MacBook — все услуги"),
     ("../../remont-macbook/macbook-pro/", "Ремонт MacBook Pro"),
     ("../../remont-macbook/macbook-air/", "Ремонт MacBook Air"),

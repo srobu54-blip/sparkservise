@@ -116,6 +116,7 @@ RELATED = [
     ("../../remont-macbook/", "Ремонт MacBook — все услуги"),
     ("../../remont-macbook/zamena-akkumulyatora/", "Замена аккумулятора MacBook"),
     ("../../remont-macbook/zamena-tachpada/", "Замена тачпада MacBook"),
+    ("../../remont-macbook/zamena-klaviatury/", "Замена клавиатуры MacBook"),
     ("../../remont-macbook/macbook-pro/", "Ремонт MacBook Pro"),
     ("../../remont-macbook/macbook-air/", "Ремонт MacBook Air"),
     ("../../diagnostika/", "Бесплатная диагностика"),

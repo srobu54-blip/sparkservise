@@ -65,6 +65,11 @@ step "assemble_macbook_cleaning — чистка";     $PY _build/assemble_macbo
 #      Смысл страницы в двух развилках: матрица внутри крышки против модуля
 #      в сборе (отсюда и вилка), и «нет подсветки» — это чаще плата, а не экран.
 step "assemble_macbook_screen — экран MacBook"; $PY _build/assemble_macbook_screen.py
+# 4.9) «Замена клавиатуры MacBook» (1 800 — 4 500 ₴) и 4.10) «MacBook после
+#      залития» (1 500 — 6 000 ₴). Клавиатура жива темой «бабочки» 2016-2019,
+#      залитие — срочным интентом: ищут в тот же час, когда пролили.
+step "assemble_macbook_keyboard — клавиатура"; $PY _build/assemble_macbook_keyboard.py
+step "assemble_macbook_water — залитие";       $PY _build/assemble_macbook_water.py
 # 5) Страницы услуг (разблокировка, диагностика, восстановление)
 step "assemble_service — услуги";            $PY _build/assemble_service.py
 # 5.1) Посадочная «Разлочка iPhone от оператора» — спойк /razblokirovka-iphone/.
