@@ -81,6 +81,11 @@ step "assemble_macbook_ssd — апгрейд SSD";     $PY _build/assemble_macb
 #      а не пять, — чтобы не плодить тонкие: весь кластер мельче, чем один
 #      запрос по iPhone, и вес лучше собрать, чем размазать.
 step "assemble_airpods — AirPods";             $PY _build/assemble_airpods.py
+# 4.13) Сервисные страницы iPad (3 шт., та же вёрстка из spoke_page.py). По GSC
+#      кластер iPad давал 87 показов и ноль кликов, НО позиция уже 8,3 — то есть
+#      Google считает сайт релевантным, а показать по услуге нечего: девять строк
+#      прайса и ни одной страницы. Поэтому эффект здесь ожидается быстрее всего.
+step "assemble_ipad — iPad";                   $PY _build/assemble_ipad.py
 # 5) Страницы услуг (разблокировка, диагностика, восстановление)
 step "assemble_service — услуги";            $PY _build/assemble_service.py
 # 5.1) Посадочная «Разлочка iPhone от оператора» — спойк /razblokirovka-iphone/.
