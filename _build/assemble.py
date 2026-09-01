@@ -516,6 +516,20 @@ def build(slug, device, c):
                                "Ремонт после воды (чистка платы)": ("ne-vklyuchaetsya/", "iPad после воды — чистка платы"),
                                "Замена кнопок Home / Power": ("ne-vklyuchaetsya/", "Замена кнопок Home и Power iPad"),
                                "Ремонт материнской платы": ("ne-vklyuchaetsya/", "Ремонт платы iPad")},
+        # Apple Watch: у хаба вообще не было SPOKE_LINKS, хотя страница стекла
+        # живёт с самого начала и даёт лучший CTR на сайте (9,4%). То есть прайс
+        # хаба одиннадцатью строками простого текста никуда не вёл.
+        "remont-apple-watch": {"Замена защитного стекла": ("zamena-stekla/", "Замена стекла Apple Watch — цены"),
+                               "Полировка стекла (царапины)": ("zamena-stekla/", "Полировка стекла Apple Watch"),
+                               "Замена дисплейного модуля": ("zamena-ekrana/", "Замена дисплея Apple Watch — цены"),
+                               "Замена тачскрина (сенсора)": ("zamena-ekrana/", "Замена сенсора Apple Watch"),
+                               "Ремонт колёсика Digital Crown": ("zamena-ekrana/", "Ремонт Digital Crown Apple Watch"),
+                               "Замена боковой кнопки": ("zamena-ekrana/", "Замена боковой кнопки Apple Watch"),
+                               "Ремонт материнской платы": ("zamena-ekrana/", "Ремонт платы Apple Watch"),
+                               "Замена аккумулятора": ("zamena-akkumulyatora/", "Замена аккумулятора Apple Watch — цены"),
+                               "Восстановление после воды": ("zamena-akkumulyatora/", "Apple Watch после воды"),
+                               "Ремонт зарядки / антенны": ("zamena-akkumulyatora/", "Apple Watch не заряжаются"),
+                               "Чистка от окислов и пыли": ("zamena-akkumulyatora/", "Чистка Apple Watch от окислов")},
     }
     slinks = SPOKE_LINKS.get(slug, {})
     for r in pr:
@@ -538,6 +552,13 @@ def build(slug, device, c):
     CARD_LINKS = {"remont-apple-watch": {
         "Замена стекла":    ("zamena-stekla/", "Цены на замену стекла Apple Watch"),
         "Полировка стекла": ("zamena-stekla/", "Сколько стоит полировка стекла"),
+        "Замена дисплея (модуля)":        ("zamena-ekrana/", "Стекло, сенсор или дисплей — в чём разница"),
+        "Замена тачскрина":               ("zamena-ekrana/", "Экран не реагирует на касания"),
+        "Кнопка и колёсико Digital Crown":("zamena-ekrana/", "Не крутится Digital Crown — причины"),
+        "Ремонт платы":                   ("zamena-ekrana/", "Ремонт платы Apple Watch"),
+        "Замена аккумулятора":            ("zamena-akkumulyatora/", "Замена аккумулятора Apple Watch — цены"),
+        "После воды":                     ("zamena-akkumulyatora/", "Apple Watch после воды и пота"),
+        "Ремонт зарядки":                 ("zamena-akkumulyatora/", "Часы не встают на зарядку — что проверить"),
     }, "remont-macbook": {
         "Замена аккумулятора": ("zamena-akkumulyatora/", "Замена батареи MacBook — цены и сроки"),
         "Замена тачпада":      ("zamena-tachpada/", "Ремонт тачпада MacBook — подробнее"),

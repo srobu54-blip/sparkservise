@@ -104,8 +104,12 @@ def build(p, ctx):
           '          <span>🕐 <b>Ежедневно 10:00-19:00</b></span>\n          <span>%s</span>\n        </div>\n' % quick)
     h += '      </div>\n      ' + ctx["hero"](p) + '\n    </div>\n  </section>\n\n'
 
+    # Описание карточки НЕ экранируем: страницам нужны инлайновые ссылки на
+    # соседние спойки (стекло Apple Watch, аккумулятор), а заголовок — да,
+    # в нём разметки не бывает. Проверено: в текстах AirPods и iPad символов
+    # & < > нет, поэтому вывод этих семейств не изменился ни на байт.
     cards = "\n        ".join('<div class="rtype reveal">\n          <h3><span class="ri">%s</span> %s</h3>\n          <p>%s</p>\n        </div>' % (
-        icon(ic), esc(t), esc(d)) for ic,t,d in p["cases"])
+        icon(ic), esc(t), d) for ic,t,d in p["cases"])
     h += ('  <section class="sec" id="cases">\n    <div class="wrap">\n      <div class="sec-head reveal">\n'
           '        <span class="sec-tag">С чем приходят</span>\n        <h2>%s</h2>\n      </div>\n'
           '      <div class="repair-types">\n        %s\n      </div>\n    </div>\n  </section>\n\n'

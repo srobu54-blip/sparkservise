@@ -237,7 +237,15 @@ def render(dev, m):
     # именно так /remont-apple-watch/zamena-stekla/ и осталась с 4 ссылками с одной
     # страницы, тогда как АКБ-лендинг iPhone собирает 45 доноров ровно этим способом.
     SPOKE_LINKS = {
-        ("apple-watch", "glass"): ("../zamena-stekla/", "Замена стекла {name}"),
+        ("apple-watch", "glass"):   ("../zamena-stekla/", "Замена стекла {name}"),
+        # Появились ещё две спойки Watch — раньше эти пять строк прайса вели в форму.
+        # Куда ведём: воду и плату отдаём тем страницам, где эта работа реально
+        # есть в таблице цен, а не «по смыслу заголовка».
+        ("apple-watch", "display"): ("../zamena-ekrana/", "Замена дисплея {name}"),
+        ("apple-watch", "crown"):   ("../zamena-ekrana/", "Ремонт Digital Crown {name}"),
+        ("apple-watch", "board"):   ("../zamena-ekrana/", "Ремонт платы {name}"),
+        ("apple-watch", "battery"): ("../zamena-akkumulyatora/", "Замена аккумулятора {name}"),
+        ("apple-watch", "water"):   ("../zamena-akkumulyatora/", "{name} после воды"),
     }
 
     # Прайс
