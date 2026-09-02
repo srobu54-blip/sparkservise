@@ -24,6 +24,8 @@ ARTICLES = [
     ("macbook-shumit-i-greetsya", "Диагностика", "heat", "2026-09-01", "1 сентября 2026"),
     # Третья MacBook-статья: не заряжается.
     ("macbook-ne-zaryazhaetsya", "Зарядка", "charge", "2026-09-01", "1 сентября 2026"),
+    # Разблокировка iCloud (Activation Lock) — под топ-конвертящую услугу.
+    ("aktivatsionnyj-zamok-icloud", "Диагностика", "lock", "2026-09-02", "2 сентября 2026"),
 ]
 SLUGS = [a[0] for a in ARTICLES]
 # dateModified = дата последнего РЕАЛЬНОГО изменения статьи. По умолчанию = дата публикации (iso/disp).
@@ -54,6 +56,7 @@ CARD_TEASERS = {
     "iphone-nedostupen-zabyl-parol": "Забыли код-пароль? Почему экстренный вызов не помогает и что реально можно сделать.",
     "macbook-shumit-i-greetsya": "Вентиляторы гудят, корпус горячий? Когда чистка и термопаста помогут, а Air на M1/M2/M3 — нет.",
     "macbook-ne-zaryazhaetsya": "Значок заряда есть, а процент не растёт? Проверяем зарядку MacBook по шагам — от розетки до платы.",
+    "aktivatsionnyj-zamok-icloud": "Устройство просит чужой Apple ID после сброса или покупки б/у? Что такое замок активации и как снять его законно.",
 }
 
 def word_count(a):
@@ -130,6 +133,7 @@ INLINE_ALT = {
     "kak-uskorit-stary-macbook": "Материнская плата ноутбука: чипы памяти распаяны вплотную к процессору",
     "macbook-shumit-i-greetsya": "Забитый пылью радиатор и вентилятор MacBook Pro крупным планом до чистки",
     "macbook-ne-zaryazhaetsya": "Порт питания USB-C MacBook и подключённый адаптер крупным планом",
+    "aktivatsionnyj-zamok-icloud": "Экран Activation Lock на iPhone с запросом ввести Apple ID после сброса",
 }
 
 def cover(slug, icon_key, alt):
