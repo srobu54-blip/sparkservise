@@ -22,6 +22,8 @@ ARTICLES = [
     ("kak-uskorit-stary-macbook", "Апгрейд", "speed", "2026-08-18", "18 августа 2026"),
     # Вторая MacBook-статья: перегрев/шум/чистка.
     ("macbook-shumit-i-greetsya", "Диагностика", "heat", "2026-09-01", "1 сентября 2026"),
+    # Третья MacBook-статья: не заряжается.
+    ("macbook-ne-zaryazhaetsya", "Зарядка", "charge", "2026-09-01", "1 сентября 2026"),
 ]
 SLUGS = [a[0] for a in ARTICLES]
 # dateModified = дата последнего РЕАЛЬНОГО изменения статьи. По умолчанию = дата публикации (iso/disp).
@@ -51,6 +53,7 @@ CARD_TEASERS = {
     "vzdulsya-akkumulyator-iphone": "Экран приподняло, корпус распирает? Чем это опасно и чего нельзя делать ни в коем случае.",
     "iphone-nedostupen-zabyl-parol": "Забыли код-пароль? Почему экстренный вызов не помогает и что реально можно сделать.",
     "macbook-shumit-i-greetsya": "Вентиляторы гудят, корпус горячий? Когда чистка и термопаста помогут, а Air на M1/M2/M3 — нет.",
+    "macbook-ne-zaryazhaetsya": "Значок заряда есть, а процент не растёт? Проверяем зарядку MacBook по шагам — от розетки до платы.",
 }
 
 def word_count(a):
@@ -94,6 +97,7 @@ def resolve(target):
     if t == "mb-akb": return "../../remont-macbook/zamena-akkumulyatora/"
     if t == "mb-ekran": return "../../remont-macbook/zamena-ekrana/"
     if t == "mb-klaviatura": return "../../remont-macbook/zamena-klaviatury/"
+    if t == "mb-ne-zaryazhaetsya": return "../../remont-macbook/ne-zaryazhaetsya/"
     if t in SLUGS: return "../" + t + "/"
     return "../../" + t + "/"
 
@@ -125,6 +129,7 @@ INLINE_ALT = {
     "iphone-nedostupen-zabyl-parol": "Заблокированный iPhone со значком замка на экране в мастерской SPARK",
     "kak-uskorit-stary-macbook": "Материнская плата ноутбука: чипы памяти распаяны вплотную к процессору",
     "macbook-shumit-i-greetsya": "Забитый пылью радиатор и вентилятор MacBook Pro крупным планом до чистки",
+    "macbook-ne-zaryazhaetsya": "Порт питания USB-C MacBook и подключённый адаптер крупным планом",
 }
 
 def cover(slug, icon_key, alt):
